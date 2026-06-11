@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1401.3208333333332,
+        "algorithm": "The new algorithm combines EDD's due-date focus with the workload and utilization awareness by computing a composite priority: the product of delivery time and (available_time + processing_time) divided by (num_neighboring_operation + 1), plus a utilization penalty, using the smaller-value-higher-priority convention.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    \n    # Avoid division by zero by adding 1 to num_neighboring_operation\n    denominator = num_neighboring_operation + 1\n    \n    # Compute composite priority: due date influence combined with workload and utilization\n    priority = (delivery_time * (available_time + processing_tm)) / denominator + utilization\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1169.6166666666666,
+          "ins_2": 689.8833333333333,
+          "ins_3": 1544.2833333333333,
+          "ins_4": 1499.8666666666666,
+          "ins_5": 904.8666666666667,
+          "ins_6": 1572.4333333333334,
+          "ins_7": 456.21666666666664,
+          "ins_8": 1348.35,
+          "ins_9": 2938.133333333333,
+          "ins_10": 1329.6666666666667,
+          "ins_11": 1213.45,
+          "ins_12": 1203.3833333333334,
+          "ins_13": 2458.35,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 1845.8166666666666,
+          "ins_16": 1328.4666666666667,
+          "ins_17": 2210.116666666667,
+          "ins_18": 691.8166666666667,
+          "ins_19": 1389.6,
+          "ins_20": 1148.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1607.8691666666668,
+        "all_scores": [
+          -1401.3208333333332,
+          -1464.0158333333334,
+          -1710.4533333333334,
+          -1855.686666666667
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1366.5624999999998,
+        "algorithm": "The algorithm computes priority as the exponential of delivery_time weighted by congestion and workload, then subtracts a machine efficiency term, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denom = num_neighboring_operation + 1\n    if denom == 0:\n        denom = epsilon\n    congestion = (available_time + processing_tm) / denom\n    efficiency = 1.0 / (utilization + epsilon)\n    priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.5\n    return priority\n\n",
+        "instances": {
+          "ins_1": 950.4166666666666,
+          "ins_2": 757.9,
+          "ins_3": 1472.85,
+          "ins_4": 1316.4333333333334,
+          "ins_5": 617.1166666666667,
+          "ins_6": 1304.7,
+          "ins_7": 597.25,
+          "ins_8": 1471.7666666666667,
+          "ins_9": 2673.1833333333334,
+          "ins_10": 1276.45,
+          "ins_11": 1400.1166666666666,
+          "ins_12": 1261.4833333333333,
+          "ins_13": 1848.3166666666666,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2386.116666666667,
+          "ins_16": 1267.2333333333333,
+          "ins_17": 2094.6,
+          "ins_18": 923.1166666666667,
+          "ins_19": 1523.25,
+          "ins_20": 1105.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1392.8854166666665,
+        "all_scores": [
+          -1366.5624999999998,
+          -1401.3208333333332,
+          -1401.3208333333332,
+          -1402.3375
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1366.5624999999998,
+        "algorithm": "The algorithm computes priority as the exponential of delivery_time weighted by congestion and workload, then subtracts a machine efficiency term, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denom = num_neighboring_operation + 1\n    if denom == 0:\n        denom = epsilon\n    congestion = (available_time + processing_tm) / denom\n    efficiency = 1.0 / (utilization + epsilon)\n    priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.5\n    return priority\n\n",
+        "instances": {
+          "ins_1": 950.4166666666666,
+          "ins_2": 757.9,
+          "ins_3": 1472.85,
+          "ins_4": 1316.4333333333334,
+          "ins_5": 617.1166666666667,
+          "ins_6": 1304.7,
+          "ins_7": 597.25,
+          "ins_8": 1471.7666666666667,
+          "ins_9": 2673.1833333333334,
+          "ins_10": 1276.45,
+          "ins_11": 1400.1166666666666,
+          "ins_12": 1261.4833333333333,
+          "ins_13": 1848.3166666666666,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2386.116666666667,
+          "ins_16": 1267.2333333333333,
+          "ins_17": 2094.6,
+          "ins_18": 923.1166666666667,
+          "ins_19": 1523.25,
+          "ins_20": 1105.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1376.5412499999998,
+        "all_scores": [
+          -1366.5624999999998,
+          -1367.7783333333332,
+          -1370.5033333333333,
+          -1401.3208333333332
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1366.5624999999998,
+        "algorithm": "The algorithm computes priority as the exponential of delivery_time weighted by congestion and workload, then subtracts a machine efficiency term, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denom = num_neighboring_operation + 1\n    if denom == 0:\n        denom = epsilon\n    congestion = (available_time + processing_tm) / denom\n    efficiency = 1.0 / (utilization + epsilon)\n    priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.5\n    return priority\n\n",
+        "instances": {
+          "ins_1": 950.4166666666666,
+          "ins_2": 757.9,
+          "ins_3": 1472.85,
+          "ins_4": 1316.4333333333334,
+          "ins_5": 617.1166666666667,
+          "ins_6": 1304.7,
+          "ins_7": 597.25,
+          "ins_8": 1471.7666666666667,
+          "ins_9": 2673.1833333333334,
+          "ins_10": 1276.45,
+          "ins_11": 1400.1166666666666,
+          "ins_12": 1261.4833333333333,
+          "ins_13": 1848.3166666666666,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2386.116666666667,
+          "ins_16": 1267.2333333333333,
+          "ins_17": 2094.6,
+          "ins_18": 923.1166666666667,
+          "ins_19": 1523.25,
+          "ins_20": 1105.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1369.5004166666663,
+        "all_scores": [
+          -1366.5624999999998,
+          -1367.7783333333332,
+          -1370.5033333333333,
+          -1373.1574999999998
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1364.0974999999999,
+        "algorithm": "The new algorithm computes priority as the exponential of available_time scaled by delivery_time urgency and machine efficiency, using a weighted combination of congestion from available_time and processing_tm divided by num_neighboring_operation, while adding a utilization penalty to avoid overload, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denominator = num_neighboring_operation + 1\n    if denominator == 0:\n        denominator = epsilon\n    congestion = (available_time + processing_tm) / denominator\n    efficiency = 1.0 / (utilization + epsilon)\n    if delivery_time == float('inf'):\n        priority = float('inf')\n    else:\n        # Combine due-date urgency (exponential of delivery_time), congestion, and efficiency penalty\n        priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.3 + (utilization * 0.2)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 950.4166666666666,
+          "ins_2": 708.6,
+          "ins_3": 1472.85,
+          "ins_4": 1316.4333333333334,
+          "ins_5": 617.1166666666667,
+          "ins_6": 1304.7,
+          "ins_7": 597.25,
+          "ins_8": 1471.7666666666667,
+          "ins_9": 2673.1833333333334,
+          "ins_10": 1276.45,
+          "ins_11": 1400.1166666666666,
+          "ins_12": 1261.4833333333333,
+          "ins_13": 1848.3166666666666,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2386.116666666667,
+          "ins_16": 1267.2333333333333,
+          "ins_17": 2094.6,
+          "ins_18": 923.1166666666667,
+          "ins_19": 1523.25,
+          "ins_20": 1105.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1366.2502083333334,
+        "all_scores": [
+          -1364.0974999999999,
+          -1366.5624999999998,
+          -1366.5624999999998,
+          -1367.7783333333332
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1364.0974999999999,
+        "algorithm": "The new algorithm computes priority as the exponential of available_time scaled by delivery_time urgency and machine efficiency, using a weighted combination of congestion from available_time and processing_tm divided by num_neighboring_operation, while adding a utilization penalty to avoid overload, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denominator = num_neighboring_operation + 1\n    if denominator == 0:\n        denominator = epsilon\n    congestion = (available_time + processing_tm) / denominator\n    efficiency = 1.0 / (utilization + epsilon)\n    if delivery_time == float('inf'):\n        priority = float('inf')\n    else:\n        # Combine due-date urgency (exponential of delivery_time), congestion, and efficiency penalty\n        priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.3 + (utilization * 0.2)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 950.4166666666666,
+          "ins_2": 708.6,
+          "ins_3": 1472.85,
+          "ins_4": 1316.4333333333334,
+          "ins_5": 617.1166666666667,
+          "ins_6": 1304.7,
+          "ins_7": 597.25,
+          "ins_8": 1471.7666666666667,
+          "ins_9": 2673.1833333333334,
+          "ins_10": 1276.45,
+          "ins_11": 1400.1166666666666,
+          "ins_12": 1261.4833333333333,
+          "ins_13": 1848.3166666666666,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2386.116666666667,
+          "ins_16": 1267.2333333333333,
+          "ins_17": 2094.6,
+          "ins_18": 923.1166666666667,
+          "ins_19": 1523.25,
+          "ins_20": 1105.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1365.94625,
+        "all_scores": [
+          -1364.0974999999999,
+          -1366.5624999999998,
+          -1366.5624999999998,
+          -1366.5624999999998
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1364.0974999999999,
+        "algorithm": "The new algorithm computes priority as the exponential of available_time scaled by delivery_time urgency and machine efficiency, using a weighted combination of congestion from available_time and processing_tm divided by num_neighboring_operation, while adding a utilization penalty to avoid overload, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denominator = num_neighboring_operation + 1\n    if denominator == 0:\n        denominator = epsilon\n    congestion = (available_time + processing_tm) / denominator\n    efficiency = 1.0 / (utilization + epsilon)\n    if delivery_time == float('inf'):\n        priority = float('inf')\n    else:\n        # Combine due-date urgency (exponential of delivery_time), congestion, and efficiency penalty\n        priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.3 + (utilization * 0.2)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 950.4166666666666,
+          "ins_2": 708.6,
+          "ins_3": 1472.85,
+          "ins_4": 1316.4333333333334,
+          "ins_5": 617.1166666666667,
+          "ins_6": 1304.7,
+          "ins_7": 597.25,
+          "ins_8": 1471.7666666666667,
+          "ins_9": 2673.1833333333334,
+          "ins_10": 1276.45,
+          "ins_11": 1400.1166666666666,
+          "ins_12": 1261.4833333333333,
+          "ins_13": 1848.3166666666666,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2386.116666666667,
+          "ins_16": 1267.2333333333333,
+          "ins_17": 2094.6,
+          "ins_18": 923.1166666666667,
+          "ins_19": 1523.25,
+          "ins_20": 1105.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1365.94625,
+        "all_scores": [
+          -1364.0974999999999,
+          -1366.5624999999998,
+          -1366.5624999999998,
+          -1366.5624999999998
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1364.0974999999999,
+        "algorithm": "The new algorithm computes priority as the exponential of available_time scaled by delivery_time urgency and machine efficiency, using a weighted combination of congestion from available_time and processing_tm divided by num_neighboring_operation, while adding a utilization penalty to avoid overload, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denominator = num_neighboring_operation + 1\n    if denominator == 0:\n        denominator = epsilon\n    congestion = (available_time + processing_tm) / denominator\n    efficiency = 1.0 / (utilization + epsilon)\n    if delivery_time == float('inf'):\n        priority = float('inf')\n    else:\n        # Combine due-date urgency (exponential of delivery_time), congestion, and efficiency penalty\n        priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.3 + (utilization * 0.2)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 950.4166666666666,
+          "ins_2": 708.6,
+          "ins_3": 1472.85,
+          "ins_4": 1316.4333333333334,
+          "ins_5": 617.1166666666667,
+          "ins_6": 1304.7,
+          "ins_7": 597.25,
+          "ins_8": 1471.7666666666667,
+          "ins_9": 2673.1833333333334,
+          "ins_10": 1276.45,
+          "ins_11": 1400.1166666666666,
+          "ins_12": 1261.4833333333333,
+          "ins_13": 1848.3166666666666,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2386.116666666667,
+          "ins_16": 1267.2333333333333,
+          "ins_17": 2094.6,
+          "ins_18": 923.1166666666667,
+          "ins_19": 1523.25,
+          "ins_20": 1105.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1365.94625,
+        "all_scores": [
+          -1364.0974999999999,
+          -1366.5624999999998,
+          -1366.5624999999998,
+          -1366.5624999999998
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1364.0974999999999,
+        "algorithm": "The new algorithm computes priority as the exponential of available_time scaled by delivery_time urgency and machine efficiency, using a weighted combination of congestion from available_time and processing_tm divided by num_neighboring_operation, while adding a utilization penalty to avoid overload, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denominator = num_neighboring_operation + 1\n    if denominator == 0:\n        denominator = epsilon\n    congestion = (available_time + processing_tm) / denominator\n    efficiency = 1.0 / (utilization + epsilon)\n    if delivery_time == float('inf'):\n        priority = float('inf')\n    else:\n        # Combine due-date urgency (exponential of delivery_time), congestion, and efficiency penalty\n        priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.3 + (utilization * 0.2)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 950.4166666666666,
+          "ins_2": 708.6,
+          "ins_3": 1472.85,
+          "ins_4": 1316.4333333333334,
+          "ins_5": 617.1166666666667,
+          "ins_6": 1304.7,
+          "ins_7": 597.25,
+          "ins_8": 1471.7666666666667,
+          "ins_9": 2673.1833333333334,
+          "ins_10": 1276.45,
+          "ins_11": 1400.1166666666666,
+          "ins_12": 1261.4833333333333,
+          "ins_13": 1848.3166666666666,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2386.116666666667,
+          "ins_16": 1267.2333333333333,
+          "ins_17": 2094.6,
+          "ins_18": 923.1166666666667,
+          "ins_19": 1523.25,
+          "ins_20": 1105.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1364.71375,
+        "all_scores": [
+          -1364.0974999999999,
+          -1364.0974999999999,
+          -1364.0974999999999,
+          -1366.5624999999998
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1316.9025000000001,
+        "algorithm": "The new algorithm computes priority by combining due-date urgency via exponential scaling of delivery time with congestion and utilization penalty, while adaptively weighting machine efficiency and incorporating additive processing time variability to improve dynamic adjustment.",
+        "code": "def cal_priority(available_time, num_neighboring_operation, utilization, processing_tm, delivery_time=None):\n    if delivery_time is None:\n        delivery_time = float('inf')\n    epsilon = 1e-10\n    denom = num_neighboring_operation + 1\n    if denom == 0:\n        denom = epsilon\n    congestion = (available_time + processing_tm) / denom\n    efficiency = 1.0 / (utilization + epsilon)\n    if delivery_time == float('inf'):\n        priority = float('inf')\n    else:\n        priority = (delivery_time ** 0.5) * (congestion ** 0.3) - efficiency * 0.3 + (utilization * 0.2) + (processing_tm * 0.1)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 777.05,
+          "ins_2": 363.4166666666667,
+          "ins_3": 1248.0333333333333,
+          "ins_4": 1540.2833333333333,
+          "ins_5": 725.6833333333333,
+          "ins_6": 1391.6,
+          "ins_7": 490.3666666666667,
+          "ins_8": 1679.4833333333333,
+          "ins_9": 2900.1,
+          "ins_10": 1323.1166666666666,
+          "ins_11": 1039.0333333333333,
+          "ins_12": 1303.2,
+          "ins_13": 2383.4,
+          "ins_14": 1130.3,
+          "ins_15": 2144.516666666667,
+          "ins_16": 789.9,
+          "ins_17": 2045.5333333333333,
+          "ins_18": 607.9166666666666,
+          "ins_19": 1164.9333333333334,
+          "ins_20": 1290.1833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1352.29875,
+        "all_scores": [
+          -1316.9025000000001,
+          -1364.0974999999999,
+          -1364.0974999999999,
+          -1364.0974999999999
+        ]
+      }
+    }
+  ],
+  "error_count": 46,
+  "total_tokens": 289925,
+  "method": "EDR_D_job",
+  "run_id": 3,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 165,
+  "time_elapsed": 1551.649534702301,
+  "llm_a_calls": 165,
+  "llm_a_input_tokens": 113095,
+  "llm_a_output_tokens": 48217,
+  "llm_s_calls": 120,
+  "llm_s_input_tokens": 109035,
+  "llm_s_output_tokens": 19578
+}

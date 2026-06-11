@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1651.1116666666665,
+        "algorithm": "The new algorithm combines EDD with slack-time, dynamic utilization adjustment, and shortest-processing-time factor to compute a composite priority value where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    edd_component = delivery_time\n    \n    # Slack time: remaining time until due date relative to processing time\n    current_time = available_time  # using available_time as current time proxy\n    remaining_time = delivery_time - current_time\n    if processing_time > 0:\n        slack_ratio = remaining_time / processing_time\n    else:\n        slack_ratio = float('inf')\n    # Higher slack means less urgency; invert to penalize tight slack\n    slack_component = 1.0 / (slack_ratio + 1e-9)  # avoid division by zero\n    \n    # Utilization adjustment: penalize jobs on high-utilization machines\n    if num_neighboring_machine > 0:\n        util_penalty = utilization * 100  # scaling factor\n    else:\n        util_penalty = 0\n    \n    # Shortest processing time factor: prioritize shorter jobs on high-utilization\n    if utilization > 0.5 and processing_time > 0:\n        spt_factor = processing_time  # smaller is better\n    else:\n        spt_factor = 0\n    \n    # Composite priority: combine components (smaller value = higher priority)\n    # Use weighted sum: EDD dominates, slack and utilization adjust\n    priority = edd_component + slack_component * 10 + util_penalty * 0.5 + spt_factor * 0.3\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 938.1,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1519.7166666666667,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3400.366666666667,
+          "ins_10": 1322.5166666666667,
+          "ins_11": 978.85,
+          "ins_12": 969.4,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2303.1666666666665,
+          "ins_16": 1354.9166666666667,
+          "ins_17": 2746.366666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2609.8333333333335
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1800.429375,
+        "all_scores": [
+          -1651.1116666666665,
+          -1710.4533333333334,
+          -1758.2375,
+          -2081.915
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1183.6875,
+        "algorithm": "The new algorithm computes priority by dynamically normalizing slack time relative to remaining tasks and available times, replacing the static SPT factor with a critical ratio that accounts for machine processing time variability, and adding a utilization threshold to adjust priority based on machine load and neighboring machine count, with smaller values indicating higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    \n    # EDD component (base priority)\n    edd_component = delivery_time\n    \n    # Dynamic slack normalization relative to remaining tasks and available times\n    current_time = max(available_time, start_time)\n    remaining_time = delivery_time - current_time\n    # Normalize slack by processing time and remaining tasks (num_neighboring_operation + 1)\n    remaining_tasks = max(num_neighboring_operation, 1)\n    slack_ratio = (remaining_time + 1e-9) / (pt * remaining_tasks)\n    # Invert to penalize tight slack (smaller slack_ratio gives higher priority)\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n    \n    # Dynamic critical ratio accounting for machine processing time variability\n    # Use processing_tm (machine processing time) to adjust critical ratio\n    if processing_tm > 0:\n        critical_ratio = (remaining_time + 1e-9) / (pt * processing_tm)\n    else:\n        critical_ratio = (remaining_time + 1e-9) / pt\n    # Smaller critical_ratio means higher urgency, so invert\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n    \n    # Resource utilization threshold adjustment\n    # Trigger adjustment if utilization > 0.7 or number of neighboring machines is low\n    util_threshold = 0.7\n    if utilization > util_threshold or num_neighboring_machine <= 2:\n        util_penalty = utilization * 50  # Increased penalty for high load\n    else:\n        util_penalty = 0\n    \n    # Composite priority with smaller value = higher priority\n    priority = edd_component + slack_component * 5 + critical_component * 10 + util_penalty * 0.3\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 430.5833333333333,
+          "ins_3": 1105.55,
+          "ins_4": 1349.55,
+          "ins_5": 505.8,
+          "ins_6": 1009.7833333333333,
+          "ins_7": 448.3666666666667,
+          "ins_8": 1490.8,
+          "ins_9": 2128.483333333333,
+          "ins_10": 1201.2833333333333,
+          "ins_11": 553.3833333333333,
+          "ins_12": 864.1833333333333,
+          "ins_13": 2291.8333333333335,
+          "ins_14": 902.4333333333333,
+          "ins_15": 2584.366666666667,
+          "ins_16": 1215.5166666666667,
+          "ins_17": 1638.9,
+          "ins_18": 563.8333333333334,
+          "ins_19": 892.8333333333334,
+          "ins_20": 1546.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1467.544375,
+        "all_scores": [
+          -1183.6875,
+          -1324.925,
+          -1651.1116666666665,
+          -1710.4533333333334
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1165.1908333333336,
+        "algorithm": "The new algorithm uses a weighted combination of EDD, a slack factor that is normalized by total estimated process time for remaining operations, and a machine-critical ratio that directly reflects tardiness risk, without the external utilization penalty.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    pt_machine = processing_tm if processing_tm > 0 else 1e-9\n    num_remaining = max(num_neighboring_operation, 1)\n    \n    # Current time based on earliest possible start\n    current_time = max(available_time, start_time)\n    \n    # EDD component: base priority (smaller delivery_time -> higher priority)\n    edd_component = delivery_time  # smaller is better\n    \n    # Slack ratio: normalized by processing time and remaining operations\n    remaining_time = delivery_time - current_time\n    slack_ratio = (remaining_time + 1e-9) / (pt * num_remaining)\n    # Invert: smaller remaining_time / (pt*num_remaining) yields smaller slack_component -> higher priority\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n    \n    # Machine critical ratio: urgency relative to machine processing time\n    # Larger ratio means less urgent (more time), so invert for priority\n    critical_ratio = (remaining_time + 1e-9) / (pt * pt_machine)\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n    \n    # Combine with weights: EDD dominates, then slack, then critical\n    priority = edd_component + slack_component * 2.0 + critical_component * 5.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 401.1,
+          "ins_3": 1072.1,
+          "ins_4": 1273.0833333333333,
+          "ins_5": 282.26666666666665,
+          "ins_6": 966.7,
+          "ins_7": 280.1666666666667,
+          "ins_8": 1290.7,
+          "ins_9": 2115.616666666667,
+          "ins_10": 1201.2833333333333,
+          "ins_11": 546.9833333333333,
+          "ins_12": 888.6833333333333,
+          "ins_13": 2264.9,
+          "ins_14": 1073.3,
+          "ins_15": 2741.8166666666666,
+          "ins_16": 1215.5166666666667,
+          "ins_17": 1799.9,
+          "ins_18": 561.5333333333333,
+          "ins_19": 833.1166666666667,
+          "ins_20": 1545.4666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1223.6095833333334,
+        "all_scores": [
+          -1165.1908333333336,
+          -1183.6875,
+          -1236.0141666666666,
+          -1309.5458333333331
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1157.8700000000001,
+        "algorithm": "The new algorithm computes priority as a weighted sum of EDD, a normalized inverse slack ratio, and a machine-specific tardiness risk factor, with different weights and a hyperbolic scaling to reduce extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    pt_machine = processing_tm if processing_tm > 0 else 1e-9\n    num_remaining = max(num_neighboring_operation, 1)\n\n    current_time = max(available_time, start_time)\n\n    # EDD component\n    edd_component = delivery_time\n\n    # Slack ratio normalized by remaining operations and processing time\n    remaining_time = delivery_time - current_time\n    slack_ratio = (remaining_time + 1e-9) / (pt * num_remaining)\n    # Invert for priority (small slack ratio -> large slack priority)\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n\n    # Machine critical ratio: time relative to machine processing\n    critical_ratio = (remaining_time + 1e-9) / (pt_machine * pt + 1e-9)\n    # Invert for priority\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n\n    # New weight settings: EDD weight 1.0, slack weight 3.0, critical weight 2.0\n    # Apply hyperbolic tangent to scale components to [0,1) to balance influence\n    priority = (edd_component * 0.01) + (slack_component * 3.0) + (critical_component * 2.0)\n    # Use sigmoid-like scaling to avoid large values\n    priority = priority / (1.0 + abs(priority))\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 401.1,
+          "ins_3": 1072.1,
+          "ins_4": 1273.0833333333333,
+          "ins_5": 282.26666666666665,
+          "ins_6": 966.7,
+          "ins_7": 280.1666666666667,
+          "ins_8": 1290.7,
+          "ins_9": 2115.616666666667,
+          "ins_10": 1228.6,
+          "ins_11": 546.9833333333333,
+          "ins_12": 888.6833333333333,
+          "ins_13": 2473.0666666666666,
+          "ins_14": 1073.3,
+          "ins_15": 2741.8166666666666,
+          "ins_16": 1300.4,
+          "ins_17": 1799.9,
+          "ins_18": 561.5333333333333,
+          "ins_19": 833.1166666666667,
+          "ins_20": 1078.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1174.565,
+        "all_scores": [
+          -1157.8700000000001,
+          -1165.1908333333336,
+          -1183.6875,
+          -1191.5116666666665
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1153.5300000000002,
+        "algorithm": "The new algorithm computes priority as a weighted sum of EDD, a normalized inverse slack ratio, and a machine-specific tardiness risk factor, with different weights and a hyperbolic scaling to reduce extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    pt_machine = processing_tm if processing_tm > 0 else 1e-9\n    num_remaining = max(num_neighboring_operation, 1)\n    \n    current_time = max(available_time, start_time)\n    \n    # EDD component\n    edd_component = delivery_time\n    \n    # Slack ratio normalized by remaining operations and processing time\n    remaining_time = delivery_time - current_time\n    slack_ratio = (remaining_time + 1e-9) / (pt * num_remaining)\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n    \n    # Machine critical ratio: time relative to machine processing\n    critical_ratio = (remaining_time + 1e-9) / (pt_machine * pt + 1e-9)\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n    \n    # New parameter settings: EDD weight 0.8, slack weight 4.0, critical weight 1.5\n    priority = (edd_component * 0.008) + (slack_component * 4.0) + (critical_component * 1.5)\n    priority = priority / (1.0 + abs(priority))\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 401.1,
+          "ins_3": 1072.1,
+          "ins_4": 1273.0833333333333,
+          "ins_5": 282.26666666666665,
+          "ins_6": 966.7,
+          "ins_7": 280.1666666666667,
+          "ins_8": 1290.7,
+          "ins_9": 2115.616666666667,
+          "ins_10": 1228.6,
+          "ins_11": 546.9833333333333,
+          "ins_12": 888.6833333333333,
+          "ins_13": 2386.266666666667,
+          "ins_14": 1073.3,
+          "ins_15": 2741.8166666666666,
+          "ins_16": 1300.4,
+          "ins_17": 1799.9,
+          "ins_18": 561.5333333333333,
+          "ins_19": 833.1166666666667,
+          "ins_20": 1078.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1165.0695833333334,
+        "all_scores": [
+          -1153.5300000000002,
+          -1157.8700000000001,
+          -1165.1908333333336,
+          -1183.6875
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1153.5300000000002,
+        "algorithm": "The new algorithm computes priority as a weighted sum of EDD, a normalized inverse slack ratio, and a machine-specific tardiness risk factor, with different weights and a hyperbolic scaling to reduce extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    pt_machine = processing_tm if processing_tm > 0 else 1e-9\n    num_remaining = max(num_neighboring_operation, 1)\n    \n    current_time = max(available_time, start_time)\n    \n    # EDD component\n    edd_component = delivery_time\n    \n    # Slack ratio normalized by remaining operations and processing time\n    remaining_time = delivery_time - current_time\n    slack_ratio = (remaining_time + 1e-9) / (pt * num_remaining)\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n    \n    # Machine critical ratio: time relative to machine processing\n    critical_ratio = (remaining_time + 1e-9) / (pt_machine * pt + 1e-9)\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n    \n    # New parameter settings: EDD weight 0.8, slack weight 4.0, critical weight 1.5\n    priority = (edd_component * 0.008) + (slack_component * 4.0) + (critical_component * 1.5)\n    priority = priority / (1.0 + abs(priority))\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 401.1,
+          "ins_3": 1072.1,
+          "ins_4": 1273.0833333333333,
+          "ins_5": 282.26666666666665,
+          "ins_6": 966.7,
+          "ins_7": 280.1666666666667,
+          "ins_8": 1290.7,
+          "ins_9": 2115.616666666667,
+          "ins_10": 1228.6,
+          "ins_11": 546.9833333333333,
+          "ins_12": 888.6833333333333,
+          "ins_13": 2386.266666666667,
+          "ins_14": 1073.3,
+          "ins_15": 2741.8166666666666,
+          "ins_16": 1300.4,
+          "ins_17": 1799.9,
+          "ins_18": 561.5333333333333,
+          "ins_19": 833.1166666666667,
+          "ins_20": 1078.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1160.75375,
+        "all_scores": [
+          -1153.5300000000002,
+          -1157.8700000000001,
+          -1165.1908333333336,
+          -1166.4241666666665
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1153.5300000000002,
+        "algorithm": "The new algorithm computes priority as a weighted sum of EDD, a normalized inverse slack ratio, and a machine-specific tardiness risk factor, with different weights and a hyperbolic scaling to reduce extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    pt_machine = processing_tm if processing_tm > 0 else 1e-9\n    num_remaining = max(num_neighboring_operation, 1)\n    \n    current_time = max(available_time, start_time)\n    \n    # EDD component\n    edd_component = delivery_time\n    \n    # Slack ratio normalized by remaining operations and processing time\n    remaining_time = delivery_time - current_time\n    slack_ratio = (remaining_time + 1e-9) / (pt * num_remaining)\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n    \n    # Machine critical ratio: time relative to machine processing\n    critical_ratio = (remaining_time + 1e-9) / (pt_machine * pt + 1e-9)\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n    \n    # New parameter settings: EDD weight 0.8, slack weight 4.0, critical weight 1.5\n    priority = (edd_component * 0.008) + (slack_component * 4.0) + (critical_component * 1.5)\n    priority = priority / (1.0 + abs(priority))\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 401.1,
+          "ins_3": 1072.1,
+          "ins_4": 1273.0833333333333,
+          "ins_5": 282.26666666666665,
+          "ins_6": 966.7,
+          "ins_7": 280.1666666666667,
+          "ins_8": 1290.7,
+          "ins_9": 2115.616666666667,
+          "ins_10": 1228.6,
+          "ins_11": 546.9833333333333,
+          "ins_12": 888.6833333333333,
+          "ins_13": 2386.266666666667,
+          "ins_14": 1073.3,
+          "ins_15": 2741.8166666666666,
+          "ins_16": 1300.4,
+          "ins_17": 1799.9,
+          "ins_18": 561.5333333333333,
+          "ins_19": 833.1166666666667,
+          "ins_20": 1078.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1158.1341666666667,
+        "all_scores": [
+          -1153.5300000000002,
+          -1156.5608333333334,
+          -1157.8700000000001,
+          -1164.5758333333333
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1153.5300000000002,
+        "algorithm": "The new algorithm computes priority as a weighted sum of EDD, a normalized inverse slack ratio, and a machine-specific tardiness risk factor, with different weights and a hyperbolic scaling to reduce extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    pt_machine = processing_tm if processing_tm > 0 else 1e-9\n    num_remaining = max(num_neighboring_operation, 1)\n    \n    current_time = max(available_time, start_time)\n    \n    # EDD component\n    edd_component = delivery_time\n    \n    # Slack ratio normalized by remaining operations and processing time\n    remaining_time = delivery_time - current_time\n    slack_ratio = (remaining_time + 1e-9) / (pt * num_remaining)\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n    \n    # Machine critical ratio: time relative to machine processing\n    critical_ratio = (remaining_time + 1e-9) / (pt_machine * pt + 1e-9)\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n    \n    # New parameter settings: EDD weight 0.8, slack weight 4.0, critical weight 1.5\n    priority = (edd_component * 0.008) + (slack_component * 4.0) + (critical_component * 1.5)\n    priority = priority / (1.0 + abs(priority))\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 401.1,
+          "ins_3": 1072.1,
+          "ins_4": 1273.0833333333333,
+          "ins_5": 282.26666666666665,
+          "ins_6": 966.7,
+          "ins_7": 280.1666666666667,
+          "ins_8": 1290.7,
+          "ins_9": 2115.616666666667,
+          "ins_10": 1228.6,
+          "ins_11": 546.9833333333333,
+          "ins_12": 888.6833333333333,
+          "ins_13": 2386.266666666667,
+          "ins_14": 1073.3,
+          "ins_15": 2741.8166666666666,
+          "ins_16": 1300.4,
+          "ins_17": 1799.9,
+          "ins_18": 561.5333333333333,
+          "ins_19": 833.1166666666667,
+          "ins_20": 1078.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1158.1341666666667,
+        "all_scores": [
+          -1153.5300000000002,
+          -1156.5608333333334,
+          -1157.8700000000001,
+          -1164.5758333333333
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1153.5300000000002,
+        "algorithm": "The new algorithm computes priority as a weighted sum of EDD, a normalized inverse slack ratio, and a machine-specific tardiness risk factor, with different weights and a hyperbolic scaling to reduce extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    pt_machine = processing_tm if processing_tm > 0 else 1e-9\n    num_remaining = max(num_neighboring_operation, 1)\n    \n    current_time = max(available_time, start_time)\n    \n    # EDD component\n    edd_component = delivery_time\n    \n    # Slack ratio normalized by remaining operations and processing time\n    remaining_time = delivery_time - current_time\n    slack_ratio = (remaining_time + 1e-9) / (pt * num_remaining)\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n    \n    # Machine critical ratio: time relative to machine processing\n    critical_ratio = (remaining_time + 1e-9) / (pt_machine * pt + 1e-9)\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n    \n    # New parameter settings: EDD weight 0.8, slack weight 4.0, critical weight 1.5\n    priority = (edd_component * 0.008) + (slack_component * 4.0) + (critical_component * 1.5)\n    priority = priority / (1.0 + abs(priority))\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 401.1,
+          "ins_3": 1072.1,
+          "ins_4": 1273.0833333333333,
+          "ins_5": 282.26666666666665,
+          "ins_6": 966.7,
+          "ins_7": 280.1666666666667,
+          "ins_8": 1290.7,
+          "ins_9": 2115.616666666667,
+          "ins_10": 1228.6,
+          "ins_11": 546.9833333333333,
+          "ins_12": 888.6833333333333,
+          "ins_13": 2386.266666666667,
+          "ins_14": 1073.3,
+          "ins_15": 2741.8166666666666,
+          "ins_16": 1300.4,
+          "ins_17": 1799.9,
+          "ins_18": 561.5333333333333,
+          "ins_19": 833.1166666666667,
+          "ins_20": 1078.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1158.1341666666667,
+        "all_scores": [
+          -1153.5300000000002,
+          -1156.5608333333334,
+          -1157.8700000000001,
+          -1164.5758333333333
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1153.5300000000002,
+        "algorithm": "The new algorithm computes priority as a weighted sum of EDD, a normalized inverse slack ratio, and a machine-specific tardiness risk factor, with different weights and a hyperbolic scaling to reduce extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    pt = processing_time if processing_time > 0 else 1e-9\n    pt_machine = processing_tm if processing_tm > 0 else 1e-9\n    num_remaining = max(num_neighboring_operation, 1)\n    \n    current_time = max(available_time, start_time)\n    \n    # EDD component\n    edd_component = delivery_time\n    \n    # Slack ratio normalized by remaining operations and processing time\n    remaining_time = delivery_time - current_time\n    slack_ratio = (remaining_time + 1e-9) / (pt * num_remaining)\n    slack_component = 1.0 / (slack_ratio + 1e-9)\n    \n    # Machine critical ratio: time relative to machine processing\n    critical_ratio = (remaining_time + 1e-9) / (pt_machine * pt + 1e-9)\n    critical_component = 1.0 / (critical_ratio + 1e-9)\n    \n    # New parameter settings: EDD weight 0.8, slack weight 4.0, critical weight 1.5\n    priority = (edd_component * 0.008) + (slack_component * 4.0) + (critical_component * 1.5)\n    priority = priority / (1.0 + abs(priority))\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 401.1,
+          "ins_3": 1072.1,
+          "ins_4": 1273.0833333333333,
+          "ins_5": 282.26666666666665,
+          "ins_6": 966.7,
+          "ins_7": 280.1666666666667,
+          "ins_8": 1290.7,
+          "ins_9": 2115.616666666667,
+          "ins_10": 1228.6,
+          "ins_11": 546.9833333333333,
+          "ins_12": 888.6833333333333,
+          "ins_13": 2386.266666666667,
+          "ins_14": 1073.3,
+          "ins_15": 2741.8166666666666,
+          "ins_16": 1300.4,
+          "ins_17": 1799.9,
+          "ins_18": 561.5333333333333,
+          "ins_19": 833.1166666666667,
+          "ins_20": 1078.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1158.1341666666667,
+        "all_scores": [
+          -1153.5300000000002,
+          -1156.5608333333334,
+          -1157.8700000000001,
+          -1164.5758333333333
+        ]
+      }
+    }
+  ],
+  "error_count": 8,
+  "total_tokens": 169276,
+  "method": "EDR_C",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 72,
+  "time_elapsed": 1079.4664852619171,
+  "llm_a_calls": 72,
+  "llm_a_input_tokens": 54396,
+  "llm_a_output_tokens": 33870,
+  "llm_s_calls": 65,
+  "llm_s_input_tokens": 70181,
+  "llm_s_output_tokens": 10829
+}

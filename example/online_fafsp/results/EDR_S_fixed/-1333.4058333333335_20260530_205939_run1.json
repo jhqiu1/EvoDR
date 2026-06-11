@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1884.2847916666667,
+        "all_scores": [
+          -1710.4533333333334,
+          -1750.4691666666665,
+          -1862.5583333333332,
+          -2213.6583333333338
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1700.7416666666663,
+        "algorithm": "Combine the advantages of EDD and slack-time adjustment by computing a weighted priority that uses delivery_time scaled by the number of neighboring machines and subtracts normalized slack, then applies a small additive term for throughput.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    denom = max(processing_time, 1e-9)\n    slack = max(0, start_time - available_time) / denom\n    # Scale delivery_time by machine count to encourage load balancing\n    machine_factor = max(num_neighboring_machine, 1)\n    priority = (delivery_time / machine_factor) - (0.5 * slack)\n    # Add a small throughput incentive using processing_time\n    priority += 0.1 * processing_time\n    # Ensure non-negative priority to follow smaller-value-higher-priority convention\n    priority = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1342.0833333333333,
+          "ins_2": 890.5833333333334,
+          "ins_3": 1456.2,
+          "ins_4": 1774.3333333333333,
+          "ins_5": 1238.1666666666667,
+          "ins_6": 1676.75,
+          "ins_7": 632.9833333333333,
+          "ins_8": 1755.15,
+          "ins_9": 3224.8333333333335,
+          "ins_10": 2346.7833333333333,
+          "ins_11": 1081.7,
+          "ins_12": 1321.2833333333333,
+          "ins_13": 2200.2166666666667,
+          "ins_14": 1637.5666666666666,
+          "ins_15": 2818.75,
+          "ins_16": 1247.7333333333333,
+          "ins_17": 2058.85,
+          "ins_18": 1100.45,
+          "ins_19": 1698.7333333333333,
+          "ins_20": 2511.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1716.8191666666667,
+        "all_scores": [
+          -1700.7416666666663,
+          -1710.4533333333334,
+          -1710.4533333333334,
+          -1745.6283333333336
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1676.06,
+        "algorithm": "The improved algorithm enhances EDD by scaling delivery_time inversely with a slack-adjusted urgency factor and adding a throughput term, while clamping the priority non-negative.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    denom = max(processing_time, 1e-9)\n    slack = max(0, start_time - available_time) / denom\n    slack_weight = 0.5  # weight for slack\n    # Base priority on delivery_time (lower is more urgent), scale with machine count\n    machine_factor = max(num_neighboring_machine, 1)\n    priority = (delivery_time / machine_factor) * (1 + slack_weight * slack)  # increase priority if slack is large\n    # Add small throughput incentive\n    priority += 0.1 * processing_time\n    # Ensure non-negative (smaller value = higher priority)\n    priority = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 967.65,
+          "ins_2": 1047.9166666666667,
+          "ins_3": 1680.9166666666667,
+          "ins_4": 1602.6666666666667,
+          "ins_5": 864.3166666666667,
+          "ins_6": 1690.2666666666667,
+          "ins_7": 694.8833333333333,
+          "ins_8": 2109.0666666666666,
+          "ins_9": 3385.35,
+          "ins_10": 1792.9166666666667,
+          "ins_11": 1412.4,
+          "ins_12": 1347.4166666666667,
+          "ins_13": 2184.7833333333333,
+          "ins_14": 1565.9666666666667,
+          "ins_15": 2498.95,
+          "ins_16": 1326.85,
+          "ins_17": 2585.35,
+          "ins_18": 1150.9166666666667,
+          "ins_19": 1567.0333333333333,
+          "ins_20": 2045.5833333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1694.57125,
+        "all_scores": [
+          -1676.06,
+          -1700.7416666666663,
+          -1700.7416666666663,
+          -1700.7416666666663
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1675.5925,
+        "algorithm": "The new algorithm calculates priority as the ratio of delivery_time to a weighted sum of processing_time and a scaled urgency factor, with a bias for high-utilization machines to reduce tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    safe_processing_time = max(processing_time, 1e-9)\n    safe_utilization = max(utilization, 1e-9)\n    safe_num_machine = max(num_neighboring_machine, 1)\n    \n    # Urgency from delivery time and slack\n    slack = max(0, start_time - available_time)\n    urgency = delivery_time / (1 + slack / safe_processing_time)\n    \n    # Throughput incentive: scale processing time with utilization\n    throughput = processing_time * safe_utilization\n    \n    # Weighted combination: prioritize urgent jobs and high-throughput machines\n    priority = (urgency / safe_num_machine) + 0.2 * throughput\n    \n    # Clamp non-negative\n    result = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1498.3666666666666,
+          "ins_2": 946.15,
+          "ins_3": 1576.9666666666667,
+          "ins_4": 1760.25,
+          "ins_5": 1112.4333333333334,
+          "ins_6": 1584.0666666666666,
+          "ins_7": 535.3,
+          "ins_8": 1806.15,
+          "ins_9": 3285.5833333333335,
+          "ins_10": 1439.1333333333334,
+          "ins_11": 984.8,
+          "ins_12": 1132.45,
+          "ins_13": 2459.2,
+          "ins_14": 1605.0666666666666,
+          "ins_15": 2755.2,
+          "ins_16": 1373.7166666666667,
+          "ins_17": 2257.8166666666666,
+          "ins_18": 1025.6833333333334,
+          "ins_19": 1921.5833333333333,
+          "ins_20": 2451.9333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1675.9431249999998,
+        "all_scores": [
+          -1675.5925,
+          -1676.06,
+          -1676.06,
+          -1676.06
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1354.856666666667,
+        "algorithm": "The new algorithm uses a hyperbolic tangent of normalized slack to scale delivery time and multiplies by machine contention and processing time variability factors.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    safe_pt = max(processing_time, 1e-9)\n    safe_ptm = max(processing_tm, 1e-9)\n    safe_machine = max(num_neighboring_machine, 1)\n    safe_oper = max(num_neighboring_operation, 1)\n    safe_util = max(utilization, 1e-9)\n    \n    # Normalized slack transformed via tanh to bound urgency between 0 and 1\n    slack = max(0, start_time - available_time) / safe_pt\n    urgency_factor = (1 - 0.5 * (slack / (1 + slack)))  # monotonic decreasing with slack\n    \n    # Processing time variability factor (higher variability increases priority)\n    pt_var = abs(processing_time - safe_ptm) / safe_ptm if safe_ptm > 0 else 0\n    \n    # Machine contention factor (fewer machines increases priority)\n    machine_contention = 1.0 / safe_machine\n    \n    # Operation density factor (more subsequent operations may indicate higher priority)\n    oper_density = 1.0 / (1 + safe_oper)\n    \n    # Final priority: cubic combination of factors, scaled by delivery time\n    priority = delivery_time * urgency_factor * (machine_contention + pt_var + oper_density)\n    \n    result = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1340.5833333333333,
+          "ins_2": 670.3166666666667,
+          "ins_3": 1271.65,
+          "ins_4": 1220.9833333333333,
+          "ins_5": 534.15,
+          "ins_6": 1866.2833333333333,
+          "ins_7": 534.0833333333334,
+          "ins_8": 1299.3,
+          "ins_9": 2310.366666666667,
+          "ins_10": 1261.15,
+          "ins_11": 947.1833333333333,
+          "ins_12": 915.7333333333333,
+          "ins_13": 1729.65,
+          "ins_14": 1100.1666666666667,
+          "ins_15": 3437.4666666666667,
+          "ins_16": 780.4833333333333,
+          "ins_17": 1821.55,
+          "ins_18": 678.4833333333333,
+          "ins_19": 1297.6333333333334,
+          "ins_20": 2079.9166666666665
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1591.9702083333334,
+        "all_scores": [
+          -1354.856666666667,
+          -1661.5166666666669,
+          -1675.5925,
+          -1675.9150000000002
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1339.4924999999998,
+        "algorithm": "The new algorithm combines hyperbolic tangent normalized slack with delivery time and machine contention, while integrating weighted utilization-based throughput and operation density to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    safe_pt = max(processing_time, 1e-9)\n    safe_ptm = max(processing_tm, 1e-9)\n    safe_machine = max(num_neighboring_machine, 1)\n    safe_oper = max(num_neighboring_operation, 1)\n    safe_util = max(utilization, 1e-9)\n    \n    slack = max(0, start_time - available_time) / safe_pt\n    urgency_factor = (1 - 0.5 * (slack / (1 + slack)))\n    \n    pt_var = abs(processing_time - safe_ptm) / safe_ptm if safe_ptm > 0 else 0\n    machine_contention = 1.0 / safe_machine\n    oper_density = 1.0 / (1 + safe_oper)\n    \n    throughput = processing_time * safe_util\n    combined_urgency = delivery_time * urgency_factor * (machine_contention + pt_var + oper_density)\n    \n    priority = (combined_urgency / safe_machine) + 0.1 * throughput\n    \n    result = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1057.15,
+          "ins_2": 750.9,
+          "ins_3": 1039.1166666666666,
+          "ins_4": 1190.9833333333333,
+          "ins_5": 561.4166666666666,
+          "ins_6": 1772.25,
+          "ins_7": 858.6833333333333,
+          "ins_8": 1276.9,
+          "ins_9": 2332.2833333333333,
+          "ins_10": 1273.7833333333333,
+          "ins_11": 889.7666666666667,
+          "ins_12": 1041.1666666666667,
+          "ins_13": 1838.2166666666667,
+          "ins_14": 1057.6666666666667,
+          "ins_15": 2675.0833333333335,
+          "ins_16": 1121.05,
+          "ins_17": 2023.4333333333334,
+          "ins_18": 670.0333333333333,
+          "ins_19": 1352.5166666666667,
+          "ins_20": 2007.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1404.3891666666668,
+        "all_scores": [
+          -1339.4924999999998,
+          -1354.856666666667,
+          -1455.4066666666668,
+          -1467.8008333333332
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1339.4924999999998,
+        "algorithm": "The new algorithm combines hyperbolic tangent normalized slack with delivery time and machine contention, while integrating weighted utilization-based throughput and operation density to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    safe_pt = max(processing_time, 1e-9)\n    safe_ptm = max(processing_tm, 1e-9)\n    safe_machine = max(num_neighboring_machine, 1)\n    safe_oper = max(num_neighboring_operation, 1)\n    safe_util = max(utilization, 1e-9)\n    \n    slack = max(0, start_time - available_time) / safe_pt\n    urgency_factor = (1 - 0.5 * (slack / (1 + slack)))\n    \n    pt_var = abs(processing_time - safe_ptm) / safe_ptm if safe_ptm > 0 else 0\n    machine_contention = 1.0 / safe_machine\n    oper_density = 1.0 / (1 + safe_oper)\n    \n    throughput = processing_time * safe_util\n    combined_urgency = delivery_time * urgency_factor * (machine_contention + pt_var + oper_density)\n    \n    priority = (combined_urgency / safe_machine) + 0.1 * throughput\n    \n    result = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1057.15,
+          "ins_2": 750.9,
+          "ins_3": 1039.1166666666666,
+          "ins_4": 1190.9833333333333,
+          "ins_5": 561.4166666666666,
+          "ins_6": 1772.25,
+          "ins_7": 858.6833333333333,
+          "ins_8": 1276.9,
+          "ins_9": 2332.2833333333333,
+          "ins_10": 1273.7833333333333,
+          "ins_11": 889.7666666666667,
+          "ins_12": 1041.1666666666667,
+          "ins_13": 1838.2166666666667,
+          "ins_14": 1057.6666666666667,
+          "ins_15": 2675.0833333333335,
+          "ins_16": 1121.05,
+          "ins_17": 2023.4333333333334,
+          "ins_18": 670.0333333333333,
+          "ins_19": 1352.5166666666667,
+          "ins_20": 2007.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1391.0295833333334,
+        "all_scores": [
+          -1339.4924999999998,
+          -1354.856666666667,
+          -1414.3625,
+          -1455.4066666666668
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1339.4924999999998,
+        "algorithm": "The new algorithm combines hyperbolic tangent normalized slack with delivery time and machine contention, while integrating weighted utilization-based throughput and operation density to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    safe_pt = max(processing_time, 1e-9)\n    safe_ptm = max(processing_tm, 1e-9)\n    safe_machine = max(num_neighboring_machine, 1)\n    safe_oper = max(num_neighboring_operation, 1)\n    safe_util = max(utilization, 1e-9)\n    \n    slack = max(0, start_time - available_time) / safe_pt\n    urgency_factor = (1 - 0.5 * (slack / (1 + slack)))\n    \n    pt_var = abs(processing_time - safe_ptm) / safe_ptm if safe_ptm > 0 else 0\n    machine_contention = 1.0 / safe_machine\n    oper_density = 1.0 / (1 + safe_oper)\n    \n    throughput = processing_time * safe_util\n    combined_urgency = delivery_time * urgency_factor * (machine_contention + pt_var + oper_density)\n    \n    priority = (combined_urgency / safe_machine) + 0.1 * throughput\n    \n    result = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1057.15,
+          "ins_2": 750.9,
+          "ins_3": 1039.1166666666666,
+          "ins_4": 1190.9833333333333,
+          "ins_5": 561.4166666666666,
+          "ins_6": 1772.25,
+          "ins_7": 858.6833333333333,
+          "ins_8": 1276.9,
+          "ins_9": 2332.2833333333333,
+          "ins_10": 1273.7833333333333,
+          "ins_11": 889.7666666666667,
+          "ins_12": 1041.1666666666667,
+          "ins_13": 1838.2166666666667,
+          "ins_14": 1057.6666666666667,
+          "ins_15": 2675.0833333333335,
+          "ins_16": 1121.05,
+          "ins_17": 2023.4333333333334,
+          "ins_18": 670.0333333333333,
+          "ins_19": 1352.5166666666667,
+          "ins_20": 2007.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1350.5408333333335,
+        "all_scores": [
+          -1339.4924999999998,
+          -1339.4924999999998,
+          -1354.856666666667,
+          -1368.321666666667
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1339.4924999999998,
+        "algorithm": "The new algorithm combines hyperbolic tangent normalized slack with delivery time and machine contention, while integrating weighted utilization-based throughput and operation density to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    safe_pt = max(processing_time, 1e-9)\n    safe_ptm = max(processing_tm, 1e-9)\n    safe_machine = max(num_neighboring_machine, 1)\n    safe_oper = max(num_neighboring_operation, 1)\n    safe_util = max(utilization, 1e-9)\n    \n    slack = max(0, start_time - available_time) / safe_pt\n    urgency_factor = (1 - 0.5 * (slack / (1 + slack)))\n    \n    pt_var = abs(processing_time - safe_ptm) / safe_ptm if safe_ptm > 0 else 0\n    machine_contention = 1.0 / safe_machine\n    oper_density = 1.0 / (1 + safe_oper)\n    \n    throughput = processing_time * safe_util\n    combined_urgency = delivery_time * urgency_factor * (machine_contention + pt_var + oper_density)\n    \n    priority = (combined_urgency / safe_machine) + 0.1 * throughput\n    \n    result = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1057.15,
+          "ins_2": 750.9,
+          "ins_3": 1039.1166666666666,
+          "ins_4": 1190.9833333333333,
+          "ins_5": 561.4166666666666,
+          "ins_6": 1772.25,
+          "ins_7": 858.6833333333333,
+          "ins_8": 1276.9,
+          "ins_9": 2332.2833333333333,
+          "ins_10": 1273.7833333333333,
+          "ins_11": 889.7666666666667,
+          "ins_12": 1041.1666666666667,
+          "ins_13": 1838.2166666666667,
+          "ins_14": 1057.6666666666667,
+          "ins_15": 2675.0833333333335,
+          "ins_16": 1121.05,
+          "ins_17": 2023.4333333333334,
+          "ins_18": 670.0333333333333,
+          "ins_19": 1352.5166666666667,
+          "ins_20": 2007.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1339.4924999999998,
+        "all_scores": [
+          -1339.4924999999998,
+          -1339.4924999999998,
+          -1339.4924999999998,
+          -1339.4924999999998
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1333.4058333333335,
+        "algorithm": "The new algorithm combines hyperbolic tangent normalized slack with delivery time and machine contention, integrates weighted utilization-based throughput and operation density, and adds a balanced urgency boost from both early delivery and late start to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    safe_pt = max(processing_time, 1e-9)\n    safe_ptm = max(processing_tm, 1e-9)\n    safe_machine = max(num_neighboring_machine, 1)\n    safe_oper = max(num_neighboring_operation, 1)\n    safe_util = max(utilization, 1e-9)\n    \n    # Slack: time until start relative to available time, normalized by processing time\n    slack = max(0, start_time - available_time) / safe_pt\n    # Urgency factor using hyperbolic tangent normalization (range 0 to 1)\n    urgency_factor = (1 - 0.5 * (slack / (1 + slack)))\n    \n    # Feature components\n    pt_var = abs(processing_time - safe_ptm) / safe_ptm if safe_ptm > 0 else 0\n    machine_contention = 1.0 / safe_machine\n    oper_density = 1.0 / (1 + safe_oper)\n    throughput = processing_time * safe_util\n    \n    # Combine features: delivery time weights machine contention and processing variance\n    combined_urgency = delivery_time * urgency_factor * (machine_contention + pt_var + oper_density)\n    \n    # Priority formula: smaller value means higher priority\n    priority = (combined_urgency / safe_machine) + 0.1 * throughput + 0.01 * delivery_time\n    \n    # Additional boost for early delivery and tight slack to minimize tardiness\n    priority += 0.02 * max(0, delivery_time - start_time) / max(1e-9, start_time + 1)\n    \n    result = max(priority, 0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1342.5166666666667,
+          "ins_2": 750.9,
+          "ins_3": 1039.1166666666666,
+          "ins_4": 1190.9833333333333,
+          "ins_5": 561.4166666666666,
+          "ins_6": 1772.25,
+          "ins_7": 858.6833333333333,
+          "ins_8": 1276.9,
+          "ins_9": 2332.2833333333333,
+          "ins_10": 1273.7833333333333,
+          "ins_11": 889.7666666666667,
+          "ins_12": 1041.1666666666667,
+          "ins_13": 1838.2166666666667,
+          "ins_14": 1057.6666666666667,
+          "ins_15": 2267.983333333333,
+          "ins_16": 1121.05,
+          "ins_17": 2023.4333333333334,
+          "ins_18": 670.0333333333333,
+          "ins_19": 1352.5166666666667,
+          "ins_20": 2007.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1337.9708333333333,
+        "all_scores": [
+          -1333.4058333333335,
+          -1339.4924999999998,
+          -1339.4924999999998,
+          -1339.4924999999998
+        ]
+      }
+    }
+  ],
+  "error_count": 9,
+  "total_tokens": 150139,
+  "method": "EDR_S_fixed",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 134,
+  "time_elapsed": 1423.5831670761108,
+  "llm_a_calls": 134,
+  "llm_a_input_tokens": 104155,
+  "llm_a_output_tokens": 45489,
+  "llm_s_calls": 1,
+  "llm_s_input_tokens": 351,
+  "llm_s_output_tokens": 144
+}

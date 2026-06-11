@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1755.8999999999996,
+        "algorithm": "The new algorithm dynamically adjusts weights based on real-time shop load factor, includes machine-task matching penalties for processing time variations, and adds a look-ahead mechanism to consider future arrivals and workload for minimizing tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    if status == 0:\n        # Compute slack and its dynamic weight based on load factor (assumed 1)\n        load_factor = 1.0  # from problem statement\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            slack_penalty = 1.0 / (abs(slack) + eps)\n        else:\n            slack_penalty = 1.0 / (slack + eps)\n        \n        # Machine availability penalty\n        machine_avail = available_time - start_time\n        if machine_avail > 0:\n            avail_penalty = 1.0 / (machine_avail + eps)\n        else:\n            avail_penalty = 1e6\n        \n        # Utilization penalty (higher utilization gives higher priority to avoid busy machines)\n        util_penalty = utilization + eps\n        \n        # Processing time penalty with machine-task matching (use processing_tm as the specific machine's time)\n        pt_penalty = processing_tm + eps\n        # Matching: difference from average processing_time across machines (approximated by processing_time*0.1)\n        matching_penalty = abs(processing_tm - processing_time * 0.1) + eps\n        \n        # Look-ahead: consider future arrivals via exponential distribution mean (average processing / load factor)\n        future_arrival = processing_time / (load_factor + eps)\n        # If start_time is far in future, reduce priority (non-urgent)\n        look_ahead_penalty = 1.0 / (future_arrival + start_time + eps) if future_arrival > 0 else 1e6\n        \n        # Dynamic weights based on load factor\n        w_slack = 0.3 * (1 + load_factor)\n        w_avail = 0.3 * (1 / (load_factor + eps))\n        w_util = 0.2\n        w_pt = 0.2\n        w_match = 0.1 * load_factor\n        w_look = 0.2\n        \n        # Normalize weights to sum to 1\n        total_weight = w_slack + w_avail + w_util + w_pt + w_match + w_look\n        w_slack /= total_weight\n        w_avail /= total_weight\n        w_util /= total_weight\n        w_pt /= total_weight\n        w_match /= total_weight\n        w_look /= total_weight\n        \n        priority = (w_slack * slack_penalty + w_avail * avail_penalty + \n                    w_util * util_penalty + w_pt * pt_penalty + \n                    w_match * matching_penalty + w_look * look_ahead_penalty)\n    else:\n        priority = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1173.3833333333334,
+          "ins_2": 362.23333333333335,
+          "ins_3": 1366.95,
+          "ins_4": 2226.116666666667,
+          "ins_5": 1479.8333333333333,
+          "ins_6": 2299.7166666666667,
+          "ins_7": 1473.9833333333333,
+          "ins_8": 1337.5666666666666,
+          "ins_9": 2740.2,
+          "ins_10": 1342.85,
+          "ins_11": 628.0333333333333,
+          "ins_12": 1708.75,
+          "ins_13": 2579.0,
+          "ins_14": 1433.45,
+          "ins_15": 3027.7,
+          "ins_16": 1515.3166666666666,
+          "ins_17": 3269.0666666666666,
+          "ins_18": 1035.6166666666666,
+          "ins_19": 1281.0833333333333,
+          "ins_20": 2837.15
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1794.7537499999996,
+        "all_scores": [
+          -1755.8999999999996,
+          -1802.7416666666663,
+          -1805.2191666666665,
+          -1815.1541666666665
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1701.6074999999998,
+        "all_scores": [
+          -1510.415,
+          -1745.5524999999998,
+          -1755.8999999999996,
+          -1794.5625
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1689.6049999999998,
+        "all_scores": [
+          -1510.415,
+          -1745.5524999999998,
+          -1746.5524999999998,
+          -1755.8999999999996
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1687.0181249999998,
+        "all_scores": [
+          -1510.415,
+          -1745.5524999999998,
+          -1745.5524999999998,
+          -1746.5524999999998
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1609.881875,
+        "all_scores": [
+          -1510.415,
+          -1525.1041666666667,
+          -1658.4558333333334,
+          -1745.5524999999998
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1535.6664583333336,
+        "all_scores": [
+          -1510.415,
+          -1525.1041666666667,
+          -1525.1041666666667,
+          -1582.0425
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1535.6664583333336,
+        "all_scores": [
+          -1510.415,
+          -1525.1041666666667,
+          -1525.1041666666667,
+          -1582.0425
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1535.6664583333336,
+        "all_scores": [
+          -1510.415,
+          -1525.1041666666667,
+          -1525.1041666666667,
+          -1582.0425
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1535.6664583333336,
+        "all_scores": [
+          -1510.415,
+          -1525.1041666666667,
+          -1525.1041666666667,
+          -1582.0425
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1510.415,
+        "algorithm": "The new algorithm uses a multi-criteria ranking based on normalized scores for tardiness risk, machine contention, and operation criticality, combined via a geometric mean to produce a single priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-6\n    \n    if status == 0:\n        # 1. Tardiness risk: ratio of processing time to slack (capped)\n        slack = delivery_time - start_time - processing_time\n        if slack <= 0:\n            tardiness_risk = 1.0 / (abs(slack) + eps)\n        else:\n            tardiness_risk = processing_time / (slack + eps)\n        \n        # 2. Machine contention: how busy the machine is relative to available time\n        if available_time > 0:\n            contention = utilization / (available_time + eps)\n        else:\n            contention = 1e6\n        \n        # 3. Operation criticality: how many operations depend on this machine\n        if num_neighboring_operation > 0:\n            criticality = 1.0 / (num_neighboring_operation + eps)\n        else:\n            criticality = 1e6\n        \n        # 4. Processing time penalty: shorter times get higher priority (inverse)\n        pt_penalty = 1.0 / (processing_tm + eps)\n        \n        # 5. Machine flexibility: more alternative machines reduce priority\n        flexibility = num_neighboring_machine + eps\n        \n        # Normalize each factor to [0,1] range using sigmoid-like scaling\n        risk_score = 1.0 / (1.0 + (tardiness_risk + eps))\n        contention_score = 1.0 / (1.0 + (contention + eps))\n        criticality_score = 1.0 / (1.0 + (criticality + eps))\n        pt_score = 1.0 / (1.0 + (pt_penalty + eps))\n        flexibility_score = flexibility / (1.0 + flexibility)\n        \n        # Geometric mean to combine scores (smaller value = higher priority)\n        priority = (risk_score * contention_score * criticality_score * pt_score * flexibility_score) ** (1.0/5.0)\n        \n        # Invert to follow smaller-value-higher-priority convention\n        result = 1.0 / (priority + eps)\n    else:\n        result = 1e9\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 586.4833333333333,
+          "ins_2": 517.05,
+          "ins_3": 1417.2333333333333,
+          "ins_4": 1550.8666666666666,
+          "ins_5": 1482.9333333333334,
+          "ins_6": 1528.5166666666667,
+          "ins_7": 1012.3833333333333,
+          "ins_8": 1192.7,
+          "ins_9": 2505.35,
+          "ins_10": 1279.5333333333333,
+          "ins_11": 851.6,
+          "ins_12": 1343.35,
+          "ins_13": 2671.0,
+          "ins_14": 1168.15,
+          "ins_15": 3280.8,
+          "ins_16": 1770.85,
+          "ins_17": 1999.0166666666667,
+          "ins_18": 855.2,
+          "ins_19": 1168.5333333333333,
+          "ins_20": 2026.75
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1534.8654166666668,
+        "all_scores": [
+          -1510.415,
+          -1525.1041666666667,
+          -1525.1041666666667,
+          -1578.8383333333334
+        ]
+      }
+    }
+  ],
+  "error_count": 29,
+  "total_tokens": 490147,
+  "method": "EDR_E",
+  "run_id": 2,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 153,
+  "time_elapsed": 2008.7934374809265,
+  "llm_a_calls": 153,
+  "llm_a_input_tokens": 200088,
+  "llm_a_output_tokens": 105663,
+  "llm_s_calls": 124,
+  "llm_s_input_tokens": 162876,
+  "llm_s_output_tokens": 21520
+}

@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1749.8158333333336,
+        "algorithm": "The improved algorithm computes priority by adaptively weighting slack ratio, machine urgency, processing efficiency, a dynamic penalty for machine-task mismatch (deviation of processing_tm from average processing_time), and a look-ahead urgency factor based on slack and machine availability, with weights adjusted by real-time utilization and arrival rate (approximated by utilization and processing_time inverse), ensuring lower values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(1, delivery_time)\n    safe_start = max(1, start_time)\n    safe_processing = max(1, processing_time)\n    safe_processing_tm = max(1, processing_tm)\n    safe_available = max(1, available_time)\n    \n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n    \n    # Machine urgency\n    machine_urgency = available_time / max(1, start_time + processing_tm)\n    \n    # Processing time efficiency (normalized to machine average)\n    proc_efficiency = processing_tm / safe_processing\n    \n    # Dynamic penalty for machine-task mismatch: deviation from machine average (processing_time)\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)  # normalize to [0,1]\n    \n    # Look-ahead urgency: estimate remaining slack relative to time pressure\n    look_ahead_urgency = max(0, (delivery_time - start_time - processing_tm)) / max(1, delivery_time - start_time)\n    if delivery_time - start_time <= 0:\n        look_ahead_urgency = 0.0\n    \n    # Job status: unscheduled (0) gives higher priority (lower weight)\n    status_factor = 0.0 if status == 1 else 0.5\n    \n    # Neighboring options: fewer options increase priority\n    machine_options = 1.0 / max(1, num_neighboring_machine)\n    operation_options = 1.0 / max(1, num_neighboring_operation)\n    \n    # Adaptive weights based on utilization and arrival rate (approximated by 1/processing_time)\n    arrival_rate = 1.0 / max(1, processing_time)\n    # High utilization and high arrival rate emphasize urgency\n    urgency_weight = min(0.5, 0.2 + 0.3 * utilization * arrival_rate)\n    efficiency_weight = max(0.1, 0.2 - 0.1 * utilization * arrival_rate)\n    mismatch_weight = min(0.3, 0.1 + 0.2 * (1 - utilization))\n    # Slack weight decreases with urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight)\n    # Distribute remaining weight among other factors\n    fixed_weight = 0.1  # for status, machine_options, operation_options\n    \n    # Normalize weights sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    fixed_weight /= total_weight\n    \n    # Composite priority (lower is higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.6 +  # scale down machine_urgency to match range\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1249.4833333333333,
+          "ins_2": 411.06666666666666,
+          "ins_3": 1386.1833333333334,
+          "ins_4": 2298.1666666666665,
+          "ins_5": 1762.1333333333334,
+          "ins_6": 2108.6666666666665,
+          "ins_7": 1481.4166666666667,
+          "ins_8": 1557.4833333333333,
+          "ins_9": 2667.0666666666666,
+          "ins_10": 1140.0,
+          "ins_11": 1259.5833333333333,
+          "ins_12": 1329.2166666666667,
+          "ins_13": 2853.5,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2201.0333333333333,
+          "ins_16": 2099.1833333333334,
+          "ins_17": 2927.766666666667,
+          "ins_18": 1557.1833333333334,
+          "ins_19": 1203.9,
+          "ins_20": 2674.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1926.6799999999998,
+        "all_scores": [
+          -1749.8158333333336,
+          -1895.1374999999996,
+          -2028.7166666666667,
+          -2033.0499999999997
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1697.0700000000002,
+        "algorithm": "The new algorithm combines the strengths of both by using a robust weighted sum of normalized slack ratio, machine urgency, processing efficiency, a scaled mismatch penalty, look-ahead urgency based on negative slack and early machine availability, and job/neighbor status, with adaptive weights driven jointly by utilization and a safer arrival rate proxy (1/(processing_time+1)), ensuring lower values indicate higher priority and minimizing tardiness through balanced exploitation of slack-awareness and machine responsiveness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start_time = max(start_time, 1)\n    safe_processing_time = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Core features\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery  # negative if urgent\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency relative to machine average\n    proc_efficiency = safe_processing_tm / safe_processing_time\n\n    # Mismatch penalty (deviation from machine average)\n    mismatch_penalty = abs(processing_tm - processing_time) / max(processing_time + processing_tm, 1)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Look-ahead: amplify when slack is negative and machine is available soon\n    look_ahead = 0.0\n    if slack < 0 and available_time <= start_time:\n        look_ahead = (-slack) / safe_delivery\n\n    # Job status and neighbor options\n    status_factor = 0.0 if status == 1 else 0.5\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights based on utilization and arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.4, 0.15 + 0.25 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.2, 0.15 + 0.05 * (1 - utilization))\n    # Slack weight remains moderate but reduces when urgency high\n    slack_weight = max(0.1, 0.3 - urgency_weight)\n    # Fixed weight for status, machine_options, operation_options\n    fixed_weight = 0.1\n\n    # Normalize sum to 1\n    total = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + fixed_weight\n    slack_weight /= total\n    urgency_weight /= total\n    efficiency_weight /= total\n    mismatch_weight /= total\n    fixed_weight /= total\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.5 +  # scale machine_urgency\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options) +\n                0.05 * look_ahead)  # additional small boost for look-ahead\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1016.2166666666667,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1584.9666666666667,
+          "ins_4": 2061.266666666667,
+          "ins_5": 1787.75,
+          "ins_6": 2197.266666666667,
+          "ins_7": 1481.4166666666667,
+          "ins_8": 1440.2333333333333,
+          "ins_9": 2600.6666666666665,
+          "ins_10": 1201.25,
+          "ins_11": 920.7833333333333,
+          "ins_12": 1319.3,
+          "ins_13": 2247.35,
+          "ins_14": 1110.15,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2641.3166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1723.914375,
+        "all_scores": [
+          -1697.0700000000002,
+          -1729.614166666667,
+          -1733.736666666667,
+          -1735.236666666667
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1681.205833333333,
+        "algorithm": "The new algorithm integrates refined adaptive weighting of normalized slack ratio, machine urgency, processing efficiency, mismatch penalty, and dual look-ahead urgency (positive slack modulation and negative slack/machine availability) with a status and neighboring factor, using dynamic weights based on utilization and a robust arrival rate proxy (1/(processing_time+1)) to minimize tardiness under lower-priority-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start = max(start_time, 1)\n    safe_processing = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency\n    proc_efficiency = processing_tm / safe_processing\n\n    # Mismatch penalty\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Dual look-ahead urgency\n    look_ahead_urgency = 0.0\n    # Positive slack: urgency as ratio of remaining slack to remaining time\n    if delivery_time - start_time > 0:\n        look_ahead_urgency = max(0, slack) / (delivery_time - start_time)\n    # Negative slack with early machine availability: amplify\n    if slack < 0 and available_time <= start_time:\n        look_ahead_urgency += (-slack) / safe_delivery\n\n    # Status factor\n    status_factor = 0.0 if status == 1 else 0.5\n\n    # Neighboring options factors\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights using utilization and robust arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.5, 0.15 + 0.35 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.3, 0.15 + 0.15 * (1 - utilization))\n    # Slack weight balances urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight * 0.5)\n    # Look-ahead weight\n    look_ahead_weight = 0.1\n    # Fixed weight for status and neighbors\n    fixed_weight = 0.1\n\n    # Normalize weights to sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + look_ahead_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    look_ahead_weight /= total_weight\n    fixed_weight /= total_weight\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.8 +\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                look_ahead_weight * look_ahead_urgency +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1018.3333333333334,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1474.25,
+          "ins_4": 1938.8666666666666,
+          "ins_5": 1774.7333333333333,
+          "ins_6": 2168.0333333333333,
+          "ins_7": 1542.5333333333333,
+          "ins_8": 1408.3166666666666,
+          "ins_9": 2678.85,
+          "ins_10": 1146.9,
+          "ins_11": 1027.1833333333334,
+          "ins_12": 1271.95,
+          "ins_13": 2309.4166666666665,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2704.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1692.049583333333,
+        "all_scores": [
+          -1681.205833333333,
+          -1692.8524999999997,
+          -1697.0700000000002,
+          -1697.0700000000002
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1681.205833333333,
+        "algorithm": "The new algorithm integrates refined adaptive weighting of normalized slack ratio, machine urgency, processing efficiency, mismatch penalty, and dual look-ahead urgency (positive slack modulation and negative slack/machine availability) with a status and neighboring factor, using dynamic weights based on utilization and a robust arrival rate proxy (1/(processing_time+1)) to minimize tardiness under lower-priority-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start = max(start_time, 1)\n    safe_processing = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency\n    proc_efficiency = processing_tm / safe_processing\n\n    # Mismatch penalty\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Dual look-ahead urgency\n    look_ahead_urgency = 0.0\n    # Positive slack: urgency as ratio of remaining slack to remaining time\n    if delivery_time - start_time > 0:\n        look_ahead_urgency = max(0, slack) / (delivery_time - start_time)\n    # Negative slack with early machine availability: amplify\n    if slack < 0 and available_time <= start_time:\n        look_ahead_urgency += (-slack) / safe_delivery\n\n    # Status factor\n    status_factor = 0.0 if status == 1 else 0.5\n\n    # Neighboring options factors\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights using utilization and robust arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.5, 0.15 + 0.35 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.3, 0.15 + 0.15 * (1 - utilization))\n    # Slack weight balances urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight * 0.5)\n    # Look-ahead weight\n    look_ahead_weight = 0.1\n    # Fixed weight for status and neighbors\n    fixed_weight = 0.1\n\n    # Normalize weights to sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + look_ahead_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    look_ahead_weight /= total_weight\n    fixed_weight /= total_weight\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.8 +\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                look_ahead_weight * look_ahead_urgency +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1018.3333333333334,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1474.25,
+          "ins_4": 1938.8666666666666,
+          "ins_5": 1774.7333333333333,
+          "ins_6": 2168.0333333333333,
+          "ins_7": 1542.5333333333333,
+          "ins_8": 1408.3166666666666,
+          "ins_9": 2678.85,
+          "ins_10": 1146.9,
+          "ins_11": 1027.1833333333334,
+          "ins_12": 1271.95,
+          "ins_13": 2309.4166666666665,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2704.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1681.9312499999999,
+        "all_scores": [
+          -1681.205833333333,
+          -1681.205833333333,
+          -1682.6566666666665,
+          -1682.6566666666665
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1681.205833333333,
+        "algorithm": "The new algorithm integrates refined adaptive weighting of normalized slack ratio, machine urgency, processing efficiency, mismatch penalty, and dual look-ahead urgency (positive slack modulation and negative slack/machine availability) with a status and neighboring factor, using dynamic weights based on utilization and a robust arrival rate proxy (1/(processing_time+1)) to minimize tardiness under lower-priority-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start = max(start_time, 1)\n    safe_processing = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency\n    proc_efficiency = processing_tm / safe_processing\n\n    # Mismatch penalty\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Dual look-ahead urgency\n    look_ahead_urgency = 0.0\n    # Positive slack: urgency as ratio of remaining slack to remaining time\n    if delivery_time - start_time > 0:\n        look_ahead_urgency = max(0, slack) / (delivery_time - start_time)\n    # Negative slack with early machine availability: amplify\n    if slack < 0 and available_time <= start_time:\n        look_ahead_urgency += (-slack) / safe_delivery\n\n    # Status factor\n    status_factor = 0.0 if status == 1 else 0.5\n\n    # Neighboring options factors\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights using utilization and robust arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.5, 0.15 + 0.35 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.3, 0.15 + 0.15 * (1 - utilization))\n    # Slack weight balances urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight * 0.5)\n    # Look-ahead weight\n    look_ahead_weight = 0.1\n    # Fixed weight for status and neighbors\n    fixed_weight = 0.1\n\n    # Normalize weights to sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + look_ahead_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    look_ahead_weight /= total_weight\n    fixed_weight /= total_weight\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.8 +\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                look_ahead_weight * look_ahead_urgency +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1018.3333333333334,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1474.25,
+          "ins_4": 1938.8666666666666,
+          "ins_5": 1774.7333333333333,
+          "ins_6": 2168.0333333333333,
+          "ins_7": 1542.5333333333333,
+          "ins_8": 1408.3166666666666,
+          "ins_9": 2678.85,
+          "ins_10": 1146.9,
+          "ins_11": 1027.1833333333334,
+          "ins_12": 1271.95,
+          "ins_13": 2309.4166666666665,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2704.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1681.205833333333,
+        "all_scores": [
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1681.205833333333,
+        "algorithm": "The new algorithm integrates refined adaptive weighting of normalized slack ratio, machine urgency, processing efficiency, mismatch penalty, and dual look-ahead urgency (positive slack modulation and negative slack/machine availability) with a status and neighboring factor, using dynamic weights based on utilization and a robust arrival rate proxy (1/(processing_time+1)) to minimize tardiness under lower-priority-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start = max(start_time, 1)\n    safe_processing = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency\n    proc_efficiency = processing_tm / safe_processing\n\n    # Mismatch penalty\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Dual look-ahead urgency\n    look_ahead_urgency = 0.0\n    # Positive slack: urgency as ratio of remaining slack to remaining time\n    if delivery_time - start_time > 0:\n        look_ahead_urgency = max(0, slack) / (delivery_time - start_time)\n    # Negative slack with early machine availability: amplify\n    if slack < 0 and available_time <= start_time:\n        look_ahead_urgency += (-slack) / safe_delivery\n\n    # Status factor\n    status_factor = 0.0 if status == 1 else 0.5\n\n    # Neighboring options factors\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights using utilization and robust arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.5, 0.15 + 0.35 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.3, 0.15 + 0.15 * (1 - utilization))\n    # Slack weight balances urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight * 0.5)\n    # Look-ahead weight\n    look_ahead_weight = 0.1\n    # Fixed weight for status and neighbors\n    fixed_weight = 0.1\n\n    # Normalize weights to sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + look_ahead_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    look_ahead_weight /= total_weight\n    fixed_weight /= total_weight\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.8 +\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                look_ahead_weight * look_ahead_urgency +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1018.3333333333334,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1474.25,
+          "ins_4": 1938.8666666666666,
+          "ins_5": 1774.7333333333333,
+          "ins_6": 2168.0333333333333,
+          "ins_7": 1542.5333333333333,
+          "ins_8": 1408.3166666666666,
+          "ins_9": 2678.85,
+          "ins_10": 1146.9,
+          "ins_11": 1027.1833333333334,
+          "ins_12": 1271.95,
+          "ins_13": 2309.4166666666665,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2704.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1681.205833333333,
+        "all_scores": [
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1681.205833333333,
+        "algorithm": "The new algorithm integrates refined adaptive weighting of normalized slack ratio, machine urgency, processing efficiency, mismatch penalty, and dual look-ahead urgency (positive slack modulation and negative slack/machine availability) with a status and neighboring factor, using dynamic weights based on utilization and a robust arrival rate proxy (1/(processing_time+1)) to minimize tardiness under lower-priority-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start = max(start_time, 1)\n    safe_processing = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency\n    proc_efficiency = processing_tm / safe_processing\n\n    # Mismatch penalty\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Dual look-ahead urgency\n    look_ahead_urgency = 0.0\n    # Positive slack: urgency as ratio of remaining slack to remaining time\n    if delivery_time - start_time > 0:\n        look_ahead_urgency = max(0, slack) / (delivery_time - start_time)\n    # Negative slack with early machine availability: amplify\n    if slack < 0 and available_time <= start_time:\n        look_ahead_urgency += (-slack) / safe_delivery\n\n    # Status factor\n    status_factor = 0.0 if status == 1 else 0.5\n\n    # Neighboring options factors\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights using utilization and robust arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.5, 0.15 + 0.35 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.3, 0.15 + 0.15 * (1 - utilization))\n    # Slack weight balances urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight * 0.5)\n    # Look-ahead weight\n    look_ahead_weight = 0.1\n    # Fixed weight for status and neighbors\n    fixed_weight = 0.1\n\n    # Normalize weights to sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + look_ahead_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    look_ahead_weight /= total_weight\n    fixed_weight /= total_weight\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.8 +\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                look_ahead_weight * look_ahead_urgency +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1018.3333333333334,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1474.25,
+          "ins_4": 1938.8666666666666,
+          "ins_5": 1774.7333333333333,
+          "ins_6": 2168.0333333333333,
+          "ins_7": 1542.5333333333333,
+          "ins_8": 1408.3166666666666,
+          "ins_9": 2678.85,
+          "ins_10": 1146.9,
+          "ins_11": 1027.1833333333334,
+          "ins_12": 1271.95,
+          "ins_13": 2309.4166666666665,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2704.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1681.205833333333,
+        "all_scores": [
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1681.205833333333,
+        "algorithm": "The new algorithm integrates refined adaptive weighting of normalized slack ratio, machine urgency, processing efficiency, mismatch penalty, and dual look-ahead urgency (positive slack modulation and negative slack/machine availability) with a status and neighboring factor, using dynamic weights based on utilization and a robust arrival rate proxy (1/(processing_time+1)) to minimize tardiness under lower-priority-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start = max(start_time, 1)\n    safe_processing = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency\n    proc_efficiency = processing_tm / safe_processing\n\n    # Mismatch penalty\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Dual look-ahead urgency\n    look_ahead_urgency = 0.0\n    # Positive slack: urgency as ratio of remaining slack to remaining time\n    if delivery_time - start_time > 0:\n        look_ahead_urgency = max(0, slack) / (delivery_time - start_time)\n    # Negative slack with early machine availability: amplify\n    if slack < 0 and available_time <= start_time:\n        look_ahead_urgency += (-slack) / safe_delivery\n\n    # Status factor\n    status_factor = 0.0 if status == 1 else 0.5\n\n    # Neighboring options factors\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights using utilization and robust arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.5, 0.15 + 0.35 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.3, 0.15 + 0.15 * (1 - utilization))\n    # Slack weight balances urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight * 0.5)\n    # Look-ahead weight\n    look_ahead_weight = 0.1\n    # Fixed weight for status and neighbors\n    fixed_weight = 0.1\n\n    # Normalize weights to sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + look_ahead_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    look_ahead_weight /= total_weight\n    fixed_weight /= total_weight\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.8 +\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                look_ahead_weight * look_ahead_urgency +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1018.3333333333334,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1474.25,
+          "ins_4": 1938.8666666666666,
+          "ins_5": 1774.7333333333333,
+          "ins_6": 2168.0333333333333,
+          "ins_7": 1542.5333333333333,
+          "ins_8": 1408.3166666666666,
+          "ins_9": 2678.85,
+          "ins_10": 1146.9,
+          "ins_11": 1027.1833333333334,
+          "ins_12": 1271.95,
+          "ins_13": 2309.4166666666665,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2704.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1681.205833333333,
+        "all_scores": [
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1681.205833333333,
+        "algorithm": "The new algorithm integrates refined adaptive weighting of normalized slack ratio, machine urgency, processing efficiency, mismatch penalty, and dual look-ahead urgency (positive slack modulation and negative slack/machine availability) with a status and neighboring factor, using dynamic weights based on utilization and a robust arrival rate proxy (1/(processing_time+1)) to minimize tardiness under lower-priority-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start = max(start_time, 1)\n    safe_processing = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency\n    proc_efficiency = processing_tm / safe_processing\n\n    # Mismatch penalty\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Dual look-ahead urgency\n    look_ahead_urgency = 0.0\n    # Positive slack: urgency as ratio of remaining slack to remaining time\n    if delivery_time - start_time > 0:\n        look_ahead_urgency = max(0, slack) / (delivery_time - start_time)\n    # Negative slack with early machine availability: amplify\n    if slack < 0 and available_time <= start_time:\n        look_ahead_urgency += (-slack) / safe_delivery\n\n    # Status factor\n    status_factor = 0.0 if status == 1 else 0.5\n\n    # Neighboring options factors\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights using utilization and robust arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.5, 0.15 + 0.35 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.3, 0.15 + 0.15 * (1 - utilization))\n    # Slack weight balances urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight * 0.5)\n    # Look-ahead weight\n    look_ahead_weight = 0.1\n    # Fixed weight for status and neighbors\n    fixed_weight = 0.1\n\n    # Normalize weights to sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + look_ahead_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    look_ahead_weight /= total_weight\n    fixed_weight /= total_weight\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.8 +\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                look_ahead_weight * look_ahead_urgency +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1018.3333333333334,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1474.25,
+          "ins_4": 1938.8666666666666,
+          "ins_5": 1774.7333333333333,
+          "ins_6": 2168.0333333333333,
+          "ins_7": 1542.5333333333333,
+          "ins_8": 1408.3166666666666,
+          "ins_9": 2678.85,
+          "ins_10": 1146.9,
+          "ins_11": 1027.1833333333334,
+          "ins_12": 1271.95,
+          "ins_13": 2309.4166666666665,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2704.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1681.205833333333,
+        "all_scores": [
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1681.205833333333,
+        "algorithm": "The new algorithm integrates refined adaptive weighting of normalized slack ratio, machine urgency, processing efficiency, mismatch penalty, and dual look-ahead urgency (positive slack modulation and negative slack/machine availability) with a status and neighboring factor, using dynamic weights based on utilization and a robust arrival rate proxy (1/(processing_time+1)) to minimize tardiness under lower-priority-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    safe_delivery = max(delivery_time, 1)\n    safe_start = max(start_time, 1)\n    safe_processing = max(processing_time, 1)\n    safe_processing_tm = max(processing_tm, 1)\n    safe_available = max(available_time, 1)\n    safe_start_plus_proc = max(start_time + processing_tm, 1)\n    safe_neighboring_machine = max(num_neighboring_machine, 1)\n    safe_neighboring_operation = max(num_neighboring_operation, 1)\n\n    # Slack ratio\n    slack = delivery_time - start_time - processing_tm\n    slack_ratio = slack / safe_delivery\n\n    # Machine urgency\n    machine_urgency = safe_available / safe_start_plus_proc\n\n    # Processing efficiency\n    proc_efficiency = processing_tm / safe_processing\n\n    # Mismatch penalty\n    mismatch_penalty = abs(processing_tm - processing_time) / max(1, processing_time + processing_tm)\n    mismatch_penalty = min(mismatch_penalty, 1.0)\n\n    # Dual look-ahead urgency\n    look_ahead_urgency = 0.0\n    # Positive slack: urgency as ratio of remaining slack to remaining time\n    if delivery_time - start_time > 0:\n        look_ahead_urgency = max(0, slack) / (delivery_time - start_time)\n    # Negative slack with early machine availability: amplify\n    if slack < 0 and available_time <= start_time:\n        look_ahead_urgency += (-slack) / safe_delivery\n\n    # Status factor\n    status_factor = 0.0 if status == 1 else 0.5\n\n    # Neighboring options factors\n    machine_options = 1.0 / safe_neighboring_machine\n    operation_options = 1.0 / safe_neighboring_operation\n\n    # Adaptive weights using utilization and robust arrival rate proxy\n    arrival_rate = 1.0 / max(processing_time, 1)\n    util_arrival = utilization * arrival_rate\n\n    # Urgency weight increases with utilization and arrival rate\n    urgency_weight = min(0.5, 0.15 + 0.35 * util_arrival)\n    # Efficiency weight decreases when urgency is high\n    efficiency_weight = max(0.1, 0.25 - 0.15 * util_arrival)\n    # Mismatch weight moderate, decreases at high utilization\n    mismatch_weight = min(0.3, 0.15 + 0.15 * (1 - utilization))\n    # Slack weight balances urgency\n    slack_weight = max(0.1, 0.3 - urgency_weight * 0.5)\n    # Look-ahead weight\n    look_ahead_weight = 0.1\n    # Fixed weight for status and neighbors\n    fixed_weight = 0.1\n\n    # Normalize weights to sum to 1\n    total_weight = slack_weight + urgency_weight + efficiency_weight + mismatch_weight + look_ahead_weight + fixed_weight\n    slack_weight /= total_weight\n    urgency_weight /= total_weight\n    efficiency_weight /= total_weight\n    mismatch_weight /= total_weight\n    look_ahead_weight /= total_weight\n    fixed_weight /= total_weight\n\n    # Composite priority (lower = higher priority)\n    priority = (slack_weight * slack_ratio +\n                urgency_weight * machine_urgency * 0.8 +\n                efficiency_weight * proc_efficiency +\n                mismatch_weight * mismatch_penalty +\n                look_ahead_weight * look_ahead_urgency +\n                fixed_weight * (0.4 * status_factor + 0.3 * machine_options + 0.3 * operation_options))\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1018.3333333333334,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1474.25,
+          "ins_4": 1938.8666666666666,
+          "ins_5": 1774.7333333333333,
+          "ins_6": 2168.0333333333333,
+          "ins_7": 1542.5333333333333,
+          "ins_8": 1408.3166666666666,
+          "ins_9": 2678.85,
+          "ins_10": 1146.9,
+          "ins_11": 1027.1833333333334,
+          "ins_12": 1271.95,
+          "ins_13": 2309.4166666666665,
+          "ins_14": 828.7166666666667,
+          "ins_15": 2210.2166666666667,
+          "ins_16": 2087.3333333333335,
+          "ins_17": 3029.983333333333,
+          "ins_18": 1441.0833333333333,
+          "ins_19": 1121.7833333333333,
+          "ins_20": 2704.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1681.205833333333,
+        "all_scores": [
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333,
+          -1681.205833333333
+        ]
+      }
+    }
+  ],
+  "error_count": 28,
+  "total_tokens": 592491,
+  "method": "EDR_E",
+  "run_id": 3,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 151,
+  "time_elapsed": 1675.8564944267273,
+  "llm_a_calls": 151,
+  "llm_a_input_tokens": 268254,
+  "llm_a_output_tokens": 119653,
+  "llm_s_calls": 123,
+  "llm_s_input_tokens": 183163,
+  "llm_s_output_tokens": 21421
+}

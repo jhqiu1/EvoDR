@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1187.1941666666667,
+        "algorithm": "The new algorithm combines EDD with critical ratio adjusted by remaining processing time and machine utilization, and penalizes long tasks on congested machines using processing time ratio.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = status[0] if isinstance(status, list) else 0\n    \n    # Calculate remaining processing time (assuming processing_tm is total processing time for the job)\n    remaining_time = processing_tm if processing_tm > 0 else processing_time\n    if remaining_time == 0:\n        remaining_time = 0.001  # Avoid division by zero\n    \n    # Critical ratio component: (delivery_time - current_time) / remaining_time\n    critical_ratio = max(0, delivery_time - current_time) / remaining_time\n    \n    # Machine utilization threshold: prefer machines with lower utilization\n    # Use num_neighboring_machine as proxy for utilization (more neighbors = more loaded)\n    utilization_factor = 1.0 / (num_neighboring_machine + 1)\n    \n    # Processing time ratio: penalize long tasks on congested machines\n    # Assuming processing_time is the operation time on current machine\n    if processing_time > 0:\n        time_ratio = processing_time / remaining_time\n    else:\n        time_ratio = 0\n    \n    # Combined priority: smaller value = higher priority\n    # Base on delivery_time, adjusted by critical_ratio, utilization, and time_ratio\n    priority = delivery_time - (critical_ratio * 0.3) + (utilization_factor * 0.2) + (time_ratio * 0.1)\n    \n    # Ensure priority is non-negative (optional)\n    priority = max(priority, 0)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1082.1,
+          "ins_4": 1201.0166666666667,
+          "ins_5": 282.26666666666665,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2135.616666666667,
+          "ins_10": 2009.3833333333334,
+          "ins_11": 546.9833333333333,
+          "ins_12": 818.7833333333333,
+          "ins_13": 2281.9166666666665,
+          "ins_14": 1220.8333333333333,
+          "ins_15": 2670.766666666667,
+          "ins_16": 1198.4,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 575.6666666666666,
+          "ins_19": 830.0666666666667,
+          "ins_20": 977.0666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1691.33625,
+        "all_scores": [
+          -1187.1941666666667,
+          -1710.4533333333334,
+          -1841.756666666667,
+          -2025.9408333333329
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1187.1941666666667,
+        "algorithm": "The new algorithm combines EDD with critical ratio adjusted by remaining processing time and machine utilization, and penalizes long tasks on congested machines using processing time ratio.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = status[0] if isinstance(status, list) else 0\n    \n    # Calculate remaining processing time (assuming processing_tm is total processing time for the job)\n    remaining_time = processing_tm if processing_tm > 0 else processing_time\n    if remaining_time == 0:\n        remaining_time = 0.001  # Avoid division by zero\n    \n    # Critical ratio component: (delivery_time - current_time) / remaining_time\n    critical_ratio = max(0, delivery_time - current_time) / remaining_time\n    \n    # Machine utilization threshold: prefer machines with lower utilization\n    # Use num_neighboring_machine as proxy for utilization (more neighbors = more loaded)\n    utilization_factor = 1.0 / (num_neighboring_machine + 1)\n    \n    # Processing time ratio: penalize long tasks on congested machines\n    # Assuming processing_time is the operation time on current machine\n    if processing_time > 0:\n        time_ratio = processing_time / remaining_time\n    else:\n        time_ratio = 0\n    \n    # Combined priority: smaller value = higher priority\n    # Base on delivery_time, adjusted by critical_ratio, utilization, and time_ratio\n    priority = delivery_time - (critical_ratio * 0.3) + (utilization_factor * 0.2) + (time_ratio * 0.1)\n    \n    # Ensure priority is non-negative (optional)\n    priority = max(priority, 0)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 949.5833333333334,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1082.1,
+          "ins_4": 1201.0166666666667,
+          "ins_5": 282.26666666666665,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2135.616666666667,
+          "ins_10": 2009.3833333333334,
+          "ins_11": 546.9833333333333,
+          "ins_12": 818.7833333333333,
+          "ins_13": 2281.9166666666665,
+          "ins_14": 1220.8333333333333,
+          "ins_15": 2670.766666666667,
+          "ins_16": 1198.4,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 575.6666666666666,
+          "ins_19": 830.0666666666667,
+          "ins_20": 977.0666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1187.1941666666667,
+        "all_scores": [
+          -1187.1941666666667,
+          -1187.1941666666667,
+          -1187.1941666666667,
+          -1187.1941666666667
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1128.9266666666665,
+        "algorithm": "The improved algorithm computes priority by combining EDD with a slack-based penalty, real-time machine utilization, processing time ratio, and a machine-task compatibility factor, where smaller values indicate higher priority.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = status[0] if isinstance(status, list) else 0\n    \n    # Calculate remaining processing time\n    remaining_time = processing_tm if processing_tm > 0 else processing_time\n    if remaining_time == 0:\n        remaining_time = 0.001\n    \n    # EDD base: due date\n    due_date_priority = delivery_time\n    \n    # Slack-based penalty: use start_time and available time to avoid idle time\n    slack = delivery_time - current_time - remaining_time\n    slack_penalty = max(0, slack) / (delivery_time + 1) if delivery_time > 0 else 0\n    \n    # Real-time machine utilization: use queue length as proxy (inverse for lower utilization = higher priority)\n    # num_neighboring_machine represents queue length or machine load\n    machine_utilization = num_neighboring_machine / (num_neighboring_machine + 1)  # between 0 and 1\n    utilization_factor = 1.0 / (num_neighboring_machine + 1)  # smaller for higher load\n    \n    # Processing time ratio: penalize long tasks on congested machines\n    if processing_time > 0 and remaining_time > 0:\n        time_ratio = processing_time / remaining_time\n    else:\n        time_ratio = 0\n    \n    # Machine-task compatibility factor: prioritize machines that can handle task type\n    # Use processing_time as proxy (shorter processing time = better compatibility)\n    compatibility_factor = 1.0 / (processing_time + 1) if processing_time > 0 else 1.0\n    \n    # Combined priority (smaller value = higher priority)\n    priority = (due_date_priority * 0.3) - (slack_penalty * 0.2) + (utilization_factor * 0.15) + (time_ratio * 0.1) + (compatibility_factor * 0.05)\n    \n    # Ensure non-negative\n    priority = max(priority, 0)\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 530.15,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1032.75,
+          "ins_4": 1144.2666666666667,
+          "ins_5": 482.53333333333336,
+          "ins_6": 1020.25,
+          "ins_7": 522.9666666666667,
+          "ins_8": 1440.9,
+          "ins_9": 2519.3166666666666,
+          "ins_10": 1198.5,
+          "ins_11": 597.1833333333333,
+          "ins_12": 958.0166666666667,
+          "ins_13": 1652.65,
+          "ins_14": 1138.7166666666667,
+          "ins_15": 2390.9166666666665,
+          "ins_16": 1070.9666666666667,
+          "ins_17": 1836.1166666666666,
+          "ins_18": 774.8833333333333,
+          "ins_19": 974.0833333333334,
+          "ins_20": 889.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1139.8408333333334,
+        "all_scores": [
+          -1128.9266666666665,
+          -1135.0291666666667,
+          -1137.0175000000004,
+          -1158.3899999999999
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1128.9266666666665,
+        "algorithm": "The improved algorithm computes priority by combining EDD with a slack-based penalty, real-time machine utilization, processing time ratio, and a machine-task compatibility factor, where smaller values indicate higher priority.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = status[0] if isinstance(status, list) else 0\n    \n    # Calculate remaining processing time\n    remaining_time = processing_tm if processing_tm > 0 else processing_time\n    if remaining_time == 0:\n        remaining_time = 0.001\n    \n    # EDD base: due date\n    due_date_priority = delivery_time\n    \n    # Slack-based penalty: use start_time and available time to avoid idle time\n    slack = delivery_time - current_time - remaining_time\n    slack_penalty = max(0, slack) / (delivery_time + 1) if delivery_time > 0 else 0\n    \n    # Real-time machine utilization: use queue length as proxy (inverse for lower utilization = higher priority)\n    # num_neighboring_machine represents queue length or machine load\n    machine_utilization = num_neighboring_machine / (num_neighboring_machine + 1)  # between 0 and 1\n    utilization_factor = 1.0 / (num_neighboring_machine + 1)  # smaller for higher load\n    \n    # Processing time ratio: penalize long tasks on congested machines\n    if processing_time > 0 and remaining_time > 0:\n        time_ratio = processing_time / remaining_time\n    else:\n        time_ratio = 0\n    \n    # Machine-task compatibility factor: prioritize machines that can handle task type\n    # Use processing_time as proxy (shorter processing time = better compatibility)\n    compatibility_factor = 1.0 / (processing_time + 1) if processing_time > 0 else 1.0\n    \n    # Combined priority (smaller value = higher priority)\n    priority = (due_date_priority * 0.3) - (slack_penalty * 0.2) + (utilization_factor * 0.15) + (time_ratio * 0.1) + (compatibility_factor * 0.05)\n    \n    # Ensure non-negative\n    priority = max(priority, 0)\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 530.15,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1032.75,
+          "ins_4": 1144.2666666666667,
+          "ins_5": 482.53333333333336,
+          "ins_6": 1020.25,
+          "ins_7": 522.9666666666667,
+          "ins_8": 1440.9,
+          "ins_9": 2519.3166666666666,
+          "ins_10": 1198.5,
+          "ins_11": 597.1833333333333,
+          "ins_12": 958.0166666666667,
+          "ins_13": 1652.65,
+          "ins_14": 1138.7166666666667,
+          "ins_15": 2390.9166666666665,
+          "ins_16": 1070.9666666666667,
+          "ins_17": 1836.1166666666666,
+          "ins_18": 774.8833333333333,
+          "ins_19": 974.0833333333334,
+          "ins_20": 889.5333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1132.9183333333333,
+        "all_scores": [
+          -1128.9266666666665,
+          -1130.6999999999998,
+          -1135.0291666666667,
+          -1137.0175000000004
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1106.540833333333,
+        "algorithm": "The new algorithm combines EDD due date, critical ratio, slack penalty, machine utilization, processing time ratio, and compatibility factor with dynamic weight adjustment based on machine load to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    if isinstance(status, (list, tuple)):\n        current_time = status[0] if status else 0.0\n    elif isinstance(status, (int, float)):\n        current_time = float(status)\n    else:\n        current_time = 0.0\n\n    # Safely compute remaining processing time\n    if processing_tm and processing_tm > 0:\n        remaining = processing_tm\n    elif processing_time and processing_time > 0:\n        remaining = processing_time\n    else:\n        remaining = 0.001  # avoid division by zero\n\n    # Component 1: EDD base (due date)\n    due_date_priority = delivery_time\n\n    # Component 2: Critical ratio (adjusted with current time)\n    if remaining > 0:\n        cr = (delivery_time - current_time) / remaining\n    else:\n        cr = 0.0\n\n    # Component 3: Slack-based penalty\n    slack = delivery_time - current_time - remaining\n    if delivery_time > 0:\n        slack_penalty = max(0.0, slack) / (delivery_time + 1.0)\n    else:\n        slack_penalty = max(0.0, slack) / 1.0\n\n    # Component 4: Idle penalty based on start_time\n    if start_time > current_time:\n        idle_penalty = (start_time - current_time) / 10.0\n    else:\n        idle_penalty = 0.0\n\n    # Component 5: Machine utilization (higher priority for less loaded machines)\n    machine_load = min(num_neighboring_machine / 10.0, 1.0)\n    utilization_priority = 1.0 - machine_load  # smaller for lower utilization\n\n    # Component 6: Processing time ratio (short tasks favored on congested machines)\n    if processing_time > 0 and remaining > 0:\n        time_ratio = processing_time / remaining\n    else:\n        time_ratio = 0.0\n\n    # Component 7: Compatibility factor (better compatibility gives higher priority)\n    if processing_time > 0:\n        compat_factor = 1.0 / (processing_time + 1.0)\n    else:\n        compat_factor = 0.5\n\n    # Dynamic weight adjustment: under high load, emphasize utilization and slack\n    load_weight = machine_load  # ranges from 0 to 1\n\n    # Weights that adapt based on machine load to improve tardiness\n    w_due = 0.25\n    w_cr = 0.15\n    w_slack = 0.10 * (1.0 - load_weight)  # less weight when load high\n    w_idle = 0.05\n    w_util = 0.15 * (1.0 + load_weight)   # more weight when load high\n    w_ratio = 0.10\n    w_compat = 0.05\n\n    # Combined priority (smaller value = higher priority)\n    priority = (due_date_priority * w_due\n                - cr * w_cr\n                - slack_penalty * w_slack\n                + idle_penalty * w_idle\n                - utilization_priority * w_util\n                + time_ratio * w_ratio\n                + compat_factor * w_compat)\n\n    # Ensure non-negative\n    result = max(priority, 0.0)\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 530.15,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1082.1,
+          "ins_4": 1152.3833333333334,
+          "ins_5": 264.01666666666665,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2135.616666666667,
+          "ins_10": 2009.3833333333334,
+          "ins_11": 545.3,
+          "ins_12": 772.4,
+          "ins_13": 1798.7333333333333,
+          "ins_14": 1220.8333333333333,
+          "ins_15": 2116.9666666666667,
+          "ins_16": 1198.4,
+          "ins_17": 1655.5333333333333,
+          "ins_18": 680.6166666666667,
+          "ins_19": 830.0666666666667,
+          "ins_20": 977.0666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1122.5718749999999,
+        "all_scores": [
+          -1106.540833333333,
+          -1124.12,
+          -1128.9266666666665,
+          -1130.6999999999998
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1106.040833333333,
+        "algorithm": "The new algorithm combines EDD due date, critical ratio, slack penalty, normalized machine count, dynamic machine utilization, processing time ratio, machine-task processing time ratio, machine availability time penalty, and compatibility factor with adaptive weights based on machine load and slack to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    if isinstance(status, (list, tuple)):\n        current_time = status[0] if status else 0.0\n    elif isinstance(status, (int, float)):\n        current_time = float(status)\n    else:\n        current_time = 0.0\n\n    # Calculate remaining processing time safely\n    if processing_tm and processing_tm > 0:\n        remaining = processing_tm\n    elif processing_time and processing_time > 0:\n        remaining = processing_time\n    else:\n        remaining = 0.001  # avoid division by zero\n\n    # Component 1: EDD base (due date)\n    due_date_priority = delivery_time\n\n    # Component 2: Critical ratio (adjusted with current time)\n    if remaining > 0:\n        cr = (delivery_time - current_time) / remaining\n    else:\n        cr = 0.0\n\n    # Component 3: Slack-based penalty\n    slack = delivery_time - current_time - remaining\n    slack_denom = delivery_time + 1.0 if delivery_time > 0 else 1.0\n    slack_penalty = max(0.0, slack) / slack_denom\n\n    # Component 4: Machine availability time penalty (idle time influence)\n    if start_time > current_time:\n        idle_penalty = (start_time - current_time) / 10.0\n    else:\n        idle_penalty = 0.0\n\n    # Component 5: Normalization by number of available machines (from algorithm 2)\n    num_machines = num_neighboring_machine + 1.0  # avoid zero\n    normalized_priority = due_date_priority / num_machines\n\n    # Component 6: Machine utilization (dynamic, from both algorithms)\n    machine_load = min(num_neighboring_machine / 10.0, 1.0)\n    utilization_factor = 1.0 / (num_neighboring_machine + 1.0)  # from algorithm 2\n    utilization_priority = 1.0 - machine_load  # smaller for lower utilization\n\n    # Component 7: Processing time ratio (short tasks favored)\n    if processing_time > 0 and remaining > 0:\n        time_ratio = processing_time / remaining\n    else:\n        time_ratio = 0.0\n\n    # Component 8: Machine-task processing time ratio (from algorithm 2)\n    if processing_time > 0 and remaining > 0:\n        machine_task_ratio = processing_time / (remaining + 1.0)  # penalize high processing time\n    else:\n        machine_task_ratio = 0.0\n\n    # Component 9: Compatibility factor\n    if processing_time > 0:\n        compat_factor = 1.0 / (processing_time + 1.0)\n    else:\n        compat_factor = 0.5\n\n    # Dynamic weight adjustment based on machine load and slack\n    load_weight = machine_load  # ranges 0 to 1\n    slack_norm = min(max(slack / (delivery_time + 1.0), 0.0), 1.0) if delivery_time > 0 else 0.0\n\n    # Adaptive weights combining advantages of both algorithms\n    w_due = 0.15\n    w_cr = 0.10\n    w_slack = 0.10 * (1.0 - load_weight)  # less weight when load high\n    w_idle = 0.08\n    w_norm = 0.12  # from algorithm 2 normalization\n    w_util = 0.15 * (1.0 + load_weight)  # more weight when load high\n    w_ratio = 0.10\n    w_machine_task = 0.08  # from algorithm 2\n    w_compat = 0.07\n\n    # Combined priority (smaller value = higher priority)\n    priority = (due_date_priority * w_due\n                - cr * w_cr\n                - slack_penalty * w_slack\n                + idle_penalty * w_idle\n                + normalized_priority * w_norm\n                - utilization_priority * w_util\n                + time_ratio * w_ratio\n                + machine_task_ratio * w_machine_task\n                + compat_factor * w_compat)\n\n    result = max(priority, 0.0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 530.15,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1082.1,
+          "ins_4": 1152.3833333333334,
+          "ins_5": 264.01666666666665,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2135.616666666667,
+          "ins_10": 2009.3833333333334,
+          "ins_11": 545.3,
+          "ins_12": 772.4,
+          "ins_13": 1798.7333333333333,
+          "ins_14": 1220.8333333333333,
+          "ins_15": 2116.9666666666667,
+          "ins_16": 1198.4,
+          "ins_17": 1655.5333333333333,
+          "ins_18": 670.6166666666667,
+          "ins_19": 830.0666666666667,
+          "ins_20": 977.0666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1106.552083333333,
+        "all_scores": [
+          -1106.040833333333,
+          -1106.540833333333,
+          -1106.540833333333,
+          -1107.085833333333
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1106.040833333333,
+        "algorithm": "The new algorithm combines EDD due date, critical ratio, slack penalty, normalized machine count, dynamic machine utilization, processing time ratio, machine-task processing time ratio, machine availability time penalty, and compatibility factor with adaptive weights based on machine load and slack to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    if isinstance(status, (list, tuple)):\n        current_time = status[0] if status else 0.0\n    elif isinstance(status, (int, float)):\n        current_time = float(status)\n    else:\n        current_time = 0.0\n\n    # Calculate remaining processing time safely\n    if processing_tm and processing_tm > 0:\n        remaining = processing_tm\n    elif processing_time and processing_time > 0:\n        remaining = processing_time\n    else:\n        remaining = 0.001  # avoid division by zero\n\n    # Component 1: EDD base (due date)\n    due_date_priority = delivery_time\n\n    # Component 2: Critical ratio (adjusted with current time)\n    if remaining > 0:\n        cr = (delivery_time - current_time) / remaining\n    else:\n        cr = 0.0\n\n    # Component 3: Slack-based penalty\n    slack = delivery_time - current_time - remaining\n    slack_denom = delivery_time + 1.0 if delivery_time > 0 else 1.0\n    slack_penalty = max(0.0, slack) / slack_denom\n\n    # Component 4: Machine availability time penalty (idle time influence)\n    if start_time > current_time:\n        idle_penalty = (start_time - current_time) / 10.0\n    else:\n        idle_penalty = 0.0\n\n    # Component 5: Normalization by number of available machines (from algorithm 2)\n    num_machines = num_neighboring_machine + 1.0  # avoid zero\n    normalized_priority = due_date_priority / num_machines\n\n    # Component 6: Machine utilization (dynamic, from both algorithms)\n    machine_load = min(num_neighboring_machine / 10.0, 1.0)\n    utilization_factor = 1.0 / (num_neighboring_machine + 1.0)  # from algorithm 2\n    utilization_priority = 1.0 - machine_load  # smaller for lower utilization\n\n    # Component 7: Processing time ratio (short tasks favored)\n    if processing_time > 0 and remaining > 0:\n        time_ratio = processing_time / remaining\n    else:\n        time_ratio = 0.0\n\n    # Component 8: Machine-task processing time ratio (from algorithm 2)\n    if processing_time > 0 and remaining > 0:\n        machine_task_ratio = processing_time / (remaining + 1.0)  # penalize high processing time\n    else:\n        machine_task_ratio = 0.0\n\n    # Component 9: Compatibility factor\n    if processing_time > 0:\n        compat_factor = 1.0 / (processing_time + 1.0)\n    else:\n        compat_factor = 0.5\n\n    # Dynamic weight adjustment based on machine load and slack\n    load_weight = machine_load  # ranges 0 to 1\n    slack_norm = min(max(slack / (delivery_time + 1.0), 0.0), 1.0) if delivery_time > 0 else 0.0\n\n    # Adaptive weights combining advantages of both algorithms\n    w_due = 0.15\n    w_cr = 0.10\n    w_slack = 0.10 * (1.0 - load_weight)  # less weight when load high\n    w_idle = 0.08\n    w_norm = 0.12  # from algorithm 2 normalization\n    w_util = 0.15 * (1.0 + load_weight)  # more weight when load high\n    w_ratio = 0.10\n    w_machine_task = 0.08  # from algorithm 2\n    w_compat = 0.07\n\n    # Combined priority (smaller value = higher priority)\n    priority = (due_date_priority * w_due\n                - cr * w_cr\n                - slack_penalty * w_slack\n                + idle_penalty * w_idle\n                + normalized_priority * w_norm\n                - utilization_priority * w_util\n                + time_ratio * w_ratio\n                + machine_task_ratio * w_machine_task\n                + compat_factor * w_compat)\n\n    result = max(priority, 0.0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 530.15,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1082.1,
+          "ins_4": 1152.3833333333334,
+          "ins_5": 264.01666666666665,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2135.616666666667,
+          "ins_10": 2009.3833333333334,
+          "ins_11": 545.3,
+          "ins_12": 772.4,
+          "ins_13": 1798.7333333333333,
+          "ins_14": 1220.8333333333333,
+          "ins_15": 2116.9666666666667,
+          "ins_16": 1198.4,
+          "ins_17": 1655.5333333333333,
+          "ins_18": 670.6166666666667,
+          "ins_19": 830.0666666666667,
+          "ins_20": 977.0666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1106.552083333333,
+        "all_scores": [
+          -1106.040833333333,
+          -1106.540833333333,
+          -1106.540833333333,
+          -1107.085833333333
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1106.040833333333,
+        "algorithm": "The new algorithm combines EDD due date, critical ratio, slack penalty, normalized machine count, dynamic machine utilization, processing time ratio, machine-task processing time ratio, machine availability time penalty, and compatibility factor with adaptive weights based on machine load and slack to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    if isinstance(status, (list, tuple)):\n        current_time = status[0] if status else 0.0\n    elif isinstance(status, (int, float)):\n        current_time = float(status)\n    else:\n        current_time = 0.0\n\n    # Calculate remaining processing time safely\n    if processing_tm and processing_tm > 0:\n        remaining = processing_tm\n    elif processing_time and processing_time > 0:\n        remaining = processing_time\n    else:\n        remaining = 0.001  # avoid division by zero\n\n    # Component 1: EDD base (due date)\n    due_date_priority = delivery_time\n\n    # Component 2: Critical ratio (adjusted with current time)\n    if remaining > 0:\n        cr = (delivery_time - current_time) / remaining\n    else:\n        cr = 0.0\n\n    # Component 3: Slack-based penalty\n    slack = delivery_time - current_time - remaining\n    slack_denom = delivery_time + 1.0 if delivery_time > 0 else 1.0\n    slack_penalty = max(0.0, slack) / slack_denom\n\n    # Component 4: Machine availability time penalty (idle time influence)\n    if start_time > current_time:\n        idle_penalty = (start_time - current_time) / 10.0\n    else:\n        idle_penalty = 0.0\n\n    # Component 5: Normalization by number of available machines (from algorithm 2)\n    num_machines = num_neighboring_machine + 1.0  # avoid zero\n    normalized_priority = due_date_priority / num_machines\n\n    # Component 6: Machine utilization (dynamic, from both algorithms)\n    machine_load = min(num_neighboring_machine / 10.0, 1.0)\n    utilization_factor = 1.0 / (num_neighboring_machine + 1.0)  # from algorithm 2\n    utilization_priority = 1.0 - machine_load  # smaller for lower utilization\n\n    # Component 7: Processing time ratio (short tasks favored)\n    if processing_time > 0 and remaining > 0:\n        time_ratio = processing_time / remaining\n    else:\n        time_ratio = 0.0\n\n    # Component 8: Machine-task processing time ratio (from algorithm 2)\n    if processing_time > 0 and remaining > 0:\n        machine_task_ratio = processing_time / (remaining + 1.0)  # penalize high processing time\n    else:\n        machine_task_ratio = 0.0\n\n    # Component 9: Compatibility factor\n    if processing_time > 0:\n        compat_factor = 1.0 / (processing_time + 1.0)\n    else:\n        compat_factor = 0.5\n\n    # Dynamic weight adjustment based on machine load and slack\n    load_weight = machine_load  # ranges 0 to 1\n    slack_norm = min(max(slack / (delivery_time + 1.0), 0.0), 1.0) if delivery_time > 0 else 0.0\n\n    # Adaptive weights combining advantages of both algorithms\n    w_due = 0.15\n    w_cr = 0.10\n    w_slack = 0.10 * (1.0 - load_weight)  # less weight when load high\n    w_idle = 0.08\n    w_norm = 0.12  # from algorithm 2 normalization\n    w_util = 0.15 * (1.0 + load_weight)  # more weight when load high\n    w_ratio = 0.10\n    w_machine_task = 0.08  # from algorithm 2\n    w_compat = 0.07\n\n    # Combined priority (smaller value = higher priority)\n    priority = (due_date_priority * w_due\n                - cr * w_cr\n                - slack_penalty * w_slack\n                + idle_penalty * w_idle\n                + normalized_priority * w_norm\n                - utilization_priority * w_util\n                + time_ratio * w_ratio\n                + machine_task_ratio * w_machine_task\n                + compat_factor * w_compat)\n\n    result = max(priority, 0.0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 530.15,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1082.1,
+          "ins_4": 1152.3833333333334,
+          "ins_5": 264.01666666666665,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2135.616666666667,
+          "ins_10": 2009.3833333333334,
+          "ins_11": 545.3,
+          "ins_12": 772.4,
+          "ins_13": 1798.7333333333333,
+          "ins_14": 1220.8333333333333,
+          "ins_15": 2116.9666666666667,
+          "ins_16": 1198.4,
+          "ins_17": 1655.5333333333333,
+          "ins_18": 670.6166666666667,
+          "ins_19": 830.0666666666667,
+          "ins_20": 977.0666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1106.290833333333,
+        "all_scores": [
+          -1106.040833333333,
+          -1106.040833333333,
+          -1106.540833333333,
+          -1106.540833333333
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1104.82,
+        "algorithm": "The new algorithm combines the strengths of both provided algorithms by using a hybrid priority function that integrates EDD due date, critical ratio, slack penalty, normalized machine count, dynamic machine utilization, processing time ratio, machine-task processing time ratio, machine availability time penalty, and compatibility factor, with adaptive weights that dynamically adjust based on machine load, slack, and an exponential smoothing factor to better handle dynamic arrivals and reduce tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    if isinstance(status, (list, tuple)):\n        current_time = status[0] if status else 0.0\n    elif isinstance(status, (int, float)):\n        current_time = float(status)\n    else:\n        current_time = 0.0\n\n    # Compute remaining processing time safely\n    if processing_tm and processing_tm > 0:\n        remaining = processing_tm\n    elif processing_time and processing_time > 0:\n        remaining = processing_time\n    else:\n        remaining = 0.001\n\n    # Component 1: EDD due date\n    due = delivery_time if delivery_time else 0.0\n\n    # Component 2: Critical ratio\n    if remaining > 0:\n        cr = (due - current_time) / remaining\n    else:\n        cr = 0.0\n\n    # Component 3: Slack penalty\n    slack = due - current_time - remaining\n    slack_denom = due + 1.0 if due > 0 else 1.0\n    slack_penalty = max(0.0, slack) / slack_denom\n\n    # Component 4: Machine availability time penalty\n    if start_time and start_time > current_time:\n        idle_penalty = (start_time - current_time) / 10.0\n    else:\n        idle_penalty = 0.0\n\n    # Component 5: Normalization by number of machines\n    num_mach = (num_neighboring_machine if num_neighboring_machine else 0) + 1.0\n    normalized = due / num_mach\n\n    # Component 6: Machine utilization\n    machine_load = min((num_neighboring_machine if num_neighboring_machine else 0) / 10.0, 1.0)\n    utilization_priority = 1.0 - machine_load\n\n    # Component 7: Processing time ratio\n    if processing_time and processing_time > 0 and remaining > 0:\n        time_ratio = processing_time / remaining\n    else:\n        time_ratio = 0.0\n\n    # Component 8: Machine-task processing time ratio\n    if processing_time and processing_time > 0 and remaining > 0:\n        machine_task_ratio = processing_time / (remaining + 1.0)\n    else:\n        machine_task_ratio = 0.0\n\n    # Component 9: Compatibility factor\n    if processing_time and processing_time > 0:\n        compat = 1.0 / (processing_time + 1.0)\n    else:\n        compat = 0.5\n\n    # Dynamic weight adjustment with hybrid parameters\n    load_weight = machine_load\n    slack_norm = min(max(slack / (due + 1.0), 0.0), 1.0) if due > 0 else 0.0\n    exp_factor = 0.9  # Exponential smoothing for dynamic arrivals\n\n    # Weighted combination (smaller value = higher priority)\n    w_due = 0.18\n    w_cr = 0.08 * (1.0 + slack_norm)\n    w_slack = 0.12 * (1.0 - load_weight)\n    w_idle = 0.09 * exp_factor\n    w_norm = 0.11\n    w_util = 0.12 * (1.0 + load_weight)\n    w_ratio = 0.12\n    w_machine = 0.06\n    w_compat = 0.12 * (1.0 - slack_norm)\n\n    priority = (due * w_due\n                - cr * w_cr\n                - slack_penalty * w_slack\n                + idle_penalty * w_idle\n                + normalized * w_norm\n                - utilization_priority * w_util\n                + time_ratio * w_ratio\n                + machine_task_ratio * w_machine\n                + compat * w_compat)\n\n    result = max(priority, 0.0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 530.15,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1082.1,
+          "ins_4": 1152.3833333333334,
+          "ins_5": 264.01666666666665,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2135.616666666667,
+          "ins_10": 2009.3833333333334,
+          "ins_11": 545.3,
+          "ins_12": 772.4,
+          "ins_13": 1798.7333333333333,
+          "ins_14": 1220.8333333333333,
+          "ins_15": 2116.9666666666667,
+          "ins_16": 1198.4,
+          "ins_17": 1655.5333333333333,
+          "ins_18": 646.2,
+          "ins_19": 830.0666666666667,
+          "ins_20": 977.0666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1105.7356249999998,
+        "all_scores": [
+          -1104.82,
+          -1106.040833333333,
+          -1106.040833333333,
+          -1106.040833333333
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1104.82,
+        "algorithm": "The new algorithm combines the strengths of both provided algorithms by using a hybrid priority function that integrates EDD due date, critical ratio, slack penalty, normalized machine count, dynamic machine utilization, processing time ratio, machine-task processing time ratio, machine availability time penalty, and compatibility factor, with adaptive weights that dynamically adjust based on machine load, slack, and an exponential smoothing factor to better handle dynamic arrivals and reduce tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    if isinstance(status, (list, tuple)):\n        current_time = status[0] if status else 0.0\n    elif isinstance(status, (int, float)):\n        current_time = float(status)\n    else:\n        current_time = 0.0\n\n    # Compute remaining processing time safely\n    if processing_tm and processing_tm > 0:\n        remaining = processing_tm\n    elif processing_time and processing_time > 0:\n        remaining = processing_time\n    else:\n        remaining = 0.001\n\n    # Component 1: EDD due date\n    due = delivery_time if delivery_time else 0.0\n\n    # Component 2: Critical ratio\n    if remaining > 0:\n        cr = (due - current_time) / remaining\n    else:\n        cr = 0.0\n\n    # Component 3: Slack penalty\n    slack = due - current_time - remaining\n    slack_denom = due + 1.0 if due > 0 else 1.0\n    slack_penalty = max(0.0, slack) / slack_denom\n\n    # Component 4: Machine availability time penalty\n    if start_time and start_time > current_time:\n        idle_penalty = (start_time - current_time) / 10.0\n    else:\n        idle_penalty = 0.0\n\n    # Component 5: Normalization by number of machines\n    num_mach = (num_neighboring_machine if num_neighboring_machine else 0) + 1.0\n    normalized = due / num_mach\n\n    # Component 6: Machine utilization\n    machine_load = min((num_neighboring_machine if num_neighboring_machine else 0) / 10.0, 1.0)\n    utilization_priority = 1.0 - machine_load\n\n    # Component 7: Processing time ratio\n    if processing_time and processing_time > 0 and remaining > 0:\n        time_ratio = processing_time / remaining\n    else:\n        time_ratio = 0.0\n\n    # Component 8: Machine-task processing time ratio\n    if processing_time and processing_time > 0 and remaining > 0:\n        machine_task_ratio = processing_time / (remaining + 1.0)\n    else:\n        machine_task_ratio = 0.0\n\n    # Component 9: Compatibility factor\n    if processing_time and processing_time > 0:\n        compat = 1.0 / (processing_time + 1.0)\n    else:\n        compat = 0.5\n\n    # Dynamic weight adjustment with hybrid parameters\n    load_weight = machine_load\n    slack_norm = min(max(slack / (due + 1.0), 0.0), 1.0) if due > 0 else 0.0\n    exp_factor = 0.9  # Exponential smoothing for dynamic arrivals\n\n    # Weighted combination (smaller value = higher priority)\n    w_due = 0.18\n    w_cr = 0.08 * (1.0 + slack_norm)\n    w_slack = 0.12 * (1.0 - load_weight)\n    w_idle = 0.09 * exp_factor\n    w_norm = 0.11\n    w_util = 0.12 * (1.0 + load_weight)\n    w_ratio = 0.12\n    w_machine = 0.06\n    w_compat = 0.12 * (1.0 - slack_norm)\n\n    priority = (due * w_due\n                - cr * w_cr\n                - slack_penalty * w_slack\n                + idle_penalty * w_idle\n                + normalized * w_norm\n                - utilization_priority * w_util\n                + time_ratio * w_ratio\n                + machine_task_ratio * w_machine\n                + compat * w_compat)\n\n    result = max(priority, 0.0)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 530.15,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1082.1,
+          "ins_4": 1152.3833333333334,
+          "ins_5": 264.01666666666665,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2135.616666666667,
+          "ins_10": 2009.3833333333334,
+          "ins_11": 545.3,
+          "ins_12": 772.4,
+          "ins_13": 1798.7333333333333,
+          "ins_14": 1220.8333333333333,
+          "ins_15": 2116.9666666666667,
+          "ins_16": 1198.4,
+          "ins_17": 1655.5333333333333,
+          "ins_18": 646.2,
+          "ins_19": 830.0666666666667,
+          "ins_20": 977.0666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1105.232708333333,
+        "all_scores": [
+          -1104.82,
+          -1104.82,
+          -1105.2499999999998,
+          -1106.040833333333
+        ]
+      }
+    }
+  ],
+  "error_count": 9,
+  "total_tokens": 455036,
+  "method": "EDR_D_machine",
+  "run_id": 3,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 133,
+  "time_elapsed": 1339.5480823516846,
+  "llm_a_calls": 133,
+  "llm_a_input_tokens": 182635,
+  "llm_a_output_tokens": 89518,
+  "llm_s_calls": 125,
+  "llm_s_input_tokens": 161963,
+  "llm_s_output_tokens": 20920
+}

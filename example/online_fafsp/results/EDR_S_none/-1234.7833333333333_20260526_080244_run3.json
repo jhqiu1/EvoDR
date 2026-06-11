@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1730.6158333333335,
+        "all_scores": [
+          -1710.4533333333334,
+          -1710.4533333333334,
+          -1745.3458333333333,
+          -1756.2108333333333
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1727.8995833333333,
+        "all_scores": [
+          -1710.4533333333334,
+          -1710.4533333333334,
+          -1745.3458333333333,
+          -1745.3458333333333
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1719.1764583333334,
+        "all_scores": [
+          -1710.4533333333334,
+          -1710.4533333333334,
+          -1710.4533333333334,
+          -1745.3458333333333
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1710.4533333333334,
+        "all_scores": [
+          -1710.4533333333334,
+          -1710.4533333333334,
+          -1710.4533333333334,
+          -1710.4533333333334
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1685.9600000000003,
+        "algorithm": "The new algorithm combines Earliest Due Date with Slack Time and remaining work to minimize tardiness, using a weighted sum with normalization and zero-division checks.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    edd = delivery_time\n    \n    # Slack time = delivery_time - (current_time + processing_time + waiting_time)\n    # Use available_time as current time proxy, and remaining work from processing_tm\n    # To avoid division by zero, handle edge cases\n    current_time = available_time\n    slack = delivery_time - (current_time + processing_time)\n    \n    # Remaining work: use processing_time as a proxy for remaining operations\n    remaining_work = processing_time * (num_neighboring_operation + 1)  # +1 to avoid zero\n    \n    # Normalize components (simple min-max within each job context)\n    # Since we don't have global min/max, use simple weighted sum with small epsilon\n    epsilon = 1e-6\n    priority = edd + slack * 0.3 + remaining_work * 0.1\n    \n    # Ensure priority is positive and non-zero\n    if priority <= 0:\n        priority = epsilon\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1198.55,
+          "ins_2": 942.5833333333334,
+          "ins_3": 1467.8,
+          "ins_4": 1523.2833333333333,
+          "ins_5": 738.3666666666667,
+          "ins_6": 1812.1833333333334,
+          "ins_7": 784.8333333333334,
+          "ins_8": 1812.9666666666667,
+          "ins_9": 3865.15,
+          "ins_10": 1474.5666666666666,
+          "ins_11": 1815.2666666666667,
+          "ins_12": 1369.2333333333333,
+          "ins_13": 2169.516666666667,
+          "ins_14": 1551.3,
+          "ins_15": 2480.75,
+          "ins_16": 1769.3,
+          "ins_17": 1909.2166666666667,
+          "ins_18": 1309.7666666666667,
+          "ins_19": 1590.4,
+          "ins_20": 2134.1666666666665
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1704.33,
+        "all_scores": [
+          -1685.9600000000003,
+          -1710.4533333333334,
+          -1710.4533333333334,
+          -1710.4533333333334
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1685.9600000000003,
+        "algorithm": "The new algorithm combines Earliest Due Date with Slack Time and remaining work to minimize tardiness, using a weighted sum with normalization and zero-division checks.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    edd = delivery_time\n    \n    # Slack time = delivery_time - (current_time + processing_time + waiting_time)\n    # Use available_time as current time proxy, and remaining work from processing_tm\n    # To avoid division by zero, handle edge cases\n    current_time = available_time\n    slack = delivery_time - (current_time + processing_time)\n    \n    # Remaining work: use processing_time as a proxy for remaining operations\n    remaining_work = processing_time * (num_neighboring_operation + 1)  # +1 to avoid zero\n    \n    # Normalize components (simple min-max within each job context)\n    # Since we don't have global min/max, use simple weighted sum with small epsilon\n    epsilon = 1e-6\n    priority = edd + slack * 0.3 + remaining_work * 0.1\n    \n    # Ensure priority is positive and non-zero\n    if priority <= 0:\n        priority = epsilon\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1198.55,
+          "ins_2": 942.5833333333334,
+          "ins_3": 1467.8,
+          "ins_4": 1523.2833333333333,
+          "ins_5": 738.3666666666667,
+          "ins_6": 1812.1833333333334,
+          "ins_7": 784.8333333333334,
+          "ins_8": 1812.9666666666667,
+          "ins_9": 3865.15,
+          "ins_10": 1474.5666666666666,
+          "ins_11": 1815.2666666666667,
+          "ins_12": 1369.2333333333333,
+          "ins_13": 2169.516666666667,
+          "ins_14": 1551.3,
+          "ins_15": 2480.75,
+          "ins_16": 1769.3,
+          "ins_17": 1909.2166666666667,
+          "ins_18": 1309.7666666666667,
+          "ins_19": 1590.4,
+          "ins_20": 2134.1666666666665
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1698.206666666667,
+        "all_scores": [
+          -1685.9600000000003,
+          -1685.9600000000003,
+          -1710.4533333333334,
+          -1710.4533333333334
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1488.8249999999998,
+        "algorithm": "The new algorithm computes priority using a weighted sum of due date, slack time with a machine utilization penalty, and a normalized remaining work term, applying epsilon-based guards to avoid zero division and ensure positive output.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    \n    # Due date component\n    edd = delivery_time\n    \n    # Slack time: time until due from current time (available_time), minus processing time\n    current_time = available_time\n    slack = delivery_time - (current_time + processing_time)\n    \n    # Utilization penalty: higher utilization increases urgency\n    utilization_penalty = utilization * processing_time  # amplifies if machine is busy\n    \n    # Remaining work: use processing_tm as total remaining work proxy\n    # Normalize by dividing by (num_neighboring_operation + 1) to avoid zero\n    denom = num_neighboring_operation + 1\n    if denom == 0:\n        denom = epsilon\n    remaining_work_norm = processing_tm / denom\n    \n    # Weighted sum with different weights: emphasize slack and utilization\n    priority = edd * 0.2 + slack * 0.4 + utilization_penalty * 0.3 + remaining_work_norm * 0.1\n    \n    # Ensure positive and non-zero priority\n    if priority <= 0:\n        priority = epsilon\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 967.7666666666667,
+          "ins_2": 740.2,
+          "ins_3": 1526.5833333333333,
+          "ins_4": 1178.4833333333333,
+          "ins_5": 543.3833333333333,
+          "ins_6": 1070.5166666666667,
+          "ins_7": 1183.4666666666667,
+          "ins_8": 1430.2,
+          "ins_9": 3141.5,
+          "ins_10": 1320.1,
+          "ins_11": 1021.95,
+          "ins_12": 1182.35,
+          "ins_13": 2593.3333333333335,
+          "ins_14": 1304.15,
+          "ins_15": 2657.65,
+          "ins_16": 1703.05,
+          "ins_17": 2226.633333333333,
+          "ins_18": 994.8666666666667,
+          "ins_19": 1312.95,
+          "ins_20": 1677.3666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1631.2708333333333,
+        "all_scores": [
+          -1488.8249999999998,
+          -1664.3383333333331,
+          -1685.9600000000003,
+          -1685.9600000000003
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1281.2308333333335,
+        "algorithm": "The new algorithm combines a weighted sum of EDD, slack with a tightness-modulated adaptive weight, a utilization penalty, and normalized remaining work, using epsilon guards to ensure positive output and avoid division by zero.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    \n    # Due date component\n    edd = delivery_time\n    \n    # Slack time\n    current_time = available_time\n    slack = delivery_time - (current_time + processing_time)\n    \n    # Utilization penalty: higher utilization increases urgency\n    utilization_penalty = utilization * processing_time\n    \n    # Remaining work: normalize by number of neighboring operations plus one\n    denom = num_neighboring_operation + 1\n    if denom == 0:\n        denom = epsilon\n    remaining_work_norm = processing_tm / denom\n    \n    # Adaptive tightness factor: higher when delivery_time is small (tight due dates)\n    if delivery_time > epsilon:\n        tightness_factor = 1.0 / (1.0 + delivery_time)\n    else:\n        tightness_factor = 1.0\n    \n    # Weighted combination: EDD base (0.2), slack adaptive (0.4 * tightness_factor), utilization penalty (0.3), remaining work (0.1)\n    priority = edd * 0.2 + max(0, slack) * (0.4 * tightness_factor) + utilization_penalty * 0.3 + remaining_work_norm * 0.1\n    \n    # Ensure positive and non-zero priority\n    if priority <= 0:\n        priority = epsilon\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1050.2166666666667,
+          "ins_2": 446.56666666666666,
+          "ins_3": 938.4833333333333,
+          "ins_4": 1201.0166666666667,
+          "ins_5": 365.55,
+          "ins_6": 945.35,
+          "ins_7": 871.05,
+          "ins_8": 1237.2833333333333,
+          "ins_9": 2394.5666666666666,
+          "ins_10": 2151.983333333333,
+          "ins_11": 902.8833333333333,
+          "ins_12": 965.3166666666667,
+          "ins_13": 2307.75,
+          "ins_14": 1230.95,
+          "ins_15": 2662.9666666666667,
+          "ins_16": 1262.0,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 557.4833333333333,
+          "ins_19": 1021.7333333333333,
+          "ins_20": 1309.2833333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1342.28,
+        "all_scores": [
+          -1281.2308333333335,
+          -1297.3841666666667,
+          -1301.6799999999998,
+          -1488.8249999999998
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1242.6433333333334,
+        "algorithm": "The algorithm combines EDD, slack with a dynamic weight modulated by a congestion factor from machine utilization, and normalized remaining work, using a weighted sum with epsilon guards to minimize tardiness under the smaller-value-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    \n    # EDD component\n    edd = delivery_time\n    \n    # Slack time\n    current_time = available_time\n    slack = delivery_time - (current_time + processing_time)\n    slack_safe = max(0, slack)\n    \n    # Utilization-based congestion factor: higher utilization increases urgency\n    congestion_factor = 1.0 + utilization\n    \n    # Remaining work normalized by number of neighboring operations\n    denom = num_neighboring_operation + 1\n    if denom == 0:\n        denom = epsilon\n    remaining_work_norm = processing_tm / denom\n    \n    # Dynamic weight for slack: more weight when slack is small (tight)\n    if slack_safe > epsilon:\n        slack_weight = 1.0 / (1.0 + slack_safe)\n    else:\n        slack_weight = 1.0\n    \n    # Weighted sum combining all features\n    priority = (edd * 0.15) + (slack_safe * 0.25 * slack_weight * congestion_factor) + (remaining_work_norm * 0.3) + (utilization * processing_time * 0.3)\n    \n    # Ensure positive and non-zero priority\n    if priority <= 0:\n        priority = epsilon\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 841.75,
+          "ins_2": 425.15,
+          "ins_3": 938.4833333333333,
+          "ins_4": 1231.0166666666667,
+          "ins_5": 365.55,
+          "ins_6": 967.4166666666666,
+          "ins_7": 871.05,
+          "ins_8": 1237.2833333333333,
+          "ins_9": 2360.5,
+          "ins_10": 2063.05,
+          "ins_11": 753.1666666666666,
+          "ins_12": 853.1833333333333,
+          "ins_13": 2251.733333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2543.133333333333,
+          "ins_16": 1154.9833333333333,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 557.4833333333333,
+          "ins_19": 972.1166666666667,
+          "ins_20": 1432.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1267.3510416666668,
+        "all_scores": [
+          -1242.6433333333334,
+          -1268.1633333333334,
+          -1278.7675000000002,
+          -1279.8300000000002
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1234.7833333333333,
+        "algorithm": "The improved algorithm computes priority as a weighted sum of EDD, normalized slack with dynamic congestion-adjusted weight, normalized remaining work, and a utilization-penalty term, ensuring positive output with epsilon guard.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    \n    # EDD component\n    edd = delivery_time\n    \n    # Current time and slack calculation\n    current_time = available_time\n    slack = delivery_time - (current_time + processing_time)\n    slack_safe = max(0, slack)\n    \n    # Utilization-based congestion factor\n    congestion_factor = 1.0 + utilization\n    \n    # Normalized remaining work\n    denom = num_neighboring_operation + 1\n    if denom == 0:\n        denom = epsilon\n    remaining_work_norm = processing_tm / denom\n    \n    # Dynamic weight for slack: increases when slack is tight\n    if slack_safe > epsilon:\n        slack_weight = 1.0 / (1.0 + slack_safe)\n    else:\n        slack_weight = 1.0\n    \n    # Weighted sum with improved coefficients (adjusted for tardiness minimization)\n    priority = (edd * 0.2) + (slack_safe * 0.3 * slack_weight * congestion_factor) + (remaining_work_norm * 0.25) + (utilization * processing_time * 0.25)\n    \n    # Ensure positive priority (smaller value = higher priority)\n    if priority <= 0:\n        priority = epsilon\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 841.75,
+          "ins_2": 425.15,
+          "ins_3": 938.4833333333333,
+          "ins_4": 1231.0166666666667,
+          "ins_5": 365.55,
+          "ins_6": 967.4166666666666,
+          "ins_7": 871.05,
+          "ins_8": 1237.2833333333333,
+          "ins_9": 2394.5666666666666,
+          "ins_10": 2063.05,
+          "ins_11": 753.1666666666666,
+          "ins_12": 774.3666666666667,
+          "ins_13": 2297.75,
+          "ins_14": 1230.95,
+          "ins_15": 2543.133333333333,
+          "ins_16": 1184.9833333333333,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 557.4833333333333,
+          "ins_19": 972.1166666666667,
+          "ins_20": 1244.2166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1239.2245833333334,
+        "all_scores": [
+          -1234.7833333333333,
+          -1236.8283333333334,
+          -1242.6433333333334,
+          -1242.6433333333334
+        ]
+      }
+    }
+  ],
+  "error_count": 6,
+  "total_tokens": 134997,
+  "method": "EDR_S_none",
+  "run_id": 3,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 129,
+  "time_elapsed": 1431.4890623092651,
+  "llm_a_calls": 129,
+  "llm_a_input_tokens": 93051,
+  "llm_a_output_tokens": 41946,
+  "llm_s_calls": 0,
+  "llm_s_input_tokens": 0,
+  "llm_s_output_tokens": 0
+}

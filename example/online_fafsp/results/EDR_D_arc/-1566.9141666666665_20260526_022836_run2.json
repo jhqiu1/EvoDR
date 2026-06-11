@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1686.98,
+        "algorithm": "The new algorithm uses a weighted combination of slack time (delivery_time - current_time) and processing_time, with a higher weight on slack to minimize tardiness, returning smaller values for higher priority.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = available_time if available_time > 0 else start_time\n    \n    # Calculate slack time (time remaining until due)\n    slack = delivery_time - current_time\n    \n    # Avoid division by zero for processing_time\n    if processing_time == 0:\n        processing_time = 1e-9\n    \n    # Weighted priority: focus on slack, with small penalty for long processing time\n    priority = slack + 0.1 * processing_time\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1198.55,
+          "ins_2": 942.5833333333334,
+          "ins_3": 1467.8,
+          "ins_4": 1523.2833333333333,
+          "ins_5": 738.3666666666667,
+          "ins_6": 1812.1833333333334,
+          "ins_7": 784.8333333333334,
+          "ins_8": 1812.9666666666667,
+          "ins_9": 3865.15,
+          "ins_10": 1474.5666666666666,
+          "ins_11": 1619.15,
+          "ins_12": 1369.2333333333333,
+          "ins_13": 2169.516666666667,
+          "ins_14": 1551.3,
+          "ins_15": 2480.75,
+          "ins_16": 1769.3,
+          "ins_17": 2125.733333333333,
+          "ins_18": 1309.7666666666667,
+          "ins_19": 1590.4,
+          "ins_20": 2134.1666666666665
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1775.7666666666669,
+        "all_scores": [
+          -1686.98,
+          -1710.4533333333334,
+          -1736.3308333333339,
+          -1969.3025000000002
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1646.3908333333334,
+        "algorithm": "The new algorithm combines slack time and delivery time with machine utilization awareness, computing a dynamic weighted priority that minimizes tardiness by scaling slack and processing time based on machine load.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = start_time if start_time > available_time else available_time\n    \n    # Calculate slack time\n    slack = delivery_time - current_time\n    \n    # Avoid division by zero for processing_time and utilization\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_utilization = utilization if utilization > 0 else 1e-9\n    \n    # Dynamic weight: prioritize slack more when utilization is high to avoid tardiness\n    slack_weight = 1.0 + safe_utilization  # increases with utilization\n    processing_weight = 0.1 / safe_utilization  # decreases penalty when utilization is low\n    \n    # Compute priority: smaller value means higher priority\n    priority = slack_weight * slack + processing_weight * safe_processing_time\n    \n    # Ensure priority is a positive number (though negative slack is possible, keep as-is for correct ordering)\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 948.9,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1466.6333333333334,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1276.4166666666667,
+          "ins_11": 820.1833333333333,
+          "ins_12": 969.4,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2436.2833333333333,
+          "ins_16": 1458.15,
+          "ins_17": 2746.366666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2536.116666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1689.2512500000003,
+        "all_scores": [
+          -1646.3908333333334,
+          -1686.98,
+          -1710.4533333333334,
+          -1713.1808333333333
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1636.8400000000001,
+        "algorithm": "The algorithm computes a dynamic weight from slack, machine count, processing time variance, and capped nonlinear utilization to minimize tardiness.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = start_time if start_time > available_time else available_time\n    slack = delivery_time - current_time\n    \n    # Safe guards against zero values\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_utilization = utilization if utilization > 0 else 1e-9\n    safe_num_machines = num_neighboring_machine if num_neighboring_machine > 0 else 1\n    \n    # 1. Incorporate number of available machines: reduce slack weight when more machines available\n    machine_factor = 1.0 / safe_num_machines  # more machines -> lower weight on slack\n    slack_weight = 1.0 + safe_utilization * machine_factor\n    \n    # 2. Add term for machine-task processing time variance: prioritize faster machines\n    # Use placeholder for variance: assume processing_time is average, variance penalty is inversely proportional\n    variance_penalty = 1.0 / (safe_processing_time + 1e-9)  # smaller penalty for faster machines\n    \n    # 3. Nonlinear utilization penalty: cap high load effects\n    capped_util = min(safe_utilization, 0.9)  # cap at 0.9 to avoid extreme values\n    nonlin_penalty = 0.1 / (1.0 - capped_util + 1e-9)  # increases sharply near cap\n    \n    # Combine into priority (smaller value = higher priority)\n    priority = slack_weight * slack + nonlin_penalty * safe_processing_time * variance_penalty\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1198.6,
+          "ins_2": 824.2833333333333,
+          "ins_3": 1412.3,
+          "ins_4": 1700.0666666666666,
+          "ins_5": 1035.2833333333333,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 816.7333333333333,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1260.8666666666666,
+          "ins_11": 888.9666666666667,
+          "ins_12": 999.4,
+          "ins_13": 2069.733333333333,
+          "ins_14": 1687.5833333333333,
+          "ins_15": 2484.2166666666667,
+          "ins_16": 1458.15,
+          "ins_17": 2746.366666666667,
+          "ins_18": 836.6333333333333,
+          "ins_19": 1598.7,
+          "ins_20": 2514.25
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1639.2927083333334,
+        "all_scores": [
+          -1636.8400000000001,
+          -1640.0766666666666,
+          -1640.0766666666666,
+          -1640.1775000000002
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1633.5049999999999,
+        "algorithm": "The algorithm combines a slack-based urgency term with a dynamic weight that increases with utilization, and a processing-time penalty adjusted by machine count and operation complexity, incorporating a hyperbolic utilization penalty to discourage high-load assignments, all scaled to ensure smaller value indicates higher priority.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = max(start_time, available_time)\n    slack = delivery_time - current_time\n    \n    # Safe guards against zero values\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_utilization = utilization if utilization > 0 else 1e-9\n    safe_num_machine = num_neighboring_machine if num_neighboring_machine > 0 else 1\n    safe_num_operation = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Dynamic slack weight: higher when utilization is high (from both algorithms)\n    slack_weight = 1.0 + safe_utilization\n    \n    # Processing penalty adjusted by machine availability and operation complexity (from No.2)\n    processing_penalty = safe_processing_time * (1.0 / safe_num_machine) * safe_num_operation\n    \n    # Hyperbolic utilization penalty (inspired by No.1's capped nonlinear term but adaptable)\n    capped_util = min(safe_utilization, 0.95)  # cap to avoid extreme values\n    nonlin_penalty = 0.1 / (1.0 - capped_util + 1e-9)  # increases as utilization nears 1\n    \n    # Final priority: smaller value means higher priority\n    priority = slack_weight * slack + nonlin_penalty * processing_penalty\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 948.9,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1466.6333333333334,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1276.4166666666667,
+          "ins_11": 1062.9,
+          "ins_12": 986.8,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2436.2833333333333,
+          "ins_16": 1420.0666666666666,
+          "ins_17": 2359.9666666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2442.766666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1633.5806249999998,
+        "all_scores": [
+          -1633.5049999999999,
+          -1633.6058333333333,
+          -1633.6058333333333,
+          -1633.6058333333333
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1633.5049999999999,
+        "algorithm": "The algorithm combines a slack-based urgency term with a dynamic weight that increases with utilization, and a processing-time penalty adjusted by machine count and operation complexity, incorporating a hyperbolic utilization penalty to discourage high-load assignments, all scaled to ensure smaller value indicates higher priority.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = max(start_time, available_time)\n    slack = delivery_time - current_time\n    \n    # Safe guards against zero values\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_utilization = utilization if utilization > 0 else 1e-9\n    safe_num_machine = num_neighboring_machine if num_neighboring_machine > 0 else 1\n    safe_num_operation = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Dynamic slack weight: higher when utilization is high (from both algorithms)\n    slack_weight = 1.0 + safe_utilization\n    \n    # Processing penalty adjusted by machine availability and operation complexity (from No.2)\n    processing_penalty = safe_processing_time * (1.0 / safe_num_machine) * safe_num_operation\n    \n    # Hyperbolic utilization penalty (inspired by No.1's capped nonlinear term but adaptable)\n    capped_util = min(safe_utilization, 0.95)  # cap to avoid extreme values\n    nonlin_penalty = 0.1 / (1.0 - capped_util + 1e-9)  # increases as utilization nears 1\n    \n    # Final priority: smaller value means higher priority\n    priority = slack_weight * slack + nonlin_penalty * processing_penalty\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 948.9,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1466.6333333333334,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1276.4166666666667,
+          "ins_11": 1062.9,
+          "ins_12": 986.8,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2436.2833333333333,
+          "ins_16": 1420.0666666666666,
+          "ins_17": 2359.9666666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2442.766666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1633.5806249999998,
+        "all_scores": [
+          -1633.5049999999999,
+          -1633.6058333333333,
+          -1633.6058333333333,
+          -1633.6058333333333
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1633.5049999999999,
+        "algorithm": "The algorithm combines a slack-based urgency term with a dynamic weight that increases with utilization, and a processing-time penalty adjusted by machine count and operation complexity, incorporating a hyperbolic utilization penalty to discourage high-load assignments, all scaled to ensure smaller value indicates higher priority.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = max(start_time, available_time)\n    slack = delivery_time - current_time\n    \n    # Safe guards against zero values\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_utilization = utilization if utilization > 0 else 1e-9\n    safe_num_machine = num_neighboring_machine if num_neighboring_machine > 0 else 1\n    safe_num_operation = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Dynamic slack weight: higher when utilization is high (from both algorithms)\n    slack_weight = 1.0 + safe_utilization\n    \n    # Processing penalty adjusted by machine availability and operation complexity (from No.2)\n    processing_penalty = safe_processing_time * (1.0 / safe_num_machine) * safe_num_operation\n    \n    # Hyperbolic utilization penalty (inspired by No.1's capped nonlinear term but adaptable)\n    capped_util = min(safe_utilization, 0.95)  # cap to avoid extreme values\n    nonlin_penalty = 0.1 / (1.0 - capped_util + 1e-9)  # increases as utilization nears 1\n    \n    # Final priority: smaller value means higher priority\n    priority = slack_weight * slack + nonlin_penalty * processing_penalty\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 948.9,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1466.6333333333334,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1276.4166666666667,
+          "ins_11": 1062.9,
+          "ins_12": 986.8,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2436.2833333333333,
+          "ins_16": 1420.0666666666666,
+          "ins_17": 2359.9666666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2442.766666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1633.5806249999998,
+        "all_scores": [
+          -1633.5049999999999,
+          -1633.6058333333333,
+          -1633.6058333333333,
+          -1633.6058333333333
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1633.5049999999999,
+        "algorithm": "The algorithm combines a slack-based urgency term with a dynamic weight that increases with utilization, and a processing-time penalty adjusted by machine count and operation complexity, incorporating a hyperbolic utilization penalty to discourage high-load assignments, all scaled to ensure smaller value indicates higher priority.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = max(start_time, available_time)\n    slack = delivery_time - current_time\n    \n    # Safe guards against zero values\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_utilization = utilization if utilization > 0 else 1e-9\n    safe_num_machine = num_neighboring_machine if num_neighboring_machine > 0 else 1\n    safe_num_operation = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Dynamic slack weight: higher when utilization is high (from both algorithms)\n    slack_weight = 1.0 + safe_utilization\n    \n    # Processing penalty adjusted by machine availability and operation complexity (from No.2)\n    processing_penalty = safe_processing_time * (1.0 / safe_num_machine) * safe_num_operation\n    \n    # Hyperbolic utilization penalty (inspired by No.1's capped nonlinear term but adaptable)\n    capped_util = min(safe_utilization, 0.95)  # cap to avoid extreme values\n    nonlin_penalty = 0.1 / (1.0 - capped_util + 1e-9)  # increases as utilization nears 1\n    \n    # Final priority: smaller value means higher priority\n    priority = slack_weight * slack + nonlin_penalty * processing_penalty\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 948.9,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1466.6333333333334,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1276.4166666666667,
+          "ins_11": 1062.9,
+          "ins_12": 986.8,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2436.2833333333333,
+          "ins_16": 1420.0666666666666,
+          "ins_17": 2359.9666666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2442.766666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1633.5806249999998,
+        "all_scores": [
+          -1633.5049999999999,
+          -1633.6058333333333,
+          -1633.6058333333333,
+          -1633.6058333333333
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1607.2341666666666,
+        "algorithm": "The new algorithm uses a linear combination of normalized slack and processing time with a static weighting, where priority decreases as slack increases and increases with processing time, and includes a small bias term for tie-breaking.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = max(start_time, available_time)\n    slack = delivery_time - current_time\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_num_machine = num_neighboring_machine if num_neighboring_machine > 0 else 1\n    safe_num_operation = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Static slack weight (fixed at 1.0)\n    slack_weight = 1.0\n    # Processing penalty without utilization influence\n    processing_penalty = safe_processing_time * safe_num_operation / safe_num_machine\n    # Small constant to avoid zero priority\n    bias = 0.001\n    priority = slack_weight * slack + processing_penalty + bias\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1273.4833333333333,
+          "ins_2": 1111.6,
+          "ins_3": 1286.75,
+          "ins_4": 1738.3166666666666,
+          "ins_5": 1111.5,
+          "ins_6": 1741.05,
+          "ins_7": 692.0166666666667,
+          "ins_8": 1804.8,
+          "ins_9": 3482.5333333333333,
+          "ins_10": 1377.0833333333333,
+          "ins_11": 1244.1666666666667,
+          "ins_12": 1220.85,
+          "ins_13": 2199.95,
+          "ins_14": 1275.9833333333333,
+          "ins_15": 2524.3166666666666,
+          "ins_16": 1490.2666666666667,
+          "ins_17": 1936.4833333333333,
+          "ins_18": 1181.5166666666667,
+          "ins_19": 1632.1166666666666,
+          "ins_20": 1819.9
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1626.7272916666666,
+        "all_scores": [
+          -1607.2341666666666,
+          -1632.5641666666666,
+          -1633.5049999999999,
+          -1633.6058333333333
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1566.9141666666665,
+        "algorithm": "The new algorithm combines dynamic slack weighting with an adaptive non-linear utilization penalty and machine availability timing factor, where priority decreases as slack increases and increases with processing time adjusted by machine and operation counts, using a sigmoid-shaped utilization penalty to avoid over-penalization at low utilization and enhanced sensitivity to timing variations.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = max(start_time, available_time)\n    slack = delivery_time - current_time\n    \n    # Safe guards against zero or negative values\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_utilization = utilization if utilization > 0 else 1e-9\n    safe_num_machine = num_neighboring_machine if num_neighboring_machine > 0 else 1\n    safe_num_operation = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Machine availability timing factor: exponential decay based on delay relative to processing time\n    available_delay = max(0, available_time - start_time)\n    timing_factor = 1.0 / (1.0 + (available_delay / (safe_processing_time + 1e-9)) ** 2)\n    \n    # Dynamic slack weight: base weight increased by utilization and timing factor\n    capped_util = min(safe_utilization, 0.95)\n    slack_weight = 1.0 + capped_util * timing_factor\n    \n    # Processing penalty: scaled by machine count and operation complexity\n    processing_penalty = safe_processing_time * safe_num_operation / safe_num_machine\n    \n    # Adaptive non-linear utilization penalty: sigmoid-shaped to avoid over-penalization at low utilization\n    import math\n    nonlin_penalty = 1.0 / (1.0 + math.exp(-10.0 * (capped_util - 0.5)))\n    nonlin_penalty = nonlin_penalty / (1.0 - capped_util + 1e-9)  # Hyperbolic tail for high utilization\n    \n    # Softening for low utilization (below 0.4) to leverage machine availability\n    if safe_utilization < 0.4:\n        nonlin_penalty = nonlin_penalty * (safe_utilization / 0.4)\n    \n    # Final priority: smaller value means higher priority\n    priority = slack_weight * slack + nonlin_penalty * processing_penalty\n    \n    # Small bias for tie-breaking\n    result = priority + 0.001\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1260.9833333333333,
+          "ins_2": 948.9,
+          "ins_3": 1133.9666666666667,
+          "ins_4": 1466.6333333333334,
+          "ins_5": 858.1333333333333,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 722.7833333333333,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1276.4166666666667,
+          "ins_11": 1082.7166666666667,
+          "ins_12": 986.8,
+          "ins_13": 2213.0333333333333,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2281.3333333333335,
+          "ins_16": 1428.4333333333334,
+          "ins_17": 1897.5,
+          "ins_18": 902.5166666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2309.1
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1604.3304166666667,
+        "all_scores": [
+          -1566.9141666666665,
+          -1607.2341666666666,
+          -1610.6091666666666,
+          -1632.5641666666666
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1566.9141666666665,
+        "algorithm": "The new algorithm combines dynamic slack weighting with an adaptive non-linear utilization penalty and machine availability timing factor, where priority decreases as slack increases and increases with processing time adjusted by machine and operation counts, using a sigmoid-shaped utilization penalty to avoid over-penalization at low utilization and enhanced sensitivity to timing variations.",
+        "code": "\nimport numpy as np\n\ndef cal_priority(status: int, num_neighboring_machine: int, processing_time: float, start_time: float, delivery_time: float, available_time: float, num_neighboring_operation: int, utilization: float, processing_tm: float) -> float:\n    \"\"\"\n    Calculate priority for job-machine arcs using multi-factor heuristic optimization.\n    This algorithm considers job urgency, machine availability, and processing efficiency\n    to minimize tardiness in dynamic flexible assembly shop scheduling.\n\n    Args:\n        status (int): Job status (0-ready, 1-in progress)\n        num_neighboring_machine (int): Number of compatible machines\n        processing_time (float): Actual processing time required\n        start_time (float): Estimated start time\n        delivery_time (float): Job due date (critical for EDF principle)\n        available_time (float): Machine's next available time\n        num_neighboring_operation (int): Number of processable operations\n        utilization (float): Machine utilization rate [0-1]\n        processing_tm (float): Actual processing time on this machine\n\n    Returns:\n        float: Priority value (smaller values indicate higher priority)\n    \"\"\"\n    current_time = max(start_time, available_time)\n    slack = delivery_time - current_time\n    \n    # Safe guards against zero or negative values\n    safe_processing_time = processing_time if processing_time > 0 else 1e-9\n    safe_utilization = utilization if utilization > 0 else 1e-9\n    safe_num_machine = num_neighboring_machine if num_neighboring_machine > 0 else 1\n    safe_num_operation = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Machine availability timing factor: exponential decay based on delay relative to processing time\n    available_delay = max(0, available_time - start_time)\n    timing_factor = 1.0 / (1.0 + (available_delay / (safe_processing_time + 1e-9)) ** 2)\n    \n    # Dynamic slack weight: base weight increased by utilization and timing factor\n    capped_util = min(safe_utilization, 0.95)\n    slack_weight = 1.0 + capped_util * timing_factor\n    \n    # Processing penalty: scaled by machine count and operation complexity\n    processing_penalty = safe_processing_time * safe_num_operation / safe_num_machine\n    \n    # Adaptive non-linear utilization penalty: sigmoid-shaped to avoid over-penalization at low utilization\n    import math\n    nonlin_penalty = 1.0 / (1.0 + math.exp(-10.0 * (capped_util - 0.5)))\n    nonlin_penalty = nonlin_penalty / (1.0 - capped_util + 1e-9)  # Hyperbolic tail for high utilization\n    \n    # Softening for low utilization (below 0.4) to leverage machine availability\n    if safe_utilization < 0.4:\n        nonlin_penalty = nonlin_penalty * (safe_utilization / 0.4)\n    \n    # Final priority: smaller value means higher priority\n    priority = slack_weight * slack + nonlin_penalty * processing_penalty\n    \n    # Small bias for tie-breaking\n    result = priority + 0.001\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1260.9833333333333,
+          "ins_2": 948.9,
+          "ins_3": 1133.9666666666667,
+          "ins_4": 1466.6333333333334,
+          "ins_5": 858.1333333333333,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 722.7833333333333,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1276.4166666666667,
+          "ins_11": 1082.7166666666667,
+          "ins_12": 986.8,
+          "ins_13": 2213.0333333333333,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2281.3333333333335,
+          "ins_16": 1428.4333333333334,
+          "ins_17": 1897.5,
+          "ins_18": 902.5166666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2309.1
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1599.1320833333332,
+        "all_scores": [
+          -1566.9141666666665,
+          -1607.2341666666666,
+          -1610.6091666666666,
+          -1611.7708333333333
+        ]
+      }
+    }
+  ],
+  "error_count": 31,
+  "total_tokens": 348263,
+  "method": "EDR_D_arc",
+  "run_id": 2,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 152,
+  "time_elapsed": 1347.24400806427,
+  "llm_a_calls": 152,
+  "llm_a_input_tokens": 141987,
+  "llm_a_output_tokens": 64360,
+  "llm_s_calls": 121,
+  "llm_s_input_tokens": 121417,
+  "llm_s_output_tokens": 20499
+}

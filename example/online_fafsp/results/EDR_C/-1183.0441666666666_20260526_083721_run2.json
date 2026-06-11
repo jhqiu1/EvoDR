@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1943.1247916666666,
+        "all_scores": [
+          -1710.4533333333334,
+          -1949.9458333333332,
+          -2030.185,
+          -2081.915
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1674.813333333333,
+        "algorithm": "The improved algorithm integrates slack time by computing the negative slack (delivery_time - available_time - processing_time) to prioritize jobs with less buffer, following smaller-value-higher-priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    slack = delivery_time - available_time - processing_time\n    # If slack is negative (already late), prioritize by delivery_time as tie-breaker\n    # Use a large base to ensure negative slack dominates but within smaller value convention\n    priority = slack if slack < 0 else (delivery_time + processing_time)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1322.0166666666667,
+          "ins_2": 1111.6,
+          "ins_3": 1286.75,
+          "ins_4": 1500.1166666666666,
+          "ins_5": 1137.5333333333333,
+          "ins_6": 1737.3,
+          "ins_7": 604.85,
+          "ins_8": 1804.8,
+          "ins_9": 3591.2166666666667,
+          "ins_10": 2302.5833333333335,
+          "ins_11": 1174.0833333333333,
+          "ins_12": 1553.3,
+          "ins_13": 2066.65,
+          "ins_14": 1192.1833333333334,
+          "ins_15": 2515.95,
+          "ins_16": 1369.3166666666666,
+          "ins_17": 2255.5333333333333,
+          "ins_18": 1181.5166666666667,
+          "ins_19": 1648.5166666666667,
+          "ins_20": 2140.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1753.0772916666665,
+        "all_scores": [
+          -1674.813333333333,
+          -1677.0966666666668,
+          -1710.4533333333334,
+          -1949.9458333333332
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1674.813333333333,
+        "algorithm": "The improved algorithm integrates slack time by computing the negative slack (delivery_time - available_time - processing_time) to prioritize jobs with less buffer, following smaller-value-higher-priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    slack = delivery_time - available_time - processing_time\n    # If slack is negative (already late), prioritize by delivery_time as tie-breaker\n    # Use a large base to ensure negative slack dominates but within smaller value convention\n    priority = slack if slack < 0 else (delivery_time + processing_time)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1322.0166666666667,
+          "ins_2": 1111.6,
+          "ins_3": 1286.75,
+          "ins_4": 1500.1166666666666,
+          "ins_5": 1137.5333333333333,
+          "ins_6": 1737.3,
+          "ins_7": 604.85,
+          "ins_8": 1804.8,
+          "ins_9": 3591.2166666666667,
+          "ins_10": 2302.5833333333335,
+          "ins_11": 1174.0833333333333,
+          "ins_12": 1553.3,
+          "ins_13": 2066.65,
+          "ins_14": 1192.1833333333334,
+          "ins_15": 2515.95,
+          "ins_16": 1369.3166666666666,
+          "ins_17": 2255.5333333333333,
+          "ins_18": 1181.5166666666667,
+          "ins_19": 1648.5166666666667,
+          "ins_20": 2140.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1684.2941666666666,
+        "all_scores": [
+          -1674.813333333333,
+          -1674.813333333333,
+          -1677.0966666666668,
+          -1710.4533333333334
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1673.8575,
+        "algorithm": "New algorithm uses a weighted combination of slack-based urgency and machine utilization penalty, where priority = - (delivery_time - available_time - processing_time) * (num_neighboring_machine + 1) if slack is negative, else (delivery_time + processing_time) * (1 + utilization) to push tighter jobs earlier.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    slack = delivery_time - available_time - processing_time\n    if slack < 0:\n        # Negative slack: prioritize by magnitude of lateness and machine contention\n        priority = -slack * (num_neighboring_machine + 1)\n    else:\n        # Positive slack: shorter delivery time and higher utilization get lower priority\n        denominator = (num_neighboring_machine + 1)\n        if denominator == 0:\n            denominator = 1\n        priority = (delivery_time + processing_time) * (1 + utilization) / denominator\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 938.1,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1519.7166666666667,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3747.0333333333333,
+          "ins_10": 1322.5166666666667,
+          "ins_11": 978.85,
+          "ins_12": 969.4,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2446.266666666667,
+          "ins_16": 1354.9166666666667,
+          "ins_17": 2711.516666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2609.8333333333335
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1674.5216666666665,
+        "all_scores": [
+          -1673.8575,
+          -1674.6025000000002,
+          -1674.813333333333,
+          -1674.813333333333
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1320.1983333333333,
+        "algorithm": "The improved algorithm computes priority using a dynamic slack ratio (delivery_time - available_time) / processing_time for positive slack and a normalized processing time with machine-specific utilization penalty only when queue length exceeds a threshold, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if processing_time == 0:\n        slack_ratio = float('inf')\n    else:\n        slack_ratio = (delivery_time - available_time) / processing_time\n    \n    # Use normalized processing time on current machine (processing_tm)\n    norm_processing = processing_tm if processing_tm != 0 else processing_time\n    \n    # Utilization penalty only when machine queue length exceeds threshold (e.g., num_neighboring_machine > 2)\n    threshold = 2\n    if num_neighboring_machine > threshold:\n        util_penalty = 1 + utilization\n    else:\n        util_penalty = 1.0\n    \n    # Determine priority based on slack\n    if slack_ratio < 0:\n        # Negative slack: prioritize by magnitude of lateness and machine contention\n        priority = -slack_ratio * (num_neighboring_machine + 1)\n    else:\n        # Positive slack: use dynamic slack ratio and normalized processing time\n        denominator = (num_neighboring_machine + 1)\n        if denominator == 0:\n            denominator = 1\n        priority = (delivery_time + norm_processing) * util_penalty / denominator\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 752.3333333333334,
+          "ins_2": 689.8166666666667,
+          "ins_3": 1282.5166666666667,
+          "ins_4": 1106.4166666666667,
+          "ins_5": 557.4666666666667,
+          "ins_6": 1064.55,
+          "ins_7": 420.6,
+          "ins_8": 1832.6666666666667,
+          "ins_9": 3033.233333333333,
+          "ins_10": 1379.2333333333333,
+          "ins_11": 737.2166666666667,
+          "ins_12": 854.7,
+          "ins_13": 2480.016666666667,
+          "ins_14": 1061.4833333333333,
+          "ins_15": 2688.133333333333,
+          "ins_16": 1230.6333333333334,
+          "ins_17": 2239.1,
+          "ins_18": 771.4666666666667,
+          "ins_19": 1004.75,
+          "ins_20": 1217.6333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1585.8679166666666,
+        "all_scores": [
+          -1320.1983333333333,
+          -1673.8575,
+          -1674.6025000000002,
+          -1674.813333333333
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1320.1983333333333,
+        "algorithm": "The improved algorithm computes priority using a dynamic slack ratio (delivery_time - available_time) / processing_time for positive slack and a normalized processing time with machine-specific utilization penalty only when queue length exceeds a threshold, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if processing_time == 0:\n        slack_ratio = float('inf')\n    else:\n        slack_ratio = (delivery_time - available_time) / processing_time\n    \n    # Use normalized processing time on current machine (processing_tm)\n    norm_processing = processing_tm if processing_tm != 0 else processing_time\n    \n    # Utilization penalty only when machine queue length exceeds threshold (e.g., num_neighboring_machine > 2)\n    threshold = 2\n    if num_neighboring_machine > threshold:\n        util_penalty = 1 + utilization\n    else:\n        util_penalty = 1.0\n    \n    # Determine priority based on slack\n    if slack_ratio < 0:\n        # Negative slack: prioritize by magnitude of lateness and machine contention\n        priority = -slack_ratio * (num_neighboring_machine + 1)\n    else:\n        # Positive slack: use dynamic slack ratio and normalized processing time\n        denominator = (num_neighboring_machine + 1)\n        if denominator == 0:\n            denominator = 1\n        priority = (delivery_time + norm_processing) * util_penalty / denominator\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 752.3333333333334,
+          "ins_2": 689.8166666666667,
+          "ins_3": 1282.5166666666667,
+          "ins_4": 1106.4166666666667,
+          "ins_5": 557.4666666666667,
+          "ins_6": 1064.55,
+          "ins_7": 420.6,
+          "ins_8": 1832.6666666666667,
+          "ins_9": 3033.233333333333,
+          "ins_10": 1379.2333333333333,
+          "ins_11": 737.2166666666667,
+          "ins_12": 854.7,
+          "ins_13": 2480.016666666667,
+          "ins_14": 1061.4833333333333,
+          "ins_15": 2688.133333333333,
+          "ins_16": 1230.6333333333334,
+          "ins_17": 2239.1,
+          "ins_18": 771.4666666666667,
+          "ins_19": 1004.75,
+          "ins_20": 1217.6333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1349.131875,
+        "all_scores": [
+          -1320.1983333333333,
+          -1337.5783333333334,
+          -1362.3325,
+          -1376.4183333333335
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1320.1983333333333,
+        "algorithm": "The improved algorithm computes priority using a dynamic slack ratio (delivery_time - available_time) / processing_time for positive slack and a normalized processing time with machine-specific utilization penalty only when queue length exceeds a threshold, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if processing_time == 0:\n        slack_ratio = float('inf')\n    else:\n        slack_ratio = (delivery_time - available_time) / processing_time\n    \n    # Use normalized processing time on current machine (processing_tm)\n    norm_processing = processing_tm if processing_tm != 0 else processing_time\n    \n    # Utilization penalty only when machine queue length exceeds threshold (e.g., num_neighboring_machine > 2)\n    threshold = 2\n    if num_neighboring_machine > threshold:\n        util_penalty = 1 + utilization\n    else:\n        util_penalty = 1.0\n    \n    # Determine priority based on slack\n    if slack_ratio < 0:\n        # Negative slack: prioritize by magnitude of lateness and machine contention\n        priority = -slack_ratio * (num_neighboring_machine + 1)\n    else:\n        # Positive slack: use dynamic slack ratio and normalized processing time\n        denominator = (num_neighboring_machine + 1)\n        if denominator == 0:\n            denominator = 1\n        priority = (delivery_time + norm_processing) * util_penalty / denominator\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 752.3333333333334,
+          "ins_2": 689.8166666666667,
+          "ins_3": 1282.5166666666667,
+          "ins_4": 1106.4166666666667,
+          "ins_5": 557.4666666666667,
+          "ins_6": 1064.55,
+          "ins_7": 420.6,
+          "ins_8": 1832.6666666666667,
+          "ins_9": 3033.233333333333,
+          "ins_10": 1379.2333333333333,
+          "ins_11": 737.2166666666667,
+          "ins_12": 854.7,
+          "ins_13": 2480.016666666667,
+          "ins_14": 1061.4833333333333,
+          "ins_15": 2688.133333333333,
+          "ins_16": 1230.6333333333334,
+          "ins_17": 2239.1,
+          "ins_18": 771.4666666666667,
+          "ins_19": 1004.75,
+          "ins_20": 1217.6333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1349.131875,
+        "all_scores": [
+          -1320.1983333333333,
+          -1337.5783333333334,
+          -1362.3325,
+          -1376.4183333333335
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1259.925,
+        "algorithm": "New algorithm: Combine a machine-specific normalized processing time with a dynamic urgency factor based on slack ratio adjusted by job queue length and machine utilization penalty only when slack is non-negative, using smaller values for higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if processing_time == 0:\n        slack_ratio = float('inf')\n    else:\n        slack_ratio = (delivery_time - available_time) / processing_time\n    \n    # Normalized processing time for machine-specific effect\n    norm_processing = processing_tm if processing_tm != 0 else 0.001  # avoid zero\n    \n    # Base penalty from utilization only when machine queue is high (threshold > 2)\n    threshold = 2\n    if num_neighboring_machine > threshold:\n        util_penalty = 1 + utilization\n    else:\n        util_penalty = 1.0\n    \n    # Compute priority based on slack condition\n    # Use a different parameter setting: penalty weight = 0.5 * norm_processing\n    weight_processing = 0.5 * norm_processing\n    \n    if slack_ratio < 0:\n        # Negative slack: absolute lateness weighted by queue length\n        priority = -slack_ratio * (num_neighboring_machine + 1)\n    else:\n        # Positive slack: combine delivery_time, weight_processing, and utilization penalty\n        # Divide by max(num_neighboring_machine, 1) to avoid zero denominator\n        denom = max(num_neighboring_machine, 1)\n        priority = (delivery_time + weight_processing) * util_penalty / denom\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 895.1166666666667,
+          "ins_2": 688.8166666666667,
+          "ins_3": 1127.6166666666666,
+          "ins_4": 1040.55,
+          "ins_5": 361.75,
+          "ins_6": 1035.0333333333333,
+          "ins_7": 446.6,
+          "ins_8": 1517.5,
+          "ins_9": 2543.383333333333,
+          "ins_10": 1420.85,
+          "ins_11": 849.6833333333333,
+          "ins_12": 1038.3666666666666,
+          "ins_13": 1722.5833333333333,
+          "ins_14": 1278.0,
+          "ins_15": 2896.0666666666666,
+          "ins_16": 1228.6833333333334,
+          "ins_17": 1995.15,
+          "ins_18": 960.3,
+          "ins_19": 925.0333333333333,
+          "ins_20": 1227.4166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1317.2904166666667,
+        "all_scores": [
+          -1259.925,
+          -1320.1983333333333,
+          -1337.5783333333334,
+          -1351.46
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1237.1066666666668,
+        "algorithm": "New algorithm uses a quadratic penalty for machine congestion combined with tardiness-based slack weighting, where priority is computed as the product of normalized processing time and a dynamic urgency factor that penalizes late jobs more heavily while using a linear queue length multiplier for all slack conditions.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if processing_time == 0:\n        slack_ratio = float('inf')\n    else:\n        slack_ratio = (delivery_time - available_time) / processing_time\n    \n    # Normalized processing time (avoid zero)\n    norm_processing = processing_tm if processing_tm != 0 else 0.001\n    \n    # Quadratic utilization penalty when machine queue length > threshold\n    threshold = 3\n    if num_neighboring_machine > threshold:\n        util_penalty = 1 + (utilization ** 2)\n    else:\n        util_penalty = 1.0\n    \n    # Base priority component: linear queue length multiplier\n    queue_mult = max(num_neighboring_machine, 1)\n    \n    if slack_ratio < 0:\n        # Negative slack: priority increases with absolute lateness and queue length\n        priority = (-slack_ratio) * queue_mult * 2.0\n    else:\n        # Positive slack: use delivery_time and weighted processing time with utilization penalty\n        weight_processing = 1.5 * norm_processing\n        priority = (delivery_time + weight_processing) * util_penalty / queue_mult\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 766.3333333333334,
+          "ins_2": 580.8,
+          "ins_3": 980.5166666666667,
+          "ins_4": 1155.5833333333333,
+          "ins_5": 526.2833333333333,
+          "ins_6": 1097.8166666666666,
+          "ins_7": 469.71666666666664,
+          "ins_8": 1580.6833333333334,
+          "ins_9": 2726.6,
+          "ins_10": 1516.7166666666667,
+          "ins_11": 1028.65,
+          "ins_12": 866.6166666666667,
+          "ins_13": 2112.5666666666666,
+          "ins_14": 1313.1666666666667,
+          "ins_15": 2379.1833333333334,
+          "ins_16": 1140.35,
+          "ins_17": 2116.483333333333,
+          "ins_18": 780.1333333333333,
+          "ins_19": 960.9666666666667,
+          "ins_20": 642.9666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1266.0491666666667,
+        "all_scores": [
+          -1237.1066666666668,
+          -1246.9666666666667,
+          -1259.925,
+          -1320.1983333333333
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1183.0441666666666,
+        "algorithm": "The improved algorithm uses an exponential queue multiplier for positive slack to emphasize delivery time urgency, incorporates machine available time into negative slack priority, and adds a processing time weighting factor to balance machine load.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if processing_time == 0:\n        slack_ratio = float('inf')\n    else:\n        slack_ratio = (delivery_time - available_time) / processing_time\n    \n    # Normalized processing time (avoid zero)\n    norm_processing = processing_tm if processing_tm != 0 else 0.001\n    \n    # Quadratic utilization penalty when machine queue length > threshold\n    threshold = 3\n    if num_neighboring_machine > threshold:\n        util_penalty = 1 + (utilization ** 2)\n    else:\n        util_penalty = 1.0\n    \n    # Improved: Exponential queue multiplier for positive slack, linear otherwise\n    if slack_ratio >= 0:\n        # Exponential factor emphasizing delivery time urgency\n        queue_mult = max(1, num_neighboring_machine) * (1 - 1 / (1 + slack_ratio))\n        # Weighting factor for processing time on specific machine\n        weight_processing = 1.5 * norm_processing * (1 + 0.1 * utilization)\n        priority = (delivery_time + weight_processing) * util_penalty / (queue_mult + 1e-10)\n    else:\n        # Negative slack: incorporate machine available time\n        abs_lateness = -slack_ratio\n        machine_avail_factor = 1 / (available_time + 1e-10)\n        queue_mult = max(num_neighboring_machine, 1)\n        priority = abs_lateness * queue_mult * 2.0 * (1 + machine_avail_factor * 0.5)\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 740.7833333333333,
+          "ins_2": 445.98333333333335,
+          "ins_3": 980.5166666666667,
+          "ins_4": 985.05,
+          "ins_5": 546.6333333333333,
+          "ins_6": 1133.8833333333334,
+          "ins_7": 309.43333333333334,
+          "ins_8": 1580.6833333333334,
+          "ins_9": 2714.116666666667,
+          "ins_10": 1551.0166666666667,
+          "ins_11": 808.1666666666666,
+          "ins_12": 1004.2833333333333,
+          "ins_13": 2313.25,
+          "ins_14": 1371.2333333333333,
+          "ins_15": 2069.016666666667,
+          "ins_16": 672.1166666666667,
+          "ins_17": 2096.75,
+          "ins_18": 670.7166666666667,
+          "ins_19": 892.75,
+          "ins_20": 774.5
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1220.859375,
+        "all_scores": [
+          -1183.0441666666666,
+          -1216.32,
+          -1237.1066666666668,
+          -1246.9666666666667
+        ]
+      }
+    }
+  ],
+  "error_count": 4,
+  "total_tokens": 140463,
+  "method": "EDR_C",
+  "run_id": 2,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 68,
+  "time_elapsed": 997.1502146720886,
+  "llm_a_calls": 68,
+  "llm_a_input_tokens": 43421,
+  "llm_a_output_tokens": 24521,
+  "llm_s_calls": 65,
+  "llm_s_input_tokens": 61911,
+  "llm_s_output_tokens": 10610
+}

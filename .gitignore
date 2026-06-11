@@ -23,7 +23,6 @@ Thumbs.db
 
 # Project specific
 logs/
-results/
 **/__pycache__/
 *.pyc
 

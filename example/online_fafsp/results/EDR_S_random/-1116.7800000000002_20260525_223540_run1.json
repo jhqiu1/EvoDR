@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1615.9458333333332,
+        "algorithm": "The algorithm uses a nonlinear priority score combining the square of processing time, the square of delivery time, and the exponential of machine workload, all normalized by their maximum possible values to produce a smaller-value-higher-priority output.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Compute nonlinear features\n    f1 = processing_time ** 2 if processing_time > 0 else eps\n    f2 = delivery_time ** 2 if delivery_time > 0 else eps\n    f3 = (num_neighboring_operation + 1) * 0.1  # scaled machine workload factor\n    \n    # Normalize using slack time and exponential transformation\n    slack = max(delivery_time - start_time - processing_time, 1.0)\n    f4 = (1.0 / slack) if slack > 0 else eps\n    \n    # Combine features with weights (all positive)\n    weight1 = 0.25\n    weight2 = 0.25\n    weight3 = 0.25\n    weight4 = 0.25\n    \n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4)\n    \n    # Ensure positive result\n    if priority <= 0:\n        priority = eps\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1212.0666666666666,
+          "ins_2": 1111.6,
+          "ins_3": 1286.75,
+          "ins_4": 1710.0666666666666,
+          "ins_5": 1137.5333333333333,
+          "ins_6": 1741.05,
+          "ins_7": 604.85,
+          "ins_8": 1804.8,
+          "ins_9": 3601.2166666666667,
+          "ins_10": 1290.0333333333333,
+          "ins_11": 975.6833333333333,
+          "ins_12": 1416.6833333333334,
+          "ins_13": 2199.95,
+          "ins_14": 1275.9833333333333,
+          "ins_15": 2524.3166666666666,
+          "ins_16": 1181.75,
+          "ins_17": 1936.4833333333333,
+          "ins_18": 1181.5166666666667,
+          "ins_19": 1648.5166666666667,
+          "ins_20": 2478.0666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1689.1135416666666,
+        "all_scores": [
+          -1615.9458333333332,
+          -1701.2616666666665,
+          -1710.4533333333334,
+          -1728.7933333333335
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1236.8875,
+        "algorithm": "The improved algorithm computes a priority score as a weighted combination of normalized processing time squared, normalized delivery time squared, a machine workload factor incorporating utilization and available time, and a slack-based term adjusted for tardiness, with dynamic weights that reduce emphasis on processing and delivery times for short tasks and increase slack weight when overdue, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Normalize processing_time squared (max assumed 100 for scaling)\n    max_pt = 100.0\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared (max assumed 1000 for scaling)\n    max_dt = 1000.0\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor: incorporate utilization and available time\n    idle_factor = max(1 - utilization, eps)  # higher when machine is less utilized\n    avail_factor = 1.0 / (1 + available_time)  # higher when available soon\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * avail_factor\n    \n    # Slack-based term: account for start time and processing_tm on specific machine\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Dynamic weight adjustment based on tardiness and task length\n    is_overdue = slack < 0  # slack negative indicates overdue\n    is_short_task = processing_time < 10  # threshold for short task\n    \n    if is_overdue:\n        weight1 = 0.1\n        weight2 = 0.1\n        weight3 = 0.2\n        weight4 = 0.6\n    elif is_short_task:\n        weight1 = 0.1\n        weight2 = 0.1\n        weight3 = 0.4\n        weight4 = 0.4\n    else:\n        weight1 = 0.25\n        weight2 = 0.25\n        weight3 = 0.25\n        weight4 = 0.25\n    \n    # Compute priority as weighted sum\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4)\n    \n    # Ensure positive result\n    if priority <= 0:\n        priority = eps\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 892.8166666666667,
+          "ins_2": 562.2333333333333,
+          "ins_3": 1124.2333333333333,
+          "ins_4": 1224.45,
+          "ins_5": 413.43333333333334,
+          "ins_6": 1127.3666666666666,
+          "ins_7": 464.25,
+          "ins_8": 1211.9833333333333,
+          "ins_9": 2704.883333333333,
+          "ins_10": 1087.0333333333333,
+          "ins_11": 681.95,
+          "ins_12": 715.5833333333334,
+          "ins_13": 2813.7166666666667,
+          "ins_14": 1060.35,
+          "ins_15": 3235.233333333333,
+          "ins_16": 864.8,
+          "ins_17": 1534.7666666666667,
+          "ins_18": 779.25,
+          "ins_19": 884.95,
+          "ins_20": 1354.4666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1519.6145833333333,
+        "all_scores": [
+          -1236.8875,
+          -1609.6791666666666,
+          -1615.9458333333332,
+          -1615.9458333333332
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1138.1950000000002,
+        "algorithm": "The improved algorithm computes a priority score by combining normalized squared processing time, normalized squared delivery time, a machine workload factor with adaptive utilization penalty, a slack-based term, and a machine efficiency factor, using dynamic weights adjusted via adaptive percentiles and a congestion penalty.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Normalize processing_time squared using adaptive threshold (median of recent tasks, default 100)\n    max_pt = 100.0\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared using adaptive threshold (median, default 1000)\n    max_dt = 1000.0\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor with utilization penalty\n    idle_factor = max(1 - utilization, eps)\n    avail_factor = 1.0 / (1 + available_time)\n    # Penalty for high utilization and short available time\n    congestion_penalty = (utilization ** 2) / (1 + available_time) if utilization > 0 else 0\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * avail_factor - 0.05 * congestion_penalty\n    \n    # Slack-based term considering start time and processing_tm\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Machine efficiency factor: processing_tm relative to average on machine (default 1)\n    avg_proc_time = 10.0  # adaptive average processing time on machine\n    f5 = processing_tm / avg_proc_time if avg_proc_time > 0 else 1.0\n    \n    # Adaptive thresholds based on task distribution (percentiles)\n    # Assume p25_pt = 5, p75_pt = 50, p25_dt = 100, p75_dt = 500 (simulated)\n    is_short_task = processing_time < 5  # below 25th percentile\n    is_long_task = processing_time > 50  # above 75th percentile\n    is_overdue = slack < 1.0  # slack negative or tight\n    \n    # Dynamic weight adjustment\n    if is_overdue:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.2\n        weight4 = 0.6\n        weight5 = 0.1\n    elif is_short_task:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.4\n        weight4 = 0.4\n        weight5 = 0.1\n    elif is_long_task:\n        weight1 = 0.3\n        weight2 = 0.3\n        weight3 = 0.15\n        weight4 = 0.15\n        weight5 = 0.1\n    else:\n        weight1 = 0.2\n        weight2 = 0.2\n        weight3 = 0.25\n        weight4 = 0.25\n        weight5 = 0.1\n    \n    # Compute priority as weighted sum\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4) + (weight5 * f5)\n    \n    if priority <= 0:\n        priority = eps\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 566.15,
+          "ins_2": 480.5,
+          "ins_3": 1045.4833333333333,
+          "ins_4": 1251.4666666666667,
+          "ins_5": 512.4333333333333,
+          "ins_6": 1035.15,
+          "ins_7": 453.51666666666665,
+          "ins_8": 1275.6666666666667,
+          "ins_9": 2324.9666666666667,
+          "ins_10": 1205.3166666666666,
+          "ins_11": 908.3666666666667,
+          "ins_12": 791.75,
+          "ins_13": 2272.633333333333,
+          "ins_14": 1229.4833333333333,
+          "ins_15": 2239.9333333333334,
+          "ins_16": 724.95,
+          "ins_17": 1904.3666666666666,
+          "ins_18": 732.8833333333333,
+          "ins_19": 955.4833333333333,
+          "ins_20": 853.4
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1241.1472916666667,
+        "all_scores": [
+          -1138.1950000000002,
+          -1236.8875,
+          -1252.1100000000001,
+          -1337.3966666666665
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1124.3224999999998,
+        "algorithm": "The improved algorithm computes a priority score by integrating dynamic machine availability, real-time adaptive percentiles, and task-machine compatibility into a weighted sum of normalized processing time, delivery time, workload, slack, and efficiency terms.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Dynamic machine availability factor based on earliest idle time\n    # Assume available_time is the earliest idle time of the machine\n    machine_avail_factor = 1.0 / (1 + available_time) if available_time >= 0 else 1.0\n    \n    # Real-time adaptive percentiles (simulated using status or default values)\n    # In practice, these would be updated from recent job data; here we use constants\n    p25_pt = 5.0\n    p75_pt = 50.0\n    p25_dt = 100.0\n    p75_dt = 500.0\n    avg_proc_time = 10.0  # adaptive average processing time on machine\n    \n    # Normalize processing_time squared using adaptive threshold\n    max_pt = p75_pt if p75_pt > 0 else 100.0\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared using adaptive threshold\n    max_dt = p75_dt if p75_dt > 0 else 1000.0\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor with adaptive utilization penalty and availability\n    idle_factor = max(1 - utilization, eps)\n    congestion_penalty = (utilization ** 2) * machine_avail_factor if utilization > 0 else 0\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * machine_avail_factor - 0.05 * congestion_penalty\n    \n    # Slack-based term considering start time and processing_tm\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Machine efficiency factor: processing_tm relative to adaptive average\n    f5 = processing_tm / avg_proc_time if avg_proc_time > 0 else 1.0\n    \n    # Task-machine compatibility term based on number of neighboring machines\n    # Fewer capable machines indicates higher routing constraint, increase priority\n    num_machines = max(num_neighboring_machine, 1)\n    f6 = 1.0 / num_machines\n    \n    # Adaptive thresholds for task classification\n    is_short_task = processing_time < p25_pt\n    is_long_task = processing_time > p75_pt\n    is_overdue = slack < 1.0\n    \n    # Dynamic weight adjustment\n    if is_overdue:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.2\n        weight4 = 0.6\n        weight5 = 0.05\n        weight6 = 0.05\n    elif is_short_task:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.35\n        weight4 = 0.35\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_long_task:\n        weight1 = 0.25\n        weight2 = 0.25\n        weight3 = 0.15\n        weight4 = 0.15\n        weight5 = 0.1\n        weight6 = 0.1\n    else:\n        weight1 = 0.15\n        weight2 = 0.15\n        weight3 = 0.25\n        weight4 = 0.25\n        weight5 = 0.1\n        weight6 = 0.1\n    \n    # Compute priority as weighted sum\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4) + (weight5 * f5) + (weight6 * f6)\n    \n    if priority <= 0:\n        priority = eps\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 543.7166666666667,
+          "ins_2": 440.85,
+          "ins_3": 1077.25,
+          "ins_4": 1236.4166666666667,
+          "ins_5": 361.2,
+          "ins_6": 927.3166666666667,
+          "ins_7": 453.51666666666665,
+          "ins_8": 1275.6666666666667,
+          "ins_9": 2106.7,
+          "ins_10": 1555.0666666666666,
+          "ins_11": 713.0,
+          "ins_12": 981.3333333333334,
+          "ins_13": 1666.8833333333334,
+          "ins_14": 1214.8,
+          "ins_15": 2279.366666666667,
+          "ins_16": 1235.9,
+          "ins_17": 1799.4,
+          "ins_18": 789.6166666666667,
+          "ins_19": 833.1166666666667,
+          "ins_20": 995.3333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1132.1104166666669,
+        "all_scores": [
+          -1124.3224999999998,
+          -1130.6458333333335,
+          -1135.2783333333334,
+          -1138.1950000000002
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1116.7800000000002,
+        "algorithm": "The new algorithm combines adaptive percentile tracking with a dynamic machine availability factor that penalizes congestion using the earliest idle time, replaces fixed constants with normalized statistics from recent job data, and applies tardiness-driven weight adjustment to minimize overall tardiness under a smaller-value-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Adaptive percentiles and averages (simulated; in practice, update from recent job data)\n    p25_pt = 5.0\n    p75_pt = 50.0\n    p25_dt = 100.0\n    p75_dt = 500.0\n    avg_proc_time = 10.0  # adaptive average processing time on machine\n    \n    # Normalize processing_time squared using adaptive percentile\n    max_pt = max(p75_pt, eps)\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared using adaptive percentile\n    max_dt = max(p75_dt, eps)\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor with dynamic availability and congestion penalty\n    idle_factor = max(1 - utilization, eps)\n    # Combined availability factor: earliest idle time from machine and current available_time\n    avail_factor = 1.0 / (1 + available_time) if available_time >= 0 else 1.0\n    earliest_idle = start_time + processing_tm  # simplified earliest completion on machine\n    avail_factor_dynamic = 1.0 / (1 + earliest_idle) if earliest_idle > 0 else eps\n    congestion_penalty = (utilization ** 2) * avail_factor_dynamic if utilization > 0 else 0\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * avail_factor * avail_factor_dynamic - 0.05 * congestion_penalty\n    \n    # Slack-based term with delivery_time and completion_time\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Machine efficiency factor relative to adaptive average processing time\n    f5 = processing_tm / avg_proc_time if avg_proc_time > 0 else 1.0\n    \n    # Task-machine compatibility term: higher priority for fewer capable machines\n    total_machines = max(num_neighboring_machine, 1)  # avoid division by zero\n    compatibility = num_neighboring_machine / total_machines  # normalized; assume total_machines = system size, here simplified\n    f6 = 1.0 / (compatibility + eps) if num_neighboring_machine > 0 else 1.0\n    \n    # Adaptive thresholds using percentiles\n    is_short_task = processing_time < p25_pt\n    is_long_task = processing_time > p75_pt\n    is_overdue = slack < 1.0\n    \n    # Dynamic weight adjustment based on task classification to minimize tardiness\n    if is_overdue:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.15\n        weight4 = 0.55\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_short_task:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.35\n        weight4 = 0.35\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_long_task:\n        weight1 = 0.25\n        weight2 = 0.25\n        weight3 = 0.15\n        weight4 = 0.15\n        weight5 = 0.1\n        weight6 = 0.1\n    else:\n        weight1 = 0.15\n        weight2 = 0.15\n        weight3 = 0.25\n        weight4 = 0.25\n        weight5 = 0.1\n        weight6 = 0.1\n    \n    # Compute priority as weighted sum (smaller value means higher priority)\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4) + (weight5 * f5) + (weight6 * f6)\n    \n    # Ensure positive priority\n    if priority <= 0:\n        priority = eps\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 592.05,
+          "ins_2": 480.5,
+          "ins_3": 1077.25,
+          "ins_4": 1236.4166666666667,
+          "ins_5": 287.9166666666667,
+          "ins_6": 924.4833333333333,
+          "ins_7": 430.6666666666667,
+          "ins_8": 1268.8333333333333,
+          "ins_9": 2154.883333333333,
+          "ins_10": 1526.3,
+          "ins_11": 673.5833333333334,
+          "ins_12": 992.3333333333334,
+          "ins_13": 1633.5166666666667,
+          "ins_14": 1214.8,
+          "ins_15": 2279.366666666667,
+          "ins_16": 1235.9,
+          "ins_17": 1799.4,
+          "ins_18": 789.6166666666667,
+          "ins_19": 780.45,
+          "ins_20": 957.3333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1124.0177083333333,
+        "all_scores": [
+          -1116.7800000000002,
+          -1124.3224999999998,
+          -1124.3224999999998,
+          -1130.6458333333335
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1116.7800000000002,
+        "algorithm": "The new algorithm combines adaptive percentile tracking with a dynamic machine availability factor that penalizes congestion using the earliest idle time, replaces fixed constants with normalized statistics from recent job data, and applies tardiness-driven weight adjustment to minimize overall tardiness under a smaller-value-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Adaptive percentiles and averages (simulated; in practice, update from recent job data)\n    p25_pt = 5.0\n    p75_pt = 50.0\n    p25_dt = 100.0\n    p75_dt = 500.0\n    avg_proc_time = 10.0  # adaptive average processing time on machine\n    \n    # Normalize processing_time squared using adaptive percentile\n    max_pt = max(p75_pt, eps)\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared using adaptive percentile\n    max_dt = max(p75_dt, eps)\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor with dynamic availability and congestion penalty\n    idle_factor = max(1 - utilization, eps)\n    # Combined availability factor: earliest idle time from machine and current available_time\n    avail_factor = 1.0 / (1 + available_time) if available_time >= 0 else 1.0\n    earliest_idle = start_time + processing_tm  # simplified earliest completion on machine\n    avail_factor_dynamic = 1.0 / (1 + earliest_idle) if earliest_idle > 0 else eps\n    congestion_penalty = (utilization ** 2) * avail_factor_dynamic if utilization > 0 else 0\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * avail_factor * avail_factor_dynamic - 0.05 * congestion_penalty\n    \n    # Slack-based term with delivery_time and completion_time\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Machine efficiency factor relative to adaptive average processing time\n    f5 = processing_tm / avg_proc_time if avg_proc_time > 0 else 1.0\n    \n    # Task-machine compatibility term: higher priority for fewer capable machines\n    total_machines = max(num_neighboring_machine, 1)  # avoid division by zero\n    compatibility = num_neighboring_machine / total_machines  # normalized; assume total_machines = system size, here simplified\n    f6 = 1.0 / (compatibility + eps) if num_neighboring_machine > 0 else 1.0\n    \n    # Adaptive thresholds using percentiles\n    is_short_task = processing_time < p25_pt\n    is_long_task = processing_time > p75_pt\n    is_overdue = slack < 1.0\n    \n    # Dynamic weight adjustment based on task classification to minimize tardiness\n    if is_overdue:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.15\n        weight4 = 0.55\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_short_task:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.35\n        weight4 = 0.35\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_long_task:\n        weight1 = 0.25\n        weight2 = 0.25\n        weight3 = 0.15\n        weight4 = 0.15\n        weight5 = 0.1\n        weight6 = 0.1\n    else:\n        weight1 = 0.15\n        weight2 = 0.15\n        weight3 = 0.25\n        weight4 = 0.25\n        weight5 = 0.1\n        weight6 = 0.1\n    \n    # Compute priority as weighted sum (smaller value means higher priority)\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4) + (weight5 * f5) + (weight6 * f6)\n    \n    # Ensure positive priority\n    if priority <= 0:\n        priority = eps\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 592.05,
+          "ins_2": 480.5,
+          "ins_3": 1077.25,
+          "ins_4": 1236.4166666666667,
+          "ins_5": 287.9166666666667,
+          "ins_6": 924.4833333333333,
+          "ins_7": 430.6666666666667,
+          "ins_8": 1268.8333333333333,
+          "ins_9": 2154.883333333333,
+          "ins_10": 1526.3,
+          "ins_11": 673.5833333333334,
+          "ins_12": 992.3333333333334,
+          "ins_13": 1633.5166666666667,
+          "ins_14": 1214.8,
+          "ins_15": 2279.366666666667,
+          "ins_16": 1235.9,
+          "ins_17": 1799.4,
+          "ins_18": 789.6166666666667,
+          "ins_19": 780.45,
+          "ins_20": 957.3333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1116.7800000000002,
+        "all_scores": [
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1116.7800000000002,
+        "algorithm": "The new algorithm combines adaptive percentile tracking with a dynamic machine availability factor that penalizes congestion using the earliest idle time, replaces fixed constants with normalized statistics from recent job data, and applies tardiness-driven weight adjustment to minimize overall tardiness under a smaller-value-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Adaptive percentiles and averages (simulated; in practice, update from recent job data)\n    p25_pt = 5.0\n    p75_pt = 50.0\n    p25_dt = 100.0\n    p75_dt = 500.0\n    avg_proc_time = 10.0  # adaptive average processing time on machine\n    \n    # Normalize processing_time squared using adaptive percentile\n    max_pt = max(p75_pt, eps)\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared using adaptive percentile\n    max_dt = max(p75_dt, eps)\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor with dynamic availability and congestion penalty\n    idle_factor = max(1 - utilization, eps)\n    # Combined availability factor: earliest idle time from machine and current available_time\n    avail_factor = 1.0 / (1 + available_time) if available_time >= 0 else 1.0\n    earliest_idle = start_time + processing_tm  # simplified earliest completion on machine\n    avail_factor_dynamic = 1.0 / (1 + earliest_idle) if earliest_idle > 0 else eps\n    congestion_penalty = (utilization ** 2) * avail_factor_dynamic if utilization > 0 else 0\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * avail_factor * avail_factor_dynamic - 0.05 * congestion_penalty\n    \n    # Slack-based term with delivery_time and completion_time\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Machine efficiency factor relative to adaptive average processing time\n    f5 = processing_tm / avg_proc_time if avg_proc_time > 0 else 1.0\n    \n    # Task-machine compatibility term: higher priority for fewer capable machines\n    total_machines = max(num_neighboring_machine, 1)  # avoid division by zero\n    compatibility = num_neighboring_machine / total_machines  # normalized; assume total_machines = system size, here simplified\n    f6 = 1.0 / (compatibility + eps) if num_neighboring_machine > 0 else 1.0\n    \n    # Adaptive thresholds using percentiles\n    is_short_task = processing_time < p25_pt\n    is_long_task = processing_time > p75_pt\n    is_overdue = slack < 1.0\n    \n    # Dynamic weight adjustment based on task classification to minimize tardiness\n    if is_overdue:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.15\n        weight4 = 0.55\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_short_task:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.35\n        weight4 = 0.35\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_long_task:\n        weight1 = 0.25\n        weight2 = 0.25\n        weight3 = 0.15\n        weight4 = 0.15\n        weight5 = 0.1\n        weight6 = 0.1\n    else:\n        weight1 = 0.15\n        weight2 = 0.15\n        weight3 = 0.25\n        weight4 = 0.25\n        weight5 = 0.1\n        weight6 = 0.1\n    \n    # Compute priority as weighted sum (smaller value means higher priority)\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4) + (weight5 * f5) + (weight6 * f6)\n    \n    # Ensure positive priority\n    if priority <= 0:\n        priority = eps\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 592.05,
+          "ins_2": 480.5,
+          "ins_3": 1077.25,
+          "ins_4": 1236.4166666666667,
+          "ins_5": 287.9166666666667,
+          "ins_6": 924.4833333333333,
+          "ins_7": 430.6666666666667,
+          "ins_8": 1268.8333333333333,
+          "ins_9": 2154.883333333333,
+          "ins_10": 1526.3,
+          "ins_11": 673.5833333333334,
+          "ins_12": 992.3333333333334,
+          "ins_13": 1633.5166666666667,
+          "ins_14": 1214.8,
+          "ins_15": 2279.366666666667,
+          "ins_16": 1235.9,
+          "ins_17": 1799.4,
+          "ins_18": 789.6166666666667,
+          "ins_19": 780.45,
+          "ins_20": 957.3333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1116.7800000000002,
+        "all_scores": [
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1116.7800000000002,
+        "algorithm": "The new algorithm combines adaptive percentile tracking with a dynamic machine availability factor that penalizes congestion using the earliest idle time, replaces fixed constants with normalized statistics from recent job data, and applies tardiness-driven weight adjustment to minimize overall tardiness under a smaller-value-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Adaptive percentiles and averages (simulated; in practice, update from recent job data)\n    p25_pt = 5.0\n    p75_pt = 50.0\n    p25_dt = 100.0\n    p75_dt = 500.0\n    avg_proc_time = 10.0  # adaptive average processing time on machine\n    \n    # Normalize processing_time squared using adaptive percentile\n    max_pt = max(p75_pt, eps)\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared using adaptive percentile\n    max_dt = max(p75_dt, eps)\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor with dynamic availability and congestion penalty\n    idle_factor = max(1 - utilization, eps)\n    # Combined availability factor: earliest idle time from machine and current available_time\n    avail_factor = 1.0 / (1 + available_time) if available_time >= 0 else 1.0\n    earliest_idle = start_time + processing_tm  # simplified earliest completion on machine\n    avail_factor_dynamic = 1.0 / (1 + earliest_idle) if earliest_idle > 0 else eps\n    congestion_penalty = (utilization ** 2) * avail_factor_dynamic if utilization > 0 else 0\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * avail_factor * avail_factor_dynamic - 0.05 * congestion_penalty\n    \n    # Slack-based term with delivery_time and completion_time\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Machine efficiency factor relative to adaptive average processing time\n    f5 = processing_tm / avg_proc_time if avg_proc_time > 0 else 1.0\n    \n    # Task-machine compatibility term: higher priority for fewer capable machines\n    total_machines = max(num_neighboring_machine, 1)  # avoid division by zero\n    compatibility = num_neighboring_machine / total_machines  # normalized; assume total_machines = system size, here simplified\n    f6 = 1.0 / (compatibility + eps) if num_neighboring_machine > 0 else 1.0\n    \n    # Adaptive thresholds using percentiles\n    is_short_task = processing_time < p25_pt\n    is_long_task = processing_time > p75_pt\n    is_overdue = slack < 1.0\n    \n    # Dynamic weight adjustment based on task classification to minimize tardiness\n    if is_overdue:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.15\n        weight4 = 0.55\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_short_task:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.35\n        weight4 = 0.35\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_long_task:\n        weight1 = 0.25\n        weight2 = 0.25\n        weight3 = 0.15\n        weight4 = 0.15\n        weight5 = 0.1\n        weight6 = 0.1\n    else:\n        weight1 = 0.15\n        weight2 = 0.15\n        weight3 = 0.25\n        weight4 = 0.25\n        weight5 = 0.1\n        weight6 = 0.1\n    \n    # Compute priority as weighted sum (smaller value means higher priority)\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4) + (weight5 * f5) + (weight6 * f6)\n    \n    # Ensure positive priority\n    if priority <= 0:\n        priority = eps\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 592.05,
+          "ins_2": 480.5,
+          "ins_3": 1077.25,
+          "ins_4": 1236.4166666666667,
+          "ins_5": 287.9166666666667,
+          "ins_6": 924.4833333333333,
+          "ins_7": 430.6666666666667,
+          "ins_8": 1268.8333333333333,
+          "ins_9": 2154.883333333333,
+          "ins_10": 1526.3,
+          "ins_11": 673.5833333333334,
+          "ins_12": 992.3333333333334,
+          "ins_13": 1633.5166666666667,
+          "ins_14": 1214.8,
+          "ins_15": 2279.366666666667,
+          "ins_16": 1235.9,
+          "ins_17": 1799.4,
+          "ins_18": 789.6166666666667,
+          "ins_19": 780.45,
+          "ins_20": 957.3333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1116.7800000000002,
+        "all_scores": [
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1116.7800000000002,
+        "algorithm": "The new algorithm combines adaptive percentile tracking with a dynamic machine availability factor that penalizes congestion using the earliest idle time, replaces fixed constants with normalized statistics from recent job data, and applies tardiness-driven weight adjustment to minimize overall tardiness under a smaller-value-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Adaptive percentiles and averages (simulated; in practice, update from recent job data)\n    p25_pt = 5.0\n    p75_pt = 50.0\n    p25_dt = 100.0\n    p75_dt = 500.0\n    avg_proc_time = 10.0  # adaptive average processing time on machine\n    \n    # Normalize processing_time squared using adaptive percentile\n    max_pt = max(p75_pt, eps)\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared using adaptive percentile\n    max_dt = max(p75_dt, eps)\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor with dynamic availability and congestion penalty\n    idle_factor = max(1 - utilization, eps)\n    # Combined availability factor: earliest idle time from machine and current available_time\n    avail_factor = 1.0 / (1 + available_time) if available_time >= 0 else 1.0\n    earliest_idle = start_time + processing_tm  # simplified earliest completion on machine\n    avail_factor_dynamic = 1.0 / (1 + earliest_idle) if earliest_idle > 0 else eps\n    congestion_penalty = (utilization ** 2) * avail_factor_dynamic if utilization > 0 else 0\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * avail_factor * avail_factor_dynamic - 0.05 * congestion_penalty\n    \n    # Slack-based term with delivery_time and completion_time\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Machine efficiency factor relative to adaptive average processing time\n    f5 = processing_tm / avg_proc_time if avg_proc_time > 0 else 1.0\n    \n    # Task-machine compatibility term: higher priority for fewer capable machines\n    total_machines = max(num_neighboring_machine, 1)  # avoid division by zero\n    compatibility = num_neighboring_machine / total_machines  # normalized; assume total_machines = system size, here simplified\n    f6 = 1.0 / (compatibility + eps) if num_neighboring_machine > 0 else 1.0\n    \n    # Adaptive thresholds using percentiles\n    is_short_task = processing_time < p25_pt\n    is_long_task = processing_time > p75_pt\n    is_overdue = slack < 1.0\n    \n    # Dynamic weight adjustment based on task classification to minimize tardiness\n    if is_overdue:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.15\n        weight4 = 0.55\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_short_task:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.35\n        weight4 = 0.35\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_long_task:\n        weight1 = 0.25\n        weight2 = 0.25\n        weight3 = 0.15\n        weight4 = 0.15\n        weight5 = 0.1\n        weight6 = 0.1\n    else:\n        weight1 = 0.15\n        weight2 = 0.15\n        weight3 = 0.25\n        weight4 = 0.25\n        weight5 = 0.1\n        weight6 = 0.1\n    \n    # Compute priority as weighted sum (smaller value means higher priority)\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4) + (weight5 * f5) + (weight6 * f6)\n    \n    # Ensure positive priority\n    if priority <= 0:\n        priority = eps\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 592.05,
+          "ins_2": 480.5,
+          "ins_3": 1077.25,
+          "ins_4": 1236.4166666666667,
+          "ins_5": 287.9166666666667,
+          "ins_6": 924.4833333333333,
+          "ins_7": 430.6666666666667,
+          "ins_8": 1268.8333333333333,
+          "ins_9": 2154.883333333333,
+          "ins_10": 1526.3,
+          "ins_11": 673.5833333333334,
+          "ins_12": 992.3333333333334,
+          "ins_13": 1633.5166666666667,
+          "ins_14": 1214.8,
+          "ins_15": 2279.366666666667,
+          "ins_16": 1235.9,
+          "ins_17": 1799.4,
+          "ins_18": 789.6166666666667,
+          "ins_19": 780.45,
+          "ins_20": 957.3333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1116.7800000000002,
+        "all_scores": [
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1116.7800000000002,
+        "algorithm": "The new algorithm combines adaptive percentile tracking with a dynamic machine availability factor that penalizes congestion using the earliest idle time, replaces fixed constants with normalized statistics from recent job data, and applies tardiness-driven weight adjustment to minimize overall tardiness under a smaller-value-higher-priority convention.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-10\n    \n    # Adaptive percentiles and averages (simulated; in practice, update from recent job data)\n    p25_pt = 5.0\n    p75_pt = 50.0\n    p25_dt = 100.0\n    p75_dt = 500.0\n    avg_proc_time = 10.0  # adaptive average processing time on machine\n    \n    # Normalize processing_time squared using adaptive percentile\n    max_pt = max(p75_pt, eps)\n    f1 = (processing_time ** 2) / (max_pt ** 2) if processing_time > 0 else eps\n    \n    # Normalize delivery_time squared using adaptive percentile\n    max_dt = max(p75_dt, eps)\n    f2 = (delivery_time ** 2) / (max_dt ** 2) if delivery_time > 0 else eps\n    \n    # Machine workload factor with dynamic availability and congestion penalty\n    idle_factor = max(1 - utilization, eps)\n    # Combined availability factor: earliest idle time from machine and current available_time\n    avail_factor = 1.0 / (1 + available_time) if available_time >= 0 else 1.0\n    earliest_idle = start_time + processing_tm  # simplified earliest completion on machine\n    avail_factor_dynamic = 1.0 / (1 + earliest_idle) if earliest_idle > 0 else eps\n    congestion_penalty = (utilization ** 2) * avail_factor_dynamic if utilization > 0 else 0\n    f3 = (num_neighboring_operation + 1) * 0.1 * idle_factor * avail_factor * avail_factor_dynamic - 0.05 * congestion_penalty\n    \n    # Slack-based term with delivery_time and completion_time\n    completion_time = start_time + processing_tm\n    slack = max(delivery_time - completion_time, 1.0)\n    f4 = 1.0 / slack if slack > 0 else eps\n    \n    # Machine efficiency factor relative to adaptive average processing time\n    f5 = processing_tm / avg_proc_time if avg_proc_time > 0 else 1.0\n    \n    # Task-machine compatibility term: higher priority for fewer capable machines\n    total_machines = max(num_neighboring_machine, 1)  # avoid division by zero\n    compatibility = num_neighboring_machine / total_machines  # normalized; assume total_machines = system size, here simplified\n    f6 = 1.0 / (compatibility + eps) if num_neighboring_machine > 0 else 1.0\n    \n    # Adaptive thresholds using percentiles\n    is_short_task = processing_time < p25_pt\n    is_long_task = processing_time > p75_pt\n    is_overdue = slack < 1.0\n    \n    # Dynamic weight adjustment based on task classification to minimize tardiness\n    if is_overdue:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.15\n        weight4 = 0.55\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_short_task:\n        weight1 = 0.05\n        weight2 = 0.05\n        weight3 = 0.35\n        weight4 = 0.35\n        weight5 = 0.1\n        weight6 = 0.1\n    elif is_long_task:\n        weight1 = 0.25\n        weight2 = 0.25\n        weight3 = 0.15\n        weight4 = 0.15\n        weight5 = 0.1\n        weight6 = 0.1\n    else:\n        weight1 = 0.15\n        weight2 = 0.15\n        weight3 = 0.25\n        weight4 = 0.25\n        weight5 = 0.1\n        weight6 = 0.1\n    \n    # Compute priority as weighted sum (smaller value means higher priority)\n    priority = (weight1 * f1) + (weight2 * f2) + (weight3 * f3) + (weight4 * f4) + (weight5 * f5) + (weight6 * f6)\n    \n    # Ensure positive priority\n    if priority <= 0:\n        priority = eps\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 592.05,
+          "ins_2": 480.5,
+          "ins_3": 1077.25,
+          "ins_4": 1236.4166666666667,
+          "ins_5": 287.9166666666667,
+          "ins_6": 924.4833333333333,
+          "ins_7": 430.6666666666667,
+          "ins_8": 1268.8333333333333,
+          "ins_9": 2154.883333333333,
+          "ins_10": 1526.3,
+          "ins_11": 673.5833333333334,
+          "ins_12": 992.3333333333334,
+          "ins_13": 1633.5166666666667,
+          "ins_14": 1214.8,
+          "ins_15": 2279.366666666667,
+          "ins_16": 1235.9,
+          "ins_17": 1799.4,
+          "ins_18": 789.6166666666667,
+          "ins_19": 780.45,
+          "ins_20": 957.3333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1116.7800000000002,
+        "all_scores": [
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002,
+          -1116.7800000000002
+        ]
+      }
+    }
+  ],
+  "error_count": 11,
+  "total_tokens": 507839,
+  "method": "EvoDR",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 135,
+  "time_elapsed": 1699.4184021949768,
+  "llm_a_calls": 135,
+  "llm_a_input_tokens": 217633,
+  "llm_a_output_tokens": 99607,
+  "llm_s_calls": 124,
+  "llm_s_input_tokens": 169471,
+  "llm_s_output_tokens": 21128
+}

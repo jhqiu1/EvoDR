@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1812.779375,
+        "all_scores": [
+          -1710.4533333333334,
+          -1716.4408333333333,
+          -1794.0383333333334,
+          -2030.185
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1708.5325,
+        "algorithm": "The algorithm combines EDD with dynamic slack-based penalty to prioritize tasks; it computes current_time as min(available_time), calculates slack = delivery_time - current_time - processing_time, then returns a priority based on slack and delivery_time, with a tie-breaking using start_time.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time)\n    else:\n        current_time = available_time\n    \n    # Calculate slack time\n    slack = delivery_time - current_time - processing_time\n    \n    # Compute priority: combine EDD and slack penalty\n    if slack >= 0:\n        # Use EDD, but add small weight from start_time as tie-breaker (smaller start_time = higher priority)\n        priority = delivery_time + 0.001 * start_time\n    else:\n        # Penalize tardy tasks: priority increases as negative slack increases\n        # Use delivery_time - slack (which becomes larger for more tardy tasks)\n        priority = delivery_time - slack + 0.001 * start_time  # equivalent to 2*delivery_time - current_time - processing_time + small tie-break\n    \n    # Ensure priority is finite and positive\n    if priority < 0:\n        priority = 0.0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3228.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2645.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3536.733333333333,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1726.8179166666666,
+        "all_scores": [
+          -1708.5325,
+          -1710.4533333333334,
+          -1716.4408333333333,
+          -1771.845
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1159.6591666666668,
+        "algorithm": "The improved algorithm integrates dynamic slack-based EDD with machine utilization, processing time variability, and explicit machine availability weighting to compute priority as delivery_time + utilization_penalty + variability_penalty + availability_weight, where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time) if available_time else 0.0\n    else:\n        current_time = available_time if available_time is not None else 0.0\n    \n    # Calculate slack\n    slack = delivery_time - current_time - processing_time\n    \n    # Utilization factor: higher utilization increases priority (penalize overloaded machines)\n    # Normalize utilization to avoid division by zero\n    util_factor = utilization if utilization > 0 else 0.5  # default 0.5 if unknown\n    \n    # Processing time variability: prefer machines with lower processing_tm (faster) for urgent tasks\n    # Use processing_tm as a measure; larger processing_tm means slower machine -> lower priority\n    # Normalize to avoid zero division\n    if processing_tm <= 0:\n        variability_factor = 0.0\n    else:\n        # Higher processing_tm reduces priority (adds to delivery_time effectively)\n        variability_factor = processing_tm * 0.1  # small weight\n    \n    # Machine availability weighting: consider available_time explicitly\n    # If current_time is far from available_time, adjust priority\n    if available_time and (isinstance(available_time, (list, tuple))):\n        min_avail = min(available_time)\n        availability_gap = current_time - min_avail\n    else:\n        availability_gap = 0.0\n    \n    # Base priority using EDD with slack penalty\n    if slack >= 0:\n        base_priority = delivery_time + 0.001 * start_time\n    else:\n        base_priority = delivery_time - slack + 0.001 * start_time\n    \n    # Incorporate utilization: higher util increases priority (smaller result)\n    util_penalty = util_factor * 0.1  # small positive adjustment\n    \n    # Incorporate variability: slower machine increases priority (bad, so add)\n    var_penalty = variability_factor\n    \n    # Incorporate availability: larger gap means machine idle, reduce priority (encourage usage)\n    # If gap is large positive (machine idle), reduce priority to favor scheduling on it\n    # If gap is negative (machine busy later), increase priority\n    avail_weight = -availability_gap * 0.01  # negative weight to make idle machine lower priority\n    \n    # Combine: priority = base + penalties (all positive additions), smaller is better\n    priority = base_priority + util_penalty + var_penalty + avail_weight\n    \n    # Ensure finite and non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1297.8,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 520.4333333333333,
+          "ins_8": 1457.8333333333333,
+          "ins_9": 2325.5833333333335,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 775.0833333333334,
+          "ins_13": 2354.766666666667,
+          "ins_14": 1230.95,
+          "ins_15": 2513.6,
+          "ins_16": 1135.6,
+          "ins_17": 1700.3,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1567.131875,
+        "all_scores": [
+          -1159.6591666666668,
+          -1689.8825000000002,
+          -1708.5325,
+          -1710.4533333333334
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1159.6591666666668,
+        "algorithm": "The improved algorithm integrates dynamic slack-based EDD with machine utilization, processing time variability, and explicit machine availability weighting to compute priority as delivery_time + utilization_penalty + variability_penalty + availability_weight, where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time) if available_time else 0.0\n    else:\n        current_time = available_time if available_time is not None else 0.0\n    \n    # Calculate slack\n    slack = delivery_time - current_time - processing_time\n    \n    # Utilization factor: higher utilization increases priority (penalize overloaded machines)\n    # Normalize utilization to avoid division by zero\n    util_factor = utilization if utilization > 0 else 0.5  # default 0.5 if unknown\n    \n    # Processing time variability: prefer machines with lower processing_tm (faster) for urgent tasks\n    # Use processing_tm as a measure; larger processing_tm means slower machine -> lower priority\n    # Normalize to avoid zero division\n    if processing_tm <= 0:\n        variability_factor = 0.0\n    else:\n        # Higher processing_tm reduces priority (adds to delivery_time effectively)\n        variability_factor = processing_tm * 0.1  # small weight\n    \n    # Machine availability weighting: consider available_time explicitly\n    # If current_time is far from available_time, adjust priority\n    if available_time and (isinstance(available_time, (list, tuple))):\n        min_avail = min(available_time)\n        availability_gap = current_time - min_avail\n    else:\n        availability_gap = 0.0\n    \n    # Base priority using EDD with slack penalty\n    if slack >= 0:\n        base_priority = delivery_time + 0.001 * start_time\n    else:\n        base_priority = delivery_time - slack + 0.001 * start_time\n    \n    # Incorporate utilization: higher util increases priority (smaller result)\n    util_penalty = util_factor * 0.1  # small positive adjustment\n    \n    # Incorporate variability: slower machine increases priority (bad, so add)\n    var_penalty = variability_factor\n    \n    # Incorporate availability: larger gap means machine idle, reduce priority (encourage usage)\n    # If gap is large positive (machine idle), reduce priority to favor scheduling on it\n    # If gap is negative (machine busy later), increase priority\n    avail_weight = -availability_gap * 0.01  # negative weight to make idle machine lower priority\n    \n    # Combine: priority = base + penalties (all positive additions), smaller is better\n    priority = base_priority + util_penalty + var_penalty + avail_weight\n    \n    # Ensure finite and non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1297.8,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 520.4333333333333,
+          "ins_8": 1457.8333333333333,
+          "ins_9": 2325.5833333333335,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 775.0833333333334,
+          "ins_13": 2354.766666666667,
+          "ins_14": 1230.95,
+          "ins_15": 2513.6,
+          "ins_16": 1135.6,
+          "ins_17": 1700.3,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1161.2685416666668,
+        "all_scores": [
+          -1159.6591666666668,
+          -1159.6591666666668,
+          -1160.6791666666668,
+          -1165.0766666666666
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1158.3125,
+        "algorithm": "The improved algorithm computes priority by combining dynamic slack with machine count, processing time ratio, and task-machine eligibility penalties, using smaller values for higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time) if available_time else 0.0\n    else:\n        current_time = available_time if available_time is not None else 0.0\n    \n    # Calculate slack\n    slack = delivery_time - current_time - processing_time\n    \n    # Base priority using EDD with slack penalty\n    if slack >= 0:\n        base_priority = delivery_time + 0.001 * start_time\n    else:\n        base_priority = delivery_time - slack + 0.001 * start_time\n    \n    # Utilization factor: higher utilization increases priority (penalize overloaded machines)\n    util_factor = utilization if utilization > 0 else 0.5\n    util_penalty = util_factor * 0.1\n    \n    # Processing time variability: prefer machines with lower processing_tm for urgent tasks\n    if processing_tm <= 0:\n        variability_factor = 0.0\n    else:\n        variability_factor = processing_tm * 0.1\n    var_penalty = variability_factor\n    \n    # Machine availability weighting: consider available_time explicitly\n    if isinstance(available_time, (list, tuple)) and available_time:\n        min_avail = min(available_time)\n        availability_gap = current_time - min_avail\n    else:\n        availability_gap = 0.0\n    avail_weight = -availability_gap * 0.01\n    \n    # Improvement 1: Incorporate number of machines as weight to reduce priority when many alternatives exist\n    # More machines available -> lower priority (smaller penalty)\n    num_machines_weight = 0\n    if num_neighboring_machine > 0:\n        num_machines_weight = -0.1 / num_neighboring_machine  # negative to reduce priority when many machines\n    \n    # Improvement 2: Adjust availability weight to consider machine-task processing time ratio\n    # Penalize assigning long tasks to soon-available busy machines\n    if isinstance(available_time, (list, tuple)) and available_time and processing_time > 0:\n        min_avail = min(available_time)\n        avail_gap = current_time - min_avail\n        # If machine is busy (gap negative) and task is long, add penalty\n        if avail_gap < 0 and processing_tm > 0:\n            ratio_penalty = (abs(avail_gap) / processing_time) * 0.05\n        else:\n            ratio_penalty = 0.0\n    else:\n        ratio_penalty = 0.0\n    \n    # Improvement 3: Add task-specific machine eligibility factor\n    # Penalize tasks with limited machine options (high num_neighboring_operation relative to machines)\n    if num_neighboring_machine > 0 and num_neighboring_operation > 0:\n        eligibility_factor = (num_neighboring_operation / num_neighboring_machine) * 0.1\n    else:\n        eligibility_factor = 0.0\n    \n    # Combine all components\n    priority = (base_priority \n                + util_penalty \n                + var_penalty \n                + avail_weight \n                + num_machines_weight \n                + ratio_penalty \n                + eligibility_factor)\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1297.8,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 520.4333333333333,
+          "ins_8": 1457.8333333333333,
+          "ins_9": 2325.5833333333335,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 775.0833333333334,
+          "ins_13": 2327.8333333333335,
+          "ins_14": 1230.95,
+          "ins_15": 2513.6,
+          "ins_16": 1135.6,
+          "ins_17": 1700.3,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1159.3225000000002,
+        "all_scores": [
+          -1158.3125,
+          -1159.6591666666668,
+          -1159.6591666666668,
+          -1159.6591666666668
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1158.3125,
+        "algorithm": "The improved algorithm computes priority by combining dynamic slack with machine count, processing time ratio, and task-machine eligibility penalties, using smaller values for higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time) if available_time else 0.0\n    else:\n        current_time = available_time if available_time is not None else 0.0\n    \n    # Calculate slack\n    slack = delivery_time - current_time - processing_time\n    \n    # Base priority using EDD with slack penalty\n    if slack >= 0:\n        base_priority = delivery_time + 0.001 * start_time\n    else:\n        base_priority = delivery_time - slack + 0.001 * start_time\n    \n    # Utilization factor: higher utilization increases priority (penalize overloaded machines)\n    util_factor = utilization if utilization > 0 else 0.5\n    util_penalty = util_factor * 0.1\n    \n    # Processing time variability: prefer machines with lower processing_tm for urgent tasks\n    if processing_tm <= 0:\n        variability_factor = 0.0\n    else:\n        variability_factor = processing_tm * 0.1\n    var_penalty = variability_factor\n    \n    # Machine availability weighting: consider available_time explicitly\n    if isinstance(available_time, (list, tuple)) and available_time:\n        min_avail = min(available_time)\n        availability_gap = current_time - min_avail\n    else:\n        availability_gap = 0.0\n    avail_weight = -availability_gap * 0.01\n    \n    # Improvement 1: Incorporate number of machines as weight to reduce priority when many alternatives exist\n    # More machines available -> lower priority (smaller penalty)\n    num_machines_weight = 0\n    if num_neighboring_machine > 0:\n        num_machines_weight = -0.1 / num_neighboring_machine  # negative to reduce priority when many machines\n    \n    # Improvement 2: Adjust availability weight to consider machine-task processing time ratio\n    # Penalize assigning long tasks to soon-available busy machines\n    if isinstance(available_time, (list, tuple)) and available_time and processing_time > 0:\n        min_avail = min(available_time)\n        avail_gap = current_time - min_avail\n        # If machine is busy (gap negative) and task is long, add penalty\n        if avail_gap < 0 and processing_tm > 0:\n            ratio_penalty = (abs(avail_gap) / processing_time) * 0.05\n        else:\n            ratio_penalty = 0.0\n    else:\n        ratio_penalty = 0.0\n    \n    # Improvement 3: Add task-specific machine eligibility factor\n    # Penalize tasks with limited machine options (high num_neighboring_operation relative to machines)\n    if num_neighboring_machine > 0 and num_neighboring_operation > 0:\n        eligibility_factor = (num_neighboring_operation / num_neighboring_machine) * 0.1\n    else:\n        eligibility_factor = 0.0\n    \n    # Combine all components\n    priority = (base_priority \n                + util_penalty \n                + var_penalty \n                + avail_weight \n                + num_machines_weight \n                + ratio_penalty \n                + eligibility_factor)\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1297.8,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 520.4333333333333,
+          "ins_8": 1457.8333333333333,
+          "ins_9": 2325.5833333333335,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 775.0833333333334,
+          "ins_13": 2327.8333333333335,
+          "ins_14": 1230.95,
+          "ins_15": 2513.6,
+          "ins_16": 1135.6,
+          "ins_17": 1700.3,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1158.3125,
+        "all_scores": [
+          -1158.3125,
+          -1158.3125,
+          -1158.3125,
+          -1158.3125
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1158.3125,
+        "algorithm": "The improved algorithm computes priority by combining dynamic slack with machine count, processing time ratio, and task-machine eligibility penalties, using smaller values for higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time) if available_time else 0.0\n    else:\n        current_time = available_time if available_time is not None else 0.0\n    \n    # Calculate slack\n    slack = delivery_time - current_time - processing_time\n    \n    # Base priority using EDD with slack penalty\n    if slack >= 0:\n        base_priority = delivery_time + 0.001 * start_time\n    else:\n        base_priority = delivery_time - slack + 0.001 * start_time\n    \n    # Utilization factor: higher utilization increases priority (penalize overloaded machines)\n    util_factor = utilization if utilization > 0 else 0.5\n    util_penalty = util_factor * 0.1\n    \n    # Processing time variability: prefer machines with lower processing_tm for urgent tasks\n    if processing_tm <= 0:\n        variability_factor = 0.0\n    else:\n        variability_factor = processing_tm * 0.1\n    var_penalty = variability_factor\n    \n    # Machine availability weighting: consider available_time explicitly\n    if isinstance(available_time, (list, tuple)) and available_time:\n        min_avail = min(available_time)\n        availability_gap = current_time - min_avail\n    else:\n        availability_gap = 0.0\n    avail_weight = -availability_gap * 0.01\n    \n    # Improvement 1: Incorporate number of machines as weight to reduce priority when many alternatives exist\n    # More machines available -> lower priority (smaller penalty)\n    num_machines_weight = 0\n    if num_neighboring_machine > 0:\n        num_machines_weight = -0.1 / num_neighboring_machine  # negative to reduce priority when many machines\n    \n    # Improvement 2: Adjust availability weight to consider machine-task processing time ratio\n    # Penalize assigning long tasks to soon-available busy machines\n    if isinstance(available_time, (list, tuple)) and available_time and processing_time > 0:\n        min_avail = min(available_time)\n        avail_gap = current_time - min_avail\n        # If machine is busy (gap negative) and task is long, add penalty\n        if avail_gap < 0 and processing_tm > 0:\n            ratio_penalty = (abs(avail_gap) / processing_time) * 0.05\n        else:\n            ratio_penalty = 0.0\n    else:\n        ratio_penalty = 0.0\n    \n    # Improvement 3: Add task-specific machine eligibility factor\n    # Penalize tasks with limited machine options (high num_neighboring_operation relative to machines)\n    if num_neighboring_machine > 0 and num_neighboring_operation > 0:\n        eligibility_factor = (num_neighboring_operation / num_neighboring_machine) * 0.1\n    else:\n        eligibility_factor = 0.0\n    \n    # Combine all components\n    priority = (base_priority \n                + util_penalty \n                + var_penalty \n                + avail_weight \n                + num_machines_weight \n                + ratio_penalty \n                + eligibility_factor)\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1297.8,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 520.4333333333333,
+          "ins_8": 1457.8333333333333,
+          "ins_9": 2325.5833333333335,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 775.0833333333334,
+          "ins_13": 2327.8333333333335,
+          "ins_14": 1230.95,
+          "ins_15": 2513.6,
+          "ins_16": 1135.6,
+          "ins_17": 1700.3,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1158.3125,
+        "all_scores": [
+          -1158.3125,
+          -1158.3125,
+          -1158.3125,
+          -1158.3125
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1158.3125,
+        "algorithm": "The improved algorithm computes priority by combining dynamic slack with machine count, processing time ratio, and task-machine eligibility penalties, using smaller values for higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time) if available_time else 0.0\n    else:\n        current_time = available_time if available_time is not None else 0.0\n    \n    # Calculate slack\n    slack = delivery_time - current_time - processing_time\n    \n    # Base priority using EDD with slack penalty\n    if slack >= 0:\n        base_priority = delivery_time + 0.001 * start_time\n    else:\n        base_priority = delivery_time - slack + 0.001 * start_time\n    \n    # Utilization factor: higher utilization increases priority (penalize overloaded machines)\n    util_factor = utilization if utilization > 0 else 0.5\n    util_penalty = util_factor * 0.1\n    \n    # Processing time variability: prefer machines with lower processing_tm for urgent tasks\n    if processing_tm <= 0:\n        variability_factor = 0.0\n    else:\n        variability_factor = processing_tm * 0.1\n    var_penalty = variability_factor\n    \n    # Machine availability weighting: consider available_time explicitly\n    if isinstance(available_time, (list, tuple)) and available_time:\n        min_avail = min(available_time)\n        availability_gap = current_time - min_avail\n    else:\n        availability_gap = 0.0\n    avail_weight = -availability_gap * 0.01\n    \n    # Improvement 1: Incorporate number of machines as weight to reduce priority when many alternatives exist\n    # More machines available -> lower priority (smaller penalty)\n    num_machines_weight = 0\n    if num_neighboring_machine > 0:\n        num_machines_weight = -0.1 / num_neighboring_machine  # negative to reduce priority when many machines\n    \n    # Improvement 2: Adjust availability weight to consider machine-task processing time ratio\n    # Penalize assigning long tasks to soon-available busy machines\n    if isinstance(available_time, (list, tuple)) and available_time and processing_time > 0:\n        min_avail = min(available_time)\n        avail_gap = current_time - min_avail\n        # If machine is busy (gap negative) and task is long, add penalty\n        if avail_gap < 0 and processing_tm > 0:\n            ratio_penalty = (abs(avail_gap) / processing_time) * 0.05\n        else:\n            ratio_penalty = 0.0\n    else:\n        ratio_penalty = 0.0\n    \n    # Improvement 3: Add task-specific machine eligibility factor\n    # Penalize tasks with limited machine options (high num_neighboring_operation relative to machines)\n    if num_neighboring_machine > 0 and num_neighboring_operation > 0:\n        eligibility_factor = (num_neighboring_operation / num_neighboring_machine) * 0.1\n    else:\n        eligibility_factor = 0.0\n    \n    # Combine all components\n    priority = (base_priority \n                + util_penalty \n                + var_penalty \n                + avail_weight \n                + num_machines_weight \n                + ratio_penalty \n                + eligibility_factor)\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1297.8,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 520.4333333333333,
+          "ins_8": 1457.8333333333333,
+          "ins_9": 2325.5833333333335,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 775.0833333333334,
+          "ins_13": 2327.8333333333335,
+          "ins_14": 1230.95,
+          "ins_15": 2513.6,
+          "ins_16": 1135.6,
+          "ins_17": 1700.3,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1158.3125,
+        "all_scores": [
+          -1158.3125,
+          -1158.3125,
+          -1158.3125,
+          -1158.3125
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1141.5233333333333,
+        "algorithm": "'The new algorithm combines dynamic slack-based EDD with a balanced machine count weight, explicit eligibility penalty, normalized availability gap, and a tardiness-sensitive penalty for negative slack, using smaller values for higher priority.'",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time) if available_time else 0.0\n    else:\n        current_time = available_time if available_time is not None else 0.0\n    \n    # Calculate slack\n    slack = delivery_time - current_time - processing_time\n    \n    # Base priority using EDD with slack penalty\n    if slack >= 0:\n        base_priority = delivery_time + 0.001 * start_time\n    else:\n        # Tardiness-sensitive penalty: amplify priority for negative slack\n        base_priority = delivery_time + abs(slack) * 0.5 + 0.001 * start_time\n    \n    # Utilization factor: higher utilization increases priority\n    util_factor = utilization if utilization > 0 else 0.5\n    util_penalty = util_factor * 0.1\n    \n    # Processing time variability: lower processing_tm reduces priority for urgent tasks\n    if processing_tm <= 0:\n        var_penalty = 0.0\n    else:\n        var_penalty = processing_tm * 0.1\n    \n    # Machine availability weighting: normalized availability gap\n    if isinstance(available_time, (list, tuple)) and available_time:\n        min_avail = min(available_time)\n        availability_gap = current_time - min_avail\n        # Normalize by processing time to avoid scale issues\n        if processing_time > 0:\n            norm_gap = availability_gap / processing_time\n        else:\n            norm_gap = availability_gap\n        avail_weight = -norm_gap * 0.1\n    else:\n        avail_weight = 0.0\n    \n    # Balanced machine count weight: positive contribution when few machines, negative when many\n    if num_neighboring_machine > 0:\n        # Use reciprocal with dampening factor to avoid over-penalizing\n        if num_neighboring_machine <= 3:\n            num_machines_weight = 0.2 / num_neighboring_machine  # positive to increase priority\n        else:\n            num_machines_weight = -0.05 * num_neighboring_machine  # negative to decrease priority\n    else:\n        num_machines_weight = 0.0\n    \n    # Explicit machine-task eligibility penalty: penalize tasks with limited options\n    eligibility_factor = 0.0\n    if num_neighboring_machine > 0 and num_neighboring_operation > 0:\n        ratio = num_neighboring_operation / num_neighboring_machine\n        if ratio > 1:\n            eligibility_factor = (ratio - 1) * 0.2  # higher penalty for more restricted tasks\n        else:\n            eligibility_factor = 0.0\n    \n    # Combine all components\n    priority = (base_priority + util_penalty + var_penalty + avail_weight + num_machines_weight + eligibility_factor)\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1297.8,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 520.4333333333333,
+          "ins_8": 1310.5,
+          "ins_9": 2206.016666666667,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 775.0833333333334,
+          "ins_13": 2258.95,
+          "ins_14": 1230.95,
+          "ins_15": 2513.6,
+          "ins_16": 1135.6,
+          "ins_17": 1700.3,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1154.1152083333334,
+        "all_scores": [
+          -1141.5233333333333,
+          -1158.3125,
+          -1158.3125,
+          -1158.3125
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1097.2366666666665,
+        "algorithm": "The improved algorithm adapts dynamic weights based on real-time utilization and slack thresholds, incorporates machine-task processing time ratio, and adds a look-ahead term for next-operation eligible machine count to minimize tardiness with smaller values indicating higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if isinstance(available_time, (list, tuple)):\n        current_time = min(available_time) if available_time else 0.0\n    else:\n        current_time = available_time if available_time is not None else 0.0\n    \n    # Calculate slack\n    slack = delivery_time - current_time - processing_time\n    \n    # Dynamic weight based on slack threshold and utilization\n    if utilization > 0.8:\n        slack_weight = 0.6  # Aggressive penalty for negative slack when highly utilized\n    elif utilization > 0.5:\n        slack_weight = 0.4\n    else:\n        slack_weight = 0.2\n    \n    # Base priority using dynamic slack-based EDD\n    if slack >= 0:\n        base_priority = delivery_time + 0.001 * start_time\n    else:\n        # Tardiness-sensitive penalty with dynamic weight\n        base_priority = delivery_time + abs(slack) * slack_weight + 0.001 * start_time\n    \n    # Dynamic utilization factor\n    util_factor = min(utilization, 1.0) if utilization > 0 else 0.5\n    util_penalty = util_factor * 0.15\n    \n    # Processing time variability\n    if processing_tm <= 0:\n        var_penalty = 0.0\n    else:\n        # Adjusted to reduce impact for urgent tasks\n        var_penalty = processing_tm * (0.05 * (1 - min(utilization, 1.0)))\n    \n    # Machine availability weighting with dynamic gap normalization\n    if isinstance(available_time, (list, tuple)) and available_time:\n        min_avail = min(available_time)\n        availability_gap = current_time - min_avail\n        if processing_time > 0:\n            norm_gap = availability_gap / (processing_time + 1e-10)\n        else:\n            norm_gap = availability_gap\n        # Dynamic weight based on gap severity\n        gap_weight = 0.15 if norm_gap > 2 else 0.1\n        avail_weight = -norm_gap * gap_weight\n    else:\n        avail_weight = 0.0\n    \n    # Balanced machine count weight with dynamic adjustment\n    if num_neighboring_machine > 0:\n        if num_neighboring_machine <= 3:\n            num_machines_weight = 0.2 / (num_neighboring_machine + 1e-10)\n        else:\n            num_machines_weight = -0.03 * num_neighboring_machine * (1 + utilization)\n    else:\n        num_machines_weight = 0.0\n    \n    # Explicit eligibility penalty with processing time ratio\n    eligibility_factor = 0.0\n    if num_neighboring_machine > 0 and num_neighboring_operation > 0:\n        ratio = num_neighboring_operation / (num_neighboring_machine + 1e-10)\n        if ratio > 1:\n            eligibility_factor = (ratio - 1) * 0.2\n        else:\n            eligibility_factor = 0.0\n    \n    # Incorporate machine-task processing time ratio (Suggestion 2)\n    # Favors assignments where task's processing time is shortest on this machine\n    pt_ratio_penalty = 0.0\n    if processing_time > 0 and processing_tm > 0:\n        pt_ratio = processing_tm / processing_time\n        if pt_ratio < 1:\n            pt_ratio_penalty = -pt_ratio * 0.1  # Lower priority for short relative processing time (better match)\n        else:\n            pt_ratio_penalty = pt_ratio * 0.05  # Higher priority for poor match\n    \n    # Look-ahead term for next operation eligible machines (Suggestion 3)\n    look_ahead_penalty = 0.0\n    if num_neighboring_operation > 0:\n        if num_neighboring_operation <= 2:\n            look_ahead_penalty = 0.3  # Increase priority for bottleneck next operation\n        elif num_neighboring_operation <= 5:\n            look_ahead_penalty = 0.1\n        else:\n            look_ahead_penalty = -0.05  # Reduce priority for many options\n    \n    # Combine all components\n    priority = (base_priority + util_penalty + var_penalty + avail_weight + \n                num_machines_weight + eligibility_factor + pt_ratio_penalty + look_ahead_penalty)\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 584.7166666666667,
+          "ins_2": 403.8333333333333,
+          "ins_3": 1019.8166666666667,
+          "ins_4": 1152.6833333333334,
+          "ins_5": 475.76666666666665,
+          "ins_6": 1303.0666666666666,
+          "ins_7": 368.21666666666664,
+          "ins_8": 1251.0833333333333,
+          "ins_9": 2214.883333333333,
+          "ins_10": 1097.3166666666666,
+          "ins_11": 849.25,
+          "ins_12": 808.8,
+          "ins_13": 1694.1166666666666,
+          "ins_14": 1009.65,
+          "ins_15": 2376.516666666667,
+          "ins_16": 694.0166666666667,
+          "ins_17": 1741.55,
+          "ins_18": 754.3166666666667,
+          "ins_19": 825.8333333333334,
+          "ins_20": 1319.3
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1128.4860416666666,
+        "all_scores": [
+          -1097.2366666666665,
+          -1133.6608333333331,
+          -1141.5233333333333,
+          -1141.5233333333333
+        ]
+      }
+    }
+  ],
+  "error_count": 16,
+  "total_tokens": 419593,
+  "method": "EvoDR",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 140,
+  "time_elapsed": 1672.8984062671661,
+  "llm_a_calls": 140,
+  "llm_a_input_tokens": 177044,
+  "llm_a_output_tokens": 79147,
+  "llm_s_calls": 124,
+  "llm_s_input_tokens": 142936,
+  "llm_s_output_tokens": 20466
+}

@@ -1,0 +1,488 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -2056.9722916666665,
+        "all_scores": [
+          -1710.4533333333334,
+          -2149.808333333333,
+          -2166.296666666666,
+          -2201.3308333333334
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1824.2704166666667,
+        "all_scores": [
+          -1710.4533333333334,
+          -1736.3308333333339,
+          -1814.6966666666667,
+          -2035.6008333333334
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1732.6881250000004,
+        "all_scores": [
+          -1710.4533333333334,
+          -1736.3308333333339,
+          -1736.3308333333339,
+          -1747.6375
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1731.299791666667,
+        "all_scores": [
+          -1710.4533333333334,
+          -1736.3308333333339,
+          -1736.3308333333339,
+          -1742.0841666666668
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1725.6775000000002,
+        "all_scores": [
+          -1710.4533333333334,
+          -1719.5949999999998,
+          -1736.3308333333339,
+          -1736.3308333333339
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1725.6775000000002,
+        "all_scores": [
+          -1710.4533333333334,
+          -1719.5949999999998,
+          -1736.3308333333339,
+          -1736.3308333333339
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1702.9066666666665,
+        "algorithm": "The new algorithm, named Urgency-Weighted Slack with Efficiency (UWSE), combines EDD's focus on delivery urgency (as the primary driver) with a secondary slack-based efficiency term that adjusts priority based on remaining time slack (delivery_time - current_time) and processing time, ensuring smaller values indicate higher priority to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"\n    UWSE heuristic: priority = delivery_time + penalty if slack is tight.\n    Smaller priority = higher priority.\n    \"\"\"\n    # Avoid division by zero in slack calculation\n    slack = delivery_time - available_time\n    if slack <= 1e-10:  # Very tight or negative slack, high urgency\n        # Use power of processing time to boost urgency (smaller processing time = higher priority)\n        priority = delivery_time - processing_time / (processing_time + 1e-10)\n    else:\n        # Normalize processing time relative to slack (smaller ratio = higher efficiency)\n        efficiency_ratio = processing_time / (slack + 1e-10)\n        # Combine: primary weight on delivery_time, secondary on efficiency (both smaller = better)\n        priority = delivery_time + 0.3 * efficiency_ratio\n\n    result = float(priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1266.1166666666666,
+          "ins_2": 939.1333333333333,
+          "ins_3": 1456.2,
+          "ins_4": 1832.4666666666667,
+          "ins_5": 1248.1333333333334,
+          "ins_6": 1676.75,
+          "ins_7": 632.9833333333333,
+          "ins_8": 1755.15,
+          "ins_9": 3234.8333333333335,
+          "ins_10": 2346.7833333333333,
+          "ins_11": 1083.15,
+          "ins_12": 1321.2833333333333,
+          "ins_13": 2191.383333333333,
+          "ins_14": 1637.5666666666666,
+          "ins_15": 2818.75,
+          "ins_16": 1247.7333333333333,
+          "ins_17": 2058.85,
+          "ins_18": 1100.45,
+          "ins_19": 1698.7333333333333,
+          "ins_20": 2511.6833333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1714.0589583333333,
+        "all_scores": [
+          -1702.9066666666665,
+          -1710.4533333333334,
+          -1719.5949999999998,
+          -1723.2808333333335
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1645.2966666666666,
+        "algorithm": "The new algorithm, Slack-Weighted Delivery with Machine Utilization (SWDMU), prioritizes jobs by combining slack-adjusted delivery urgency with a machine utilization penalty to minimize tardiness, where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"\n    SWDMU heuristic: priority = delivery_time + slack_weight * (1 - slack_ratio) + utilization_penalty\n    Smaller priority = higher priority.\n    \"\"\"\n    # Avoid division by zero\n    epsilon = 1e-10\n    \n    # Calculate slack and ensure non-negative\n    slack = max(delivery_time - available_time, 0)\n    \n    # Use processing_time to normalize slack\n    processing_eff = processing_time if processing_time > epsilon else epsilon\n    slack_ratio = slack / (slack + processing_eff)  # 0 for tight slack, 1 for loose slack\n    \n    # Primary component: delivery_time (urgency)\n    urgency = delivery_time\n    \n    # Secondary component: slack-based weight (reduce priority if slack is large)\n    slack_weight = 1.0 - slack_ratio  # Larger when slack is tight\n    \n    # Tertiary component: utilization factor (higher utilization increases priority)\n    utilization_factor = utilization if utilization > 0 else 0  # Utilization is between 0 and 1\n    \n    # Combine with weights\n    priority = urgency + 0.5 * slack_weight + 0.2 * utilization_factor\n    \n    # Ensure result is defined and return\n    result = float(priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 938.1,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1519.7166666666667,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3400.366666666667,
+          "ins_10": 1322.5166666666667,
+          "ins_11": 978.85,
+          "ins_12": 969.4,
+          "ins_13": 2223.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2436.2833333333333,
+          "ins_16": 1354.9166666666667,
+          "ins_17": 2629.616666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1660.8833333333334,
+          "ins_20": 2609.8333333333335
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1687.0902083333333,
+        "all_scores": [
+          -1645.2966666666666,
+          -1696.250833333333,
+          -1702.9066666666665,
+          -1703.9066666666665
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1428.3791666666668,
+        "algorithm": "The new algorithm, Adaptive Exponential Slack with Machine-Weighted Utilization (AESMU), combines EDD urgency with an adaptive exponential slack penalty weighted by machine-specific processing time efficiency and a dynamic utilization penalty to minimize tardiness, where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-10\n    # Calculate slack and ensure non-negative\n    slack = max(delivery_time - available_time, 0)\n    \n    # Primary component: delivery_time (urgency)\n    urgency = delivery_time\n    \n    # Secondary component: adaptive exponential slack penalty\n    # Use processing_tm if available, else fallback to general processing_time\n    effective_pt = processing_tm if processing_tm > 0 else processing_time\n    effective_pt = max(effective_pt, epsilon)\n    if slack > epsilon:\n        # Exponential decay: larger slack gives lower penalty, tight slack gives high penalty\n        slack_penalty = (1 / (1 + slack)) * effective_pt\n    else:\n        # Very tight or negative slack: aggressively penalize based on effective processing time\n        slack_penalty = effective_pt * (1 + 1 / (effective_pt + epsilon))\n    \n    # Tertiary component: dynamic utilization penalty weighted by machine availability\n    # Higher utilization increases priority (makes it less urgent) to avoid overload\n    utilization_penalty = utilization * 0.3\n    \n    # Combine with adaptive weights based on slack tightness\n    # When slack is tight, emphasize slack_penalty more; when slack is loose, emphasize urgency\n    slack_tightness = 1 / (slack + epsilon)  # High when slack is small\n    weight_urgency = 1.0\n    weight_slack = min(0.5, slack_tightness * 0.1)  # Adaptive weight capped at 0.5\n    weight_util = 0.2 + 0.1 * utilization  # Increase utilization weight when machine is busy\n    \n    priority = (weight_urgency * urgency) + (weight_slack * slack_penalty) + (weight_util * utilization_penalty)\n    \n    result = float(priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1051.4833333333333,
+          "ins_2": 680.8,
+          "ins_3": 1424.5833333333333,
+          "ins_4": 1429.8833333333334,
+          "ins_5": 735.45,
+          "ins_6": 1160.1333333333334,
+          "ins_7": 701.8166666666667,
+          "ins_8": 1684.6666666666667,
+          "ins_9": 2990.0833333333335,
+          "ins_10": 1196.9,
+          "ins_11": 918.4166666666666,
+          "ins_12": 1135.45,
+          "ins_13": 2001.7,
+          "ins_14": 1340.05,
+          "ins_15": 2516.2166666666667,
+          "ins_16": 1463.7666666666667,
+          "ins_17": 1991.4,
+          "ins_18": 596.8333333333334,
+          "ins_19": 1431.5333333333333,
+          "ins_20": 2116.4166666666665
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1588.8756250000001,
+        "all_scores": [
+          -1428.3791666666668,
+          -1637.1591666666666,
+          -1644.6675000000002,
+          -1645.2966666666666
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1311.8183333333332,
+        "algorithm": "The Improved Adaptive Exponential Slack with Machine-Weighted Utilization (IAESMU) algorithm calculates priority as the sum of delivery_time urgency, an exponential slack penalty scaled by processing_time reciprocal, and a normalized utilization penalty, where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    epsilon = 1e-10\n\n    # Use effective processing time (prefer processing_tm)\n    effective_pt = processing_tm if processing_tm > epsilon else processing_time\n    effective_pt = max(effective_pt, epsilon)\n\n    # Slack\n    slack = max(delivery_time - available_time, 0.0)\n\n    # Primary: urgency (delivery_time)\n    urgency = delivery_time\n\n    # Secondary: exponential slack penalty with reciprocal of processing time\n    if slack > epsilon:\n        slack_penalty = math.exp(-slack / effective_pt) * effective_pt\n    else:\n        slack_penalty = effective_pt * 2.0  # high penalty for zero/negative slack\n\n    # Tertiary: dynamic utilization penalty (less weight)\n    utilization_penalty = utilization * 0.2\n\n    # Fixed weights: emphasize urgency, reduce slack and utilization influence\n    weight_urgency = 1.0\n    weight_slack = 0.3\n    weight_util = 0.5\n\n    priority = (weight_urgency * urgency) + (weight_slack * slack_penalty) + (weight_util * utilization_penalty)\n\n    result = float(priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 841.6,
+          "ins_2": 624.0833333333334,
+          "ins_3": 1167.9333333333334,
+          "ins_4": 1315.4166666666667,
+          "ins_5": 406.03333333333336,
+          "ins_6": 1146.1333333333334,
+          "ins_7": 487.25,
+          "ins_8": 1526.6333333333334,
+          "ins_9": 2275.0666666666666,
+          "ins_10": 2207.2166666666667,
+          "ins_11": 846.9166666666666,
+          "ins_12": 759.3,
+          "ins_13": 2238.2833333333333,
+          "ins_14": 1207.0,
+          "ins_15": 2777.983333333333,
+          "ins_16": 1212.0666666666666,
+          "ins_17": 2057.4166666666665,
+          "ins_18": 760.7833333333333,
+          "ins_19": 1047.3333333333333,
+          "ins_20": 1331.9166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1390.2147916666665,
+        "all_scores": [
+          -1311.8183333333332,
+          -1409.7025,
+          -1410.9591666666668,
+          -1428.3791666666668
+        ]
+      }
+    },
+    {
+      "gen": 11,
+      "best_individual": {
+        "score": -1215.9758333333334,
+        "algorithm": "The Enhanced Adaptive Exponential Slack with Machine-Weighted Utilization (EAESMU) algorithm improves priority calculation by dynamically adjusting weights based on average slack and arrival interval, incorporating a machine-task efficiency factor into slack penalty, and adapting utilization penalty weight according to machine availability.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    epsilon = 1e-10\n    \n    # Effective processing time\n    effective_pt = processing_tm if processing_tm > epsilon else processing_time\n    effective_pt = max(effective_pt, epsilon)\n    \n    # Slack calculation\n    slack = max(delivery_time - available_time, 0.0)\n    \n    # Average slack and arrival interval estimates (using available_time as proxy for average)\n    avg_slack = slack if slack > epsilon else epsilon\n    avg_arrival_interval = max(available_time / max(num_neighboring_operation, 1), epsilon) if num_neighboring_operation > 0 else 1.0\n    \n    # Dynamic weight adjustment based on average slack and arrival interval\n    base_urgency_weight = 1.0\n    base_slack_weight = 0.3\n    base_util_weight = 0.5\n    \n    # Increase urgency when arrivals are frequent (small avg_arrival_interval)\n    arrival_factor = 1.0 / (1.0 + math.exp(-avg_arrival_interval))\n    weight_urgency = base_urgency_weight * (1.0 + arrival_factor * 0.5)\n    \n    # Slack weight adjusted inversely with avg_slack to emphasize when slack is tight\n    weight_slack = base_slack_weight / (1.0 + avg_slack / effective_pt)\n    \n    # Machine availability factor: increase utilization penalty when machines are limited\n    machine_availability_factor = 1.0 if num_neighboring_machine > 0 else 1.5\n    machine_availability_factor = 1.0 + 0.5 * math.exp(-num_neighboring_machine) if num_neighboring_machine > 0 else 2.0\n    weight_util = base_util_weight * machine_availability_factor\n    \n    # Urgency component\n    urgency = delivery_time\n    \n    # Slack penalty with machine-task efficiency factor\n    if slack > epsilon:\n        # Efficiency factor: ratio of processing_tm to average processing_time on this machine\n        efficiency_factor = processing_tm / max(processing_time, epsilon) if processing_time > epsilon else 1.0\n        slack_penalty = math.exp(-slack / (effective_pt * efficiency_factor)) * effective_pt\n    else:\n        slack_penalty = effective_pt * 2.0\n    \n    # Utilization penalty\n    utilization_penalty = utilization * 0.2 * weight_util\n    \n    # Calculate priority\n    priority = (weight_urgency * urgency) + (weight_slack * slack_penalty) + (utilization_penalty)\n    \n    result = float(priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 757.15,
+          "ins_2": 421.0833333333333,
+          "ins_3": 1103.2,
+          "ins_4": 1330.4833333333333,
+          "ins_5": 415.0833333333333,
+          "ins_6": 1100.7666666666667,
+          "ins_7": 474.6166666666667,
+          "ins_8": 1184.5333333333333,
+          "ins_9": 2206.116666666667,
+          "ins_10": 2043.7,
+          "ins_11": 772.0333333333333,
+          "ins_12": 745.7666666666667,
+          "ins_13": 2288.1666666666665,
+          "ins_14": 1050.0,
+          "ins_15": 2536.3333333333335,
+          "ins_16": 1154.8333333333333,
+          "ins_17": 1577.05,
+          "ins_18": 701.55,
+          "ins_19": 1153.2833333333333,
+          "ins_20": 1303.7666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1277.6941666666667,
+        "all_scores": [
+          -1215.9758333333334,
+          -1245.3333333333335,
+          -1311.8183333333332,
+          -1337.6491666666668
+        ]
+      }
+    },
+    {
+      "gen": 12,
+      "best_individual": {
+        "score": -1215.9758333333334,
+        "algorithm": "The Enhanced Adaptive Exponential Slack with Machine-Weighted Utilization (EAESMU) algorithm improves priority calculation by dynamically adjusting weights based on average slack and arrival interval, incorporating a machine-task efficiency factor into slack penalty, and adapting utilization penalty weight according to machine availability.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    epsilon = 1e-10\n    \n    # Effective processing time\n    effective_pt = processing_tm if processing_tm > epsilon else processing_time\n    effective_pt = max(effective_pt, epsilon)\n    \n    # Slack calculation\n    slack = max(delivery_time - available_time, 0.0)\n    \n    # Average slack and arrival interval estimates (using available_time as proxy for average)\n    avg_slack = slack if slack > epsilon else epsilon\n    avg_arrival_interval = max(available_time / max(num_neighboring_operation, 1), epsilon) if num_neighboring_operation > 0 else 1.0\n    \n    # Dynamic weight adjustment based on average slack and arrival interval\n    base_urgency_weight = 1.0\n    base_slack_weight = 0.3\n    base_util_weight = 0.5\n    \n    # Increase urgency when arrivals are frequent (small avg_arrival_interval)\n    arrival_factor = 1.0 / (1.0 + math.exp(-avg_arrival_interval))\n    weight_urgency = base_urgency_weight * (1.0 + arrival_factor * 0.5)\n    \n    # Slack weight adjusted inversely with avg_slack to emphasize when slack is tight\n    weight_slack = base_slack_weight / (1.0 + avg_slack / effective_pt)\n    \n    # Machine availability factor: increase utilization penalty when machines are limited\n    machine_availability_factor = 1.0 if num_neighboring_machine > 0 else 1.5\n    machine_availability_factor = 1.0 + 0.5 * math.exp(-num_neighboring_machine) if num_neighboring_machine > 0 else 2.0\n    weight_util = base_util_weight * machine_availability_factor\n    \n    # Urgency component\n    urgency = delivery_time\n    \n    # Slack penalty with machine-task efficiency factor\n    if slack > epsilon:\n        # Efficiency factor: ratio of processing_tm to average processing_time on this machine\n        efficiency_factor = processing_tm / max(processing_time, epsilon) if processing_time > epsilon else 1.0\n        slack_penalty = math.exp(-slack / (effective_pt * efficiency_factor)) * effective_pt\n    else:\n        slack_penalty = effective_pt * 2.0\n    \n    # Utilization penalty\n    utilization_penalty = utilization * 0.2 * weight_util\n    \n    # Calculate priority\n    priority = (weight_urgency * urgency) + (weight_slack * slack_penalty) + (utilization_penalty)\n    \n    result = float(priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 757.15,
+          "ins_2": 421.0833333333333,
+          "ins_3": 1103.2,
+          "ins_4": 1330.4833333333333,
+          "ins_5": 415.0833333333333,
+          "ins_6": 1100.7666666666667,
+          "ins_7": 474.6166666666667,
+          "ins_8": 1184.5333333333333,
+          "ins_9": 2206.116666666667,
+          "ins_10": 2043.7,
+          "ins_11": 772.0333333333333,
+          "ins_12": 745.7666666666667,
+          "ins_13": 2288.1666666666665,
+          "ins_14": 1050.0,
+          "ins_15": 2536.3333333333335,
+          "ins_16": 1154.8333333333333,
+          "ins_17": 1577.05,
+          "ins_18": 701.55,
+          "ins_19": 1153.2833333333333,
+          "ins_20": 1303.7666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1258.7302083333334,
+        "all_scores": [
+          -1215.9758333333334,
+          -1245.3333333333335,
+          -1261.7933333333335,
+          -1311.8183333333332
+        ]
+      }
+    }
+  ],
+  "error_count": 4,
+  "total_tokens": 221283,
+  "method": "EvoDR",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 25
+  },
+  "api_calls": 100,
+  "time_elapsed": 1285.5178697109222,
+  "llm_a_calls": 100,
+  "llm_a_input_tokens": 76735,
+  "llm_a_output_tokens": 36012,
+  "llm_s_calls": 97,
+  "llm_s_input_tokens": 92525,
+  "llm_s_output_tokens": 16011
+}

@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1811.2616666666668,
+        "algorithm": "The algorithm computes priority as a normalized slack with deadline risk penalty, weighted by machine utilization and processing efficiency, where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    # Edge case: if job already scheduled, give very low priority\n    if status != 0:\n        return 10000.0\n    \n    # Feature 1: Slack with deadline risk (from algorithm 2's tardiness risk)\n    slack = delivery_time - (start_time + processing_time)\n    if slack < 0:\n        # Overdue: penalty proportional to lateness\n        deadline_risk = abs(slack) * 100.0\n    else:\n        # Positive slack: normalize to encourage smaller slack (higher urgency)\n        # Use inverse so that smaller slack gives smaller priority\n        deadline_risk = 1.0 / (slack + eps) if slack > eps else 1000.0\n    \n    # Feature 2: Machine utilization penalty (from algorithm 1)\n    util_penalty = utilization  # [0-1]; higher utilization means lower priority\n    \n    # Feature 3: Processing time efficiency (from algorithm 2, adapted)\n    # Shorter processing time gives higher priority\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature 4: Machine availability factor (from algorithm 2)\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Normalize by slack magnitude to avoid overflow, combine with weights\n    # Weights tuned: deadline risk most important, then utilization, then efficiency\n    priority = 10.0 * deadline_risk + 5.0 * util_penalty + 0.1 * (1.0 / (efficiency + eps)) + 0.01 * machine_avail\n    \n    # Ensure positive and smaller value = higher priority\n    if priority < 0:\n        priority = 0.0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1252.1666666666667,
+          "ins_2": 456.53333333333336,
+          "ins_3": 1366.95,
+          "ins_4": 2127.4333333333334,
+          "ins_5": 1479.8333333333333,
+          "ins_6": 2299.7166666666667,
+          "ins_7": 1376.6666666666667,
+          "ins_8": 1348.3666666666666,
+          "ins_9": 2740.2,
+          "ins_10": 2146.4666666666667,
+          "ins_11": 801.5833333333334,
+          "ins_12": 1520.4,
+          "ins_13": 2579.0,
+          "ins_14": 1433.45,
+          "ins_15": 3162.5333333333333,
+          "ins_16": 1514.75,
+          "ins_17": 2971.3166666666666,
+          "ins_18": 1520.6333333333334,
+          "ins_19": 1290.0833333333333,
+          "ins_20": 2837.15
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1953.6885416666664,
+        "all_scores": [
+          -1811.2616666666668,
+          -1999.1625,
+          -1999.1625,
+          -2005.1675
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1792.9575,
+        "algorithm": "The algorithm computes priority as a product of reciprocal deadlines and machine contention, modulated by a sigmoid of normalized slack, using multiplicative combination to ensure nonlinear differentiation.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # If job already scheduled, give very low priority\n    if status != 0:\n        return 10000.0\n    \n    # Feature 1: Deadline urgency - inverse of delivery time (smaller delivery = more urgent)\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    \n    # Feature 2: Machine contention - product of machine congestion and operation count\n    machine_congestion = (1.0 - utilization) * (num_neighboring_machine + 1)\n    contention = 1.0 / (machine_congestion + eps)\n    \n    # Feature 3: Sigmoid of normalized slack to capture tardiness risk nonlinearly\n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + pow(2.71828, -normalized_slack))  # sigmoid\n    \n    # Combine multiplicatively to create nonlinear priority landscape\n    # Smaller value = higher priority, so we use inverse of product\n    product = deadline_urgency * contention * (slack_risk + eps)\n    priority = 1.0 / (product + eps)\n    \n    # Clip to avoid extreme values\n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1153.8,
+          "ins_2": 1100.2166666666667,
+          "ins_3": 1490.4166666666667,
+          "ins_4": 1841.6,
+          "ins_5": 1121.0833333333333,
+          "ins_6": 1598.2833333333333,
+          "ins_7": 964.75,
+          "ins_8": 1874.1666666666667,
+          "ins_9": 3387.133333333333,
+          "ins_10": 1980.7666666666667,
+          "ins_11": 1595.8166666666666,
+          "ins_12": 1243.25,
+          "ins_13": 2761.0833333333335,
+          "ins_14": 1545.15,
+          "ins_15": 3697.6833333333334,
+          "ins_16": 1165.2833333333333,
+          "ins_17": 1972.4333333333334,
+          "ins_18": 1088.9333333333334,
+          "ins_19": 1761.8,
+          "ins_20": 2515.5
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1802.47125,
+        "all_scores": [
+          -1792.9575,
+          -1794.8783333333333,
+          -1810.7875,
+          -1811.2616666666668
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1146.4058333333335,
+        "algorithm": "The new algorithm combines multiplicative deadline urgency and sigmoid slack risk from algorithm 1 with adaptive deadline risk scaling, machine utilization penalty, processing efficiency, task-machine suitability, and machine availability from algorithm 2, using a weighted sum optimized for tardiness minimization.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # If job already scheduled, give very low priority\n    if status != 0:\n        return 10000.0\n    \n    # Feature from Algorithm 1: Multiplicative deadline urgency and sigmoid slack risk\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    \n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + 2.71828 ** (-normalized_slack))\n    \n    multiplicative_factor = deadline_urgency * (slack_risk + eps)\n    \n    # Feature from Algorithm 2: Adaptive deadline risk with shop load factor\n    if slack < 0:\n        shop_load_factor = processing_time / (processing_tm + eps) if processing_tm > eps else 1.0\n        deadline_risk = abs(slack) * 10.0 * shop_load_factor\n    else:\n        if slack > eps:\n            deadline_risk = 1.0 / (slack + eps) * (1.0 + 0.1 * (processing_time / (processing_tm + eps)))\n        else:\n            deadline_risk = 1000.0\n    \n    # Feature from Algorithm 2: Machine utilization with idle time and queue length penalty\n    idle_time = max(0, available_time - (start_time + processing_time))\n    queue_penalty = num_neighboring_operation / (num_neighboring_machine + eps)\n    util_penalty = utilization + 0.05 * (1.0 / (idle_time + 1.0)) + 0.1 * queue_penalty\n    \n    # Feature from Algorithm 2: Processing time efficiency\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature from Algorithm 2: Task-machine suitability\n    avg_processing = (processing_time + processing_tm) / 2.0 if processing_time > eps else processing_tm\n    suitability = processing_tm / (avg_processing + eps) if avg_processing > eps else 1.0\n    \n    # Feature from Algorithm 2: Machine availability factor\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Combine both components: multiplicative urgency from Algorithm 1 and weighted sum from Algorithm 2\n    priority = 10.0 * deadline_risk + 5.0 * util_penalty + 0.1 * (1.0 / (efficiency + eps)) + 2.0 * suitability + 0.01 * machine_avail + 0.5 * (1.0 / (multiplicative_factor + eps))\n    \n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 470.6166666666667,
+          "ins_3": 1161.2333333333333,
+          "ins_4": 1249.1666666666667,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2287.8,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 795.4833333333333,
+          "ins_13": 2239.866666666667,
+          "ins_14": 1230.95,
+          "ins_15": 2501.1666666666665,
+          "ins_16": 1135.6,
+          "ins_17": 1797.15,
+          "ins_18": 559.45,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1434.455625,
+        "all_scores": [
+          -1146.4058333333335,
+          -1419.6600000000003,
+          -1527.7566666666664,
+          -1643.9999999999995
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1146.4058333333335,
+        "algorithm": "The new algorithm combines multiplicative deadline urgency and sigmoid slack risk from algorithm 1 with adaptive deadline risk scaling, machine utilization penalty, processing efficiency, task-machine suitability, and machine availability from algorithm 2, using a weighted sum optimized for tardiness minimization.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # If job already scheduled, give very low priority\n    if status != 0:\n        return 10000.0\n    \n    # Feature from Algorithm 1: Multiplicative deadline urgency and sigmoid slack risk\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    \n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + 2.71828 ** (-normalized_slack))\n    \n    multiplicative_factor = deadline_urgency * (slack_risk + eps)\n    \n    # Feature from Algorithm 2: Adaptive deadline risk with shop load factor\n    if slack < 0:\n        shop_load_factor = processing_time / (processing_tm + eps) if processing_tm > eps else 1.0\n        deadline_risk = abs(slack) * 10.0 * shop_load_factor\n    else:\n        if slack > eps:\n            deadline_risk = 1.0 / (slack + eps) * (1.0 + 0.1 * (processing_time / (processing_tm + eps)))\n        else:\n            deadline_risk = 1000.0\n    \n    # Feature from Algorithm 2: Machine utilization with idle time and queue length penalty\n    idle_time = max(0, available_time - (start_time + processing_time))\n    queue_penalty = num_neighboring_operation / (num_neighboring_machine + eps)\n    util_penalty = utilization + 0.05 * (1.0 / (idle_time + 1.0)) + 0.1 * queue_penalty\n    \n    # Feature from Algorithm 2: Processing time efficiency\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature from Algorithm 2: Task-machine suitability\n    avg_processing = (processing_time + processing_tm) / 2.0 if processing_time > eps else processing_tm\n    suitability = processing_tm / (avg_processing + eps) if avg_processing > eps else 1.0\n    \n    # Feature from Algorithm 2: Machine availability factor\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Combine both components: multiplicative urgency from Algorithm 1 and weighted sum from Algorithm 2\n    priority = 10.0 * deadline_risk + 5.0 * util_penalty + 0.1 * (1.0 / (efficiency + eps)) + 2.0 * suitability + 0.01 * machine_avail + 0.5 * (1.0 / (multiplicative_factor + eps))\n    \n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 470.6166666666667,
+          "ins_3": 1161.2333333333333,
+          "ins_4": 1249.1666666666667,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2287.8,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 795.4833333333333,
+          "ins_13": 2239.866666666667,
+          "ins_14": 1230.95,
+          "ins_15": 2501.1666666666665,
+          "ins_16": 1135.6,
+          "ins_17": 1797.15,
+          "ins_18": 559.45,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1168.8470833333336,
+        "all_scores": [
+          -1146.4058333333335,
+          -1146.4058333333335,
+          -1183.6591666666668,
+          -1198.9175
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1146.4058333333335,
+        "algorithm": "The new algorithm combines multiplicative deadline urgency and sigmoid slack risk from algorithm 1 with adaptive deadline risk scaling, machine utilization penalty, processing efficiency, task-machine suitability, and machine availability from algorithm 2, using a weighted sum optimized for tardiness minimization.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # If job already scheduled, give very low priority\n    if status != 0:\n        return 10000.0\n    \n    # Feature from Algorithm 1: Multiplicative deadline urgency and sigmoid slack risk\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    \n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + 2.71828 ** (-normalized_slack))\n    \n    multiplicative_factor = deadline_urgency * (slack_risk + eps)\n    \n    # Feature from Algorithm 2: Adaptive deadline risk with shop load factor\n    if slack < 0:\n        shop_load_factor = processing_time / (processing_tm + eps) if processing_tm > eps else 1.0\n        deadline_risk = abs(slack) * 10.0 * shop_load_factor\n    else:\n        if slack > eps:\n            deadline_risk = 1.0 / (slack + eps) * (1.0 + 0.1 * (processing_time / (processing_tm + eps)))\n        else:\n            deadline_risk = 1000.0\n    \n    # Feature from Algorithm 2: Machine utilization with idle time and queue length penalty\n    idle_time = max(0, available_time - (start_time + processing_time))\n    queue_penalty = num_neighboring_operation / (num_neighboring_machine + eps)\n    util_penalty = utilization + 0.05 * (1.0 / (idle_time + 1.0)) + 0.1 * queue_penalty\n    \n    # Feature from Algorithm 2: Processing time efficiency\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature from Algorithm 2: Task-machine suitability\n    avg_processing = (processing_time + processing_tm) / 2.0 if processing_time > eps else processing_tm\n    suitability = processing_tm / (avg_processing + eps) if avg_processing > eps else 1.0\n    \n    # Feature from Algorithm 2: Machine availability factor\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Combine both components: multiplicative urgency from Algorithm 1 and weighted sum from Algorithm 2\n    priority = 10.0 * deadline_risk + 5.0 * util_penalty + 0.1 * (1.0 / (efficiency + eps)) + 2.0 * suitability + 0.01 * machine_avail + 0.5 * (1.0 / (multiplicative_factor + eps))\n    \n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 470.6166666666667,
+          "ins_3": 1161.2333333333333,
+          "ins_4": 1249.1666666666667,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2287.8,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 795.4833333333333,
+          "ins_13": 2239.866666666667,
+          "ins_14": 1230.95,
+          "ins_15": 2501.1666666666665,
+          "ins_16": 1135.6,
+          "ins_17": 1797.15,
+          "ins_18": 559.45,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1151.3597916666668,
+        "all_scores": [
+          -1146.4058333333335,
+          -1146.4058333333335,
+          -1146.4058333333335,
+          -1166.2216666666668
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1146.4058333333335,
+        "algorithm": "The new algorithm combines multiplicative deadline urgency and sigmoid slack risk from algorithm 1 with adaptive deadline risk scaling, machine utilization penalty, processing efficiency, task-machine suitability, and machine availability from algorithm 2, using a weighted sum optimized for tardiness minimization.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # If job already scheduled, give very low priority\n    if status != 0:\n        return 10000.0\n    \n    # Feature from Algorithm 1: Multiplicative deadline urgency and sigmoid slack risk\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    \n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + 2.71828 ** (-normalized_slack))\n    \n    multiplicative_factor = deadline_urgency * (slack_risk + eps)\n    \n    # Feature from Algorithm 2: Adaptive deadline risk with shop load factor\n    if slack < 0:\n        shop_load_factor = processing_time / (processing_tm + eps) if processing_tm > eps else 1.0\n        deadline_risk = abs(slack) * 10.0 * shop_load_factor\n    else:\n        if slack > eps:\n            deadline_risk = 1.0 / (slack + eps) * (1.0 + 0.1 * (processing_time / (processing_tm + eps)))\n        else:\n            deadline_risk = 1000.0\n    \n    # Feature from Algorithm 2: Machine utilization with idle time and queue length penalty\n    idle_time = max(0, available_time - (start_time + processing_time))\n    queue_penalty = num_neighboring_operation / (num_neighboring_machine + eps)\n    util_penalty = utilization + 0.05 * (1.0 / (idle_time + 1.0)) + 0.1 * queue_penalty\n    \n    # Feature from Algorithm 2: Processing time efficiency\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature from Algorithm 2: Task-machine suitability\n    avg_processing = (processing_time + processing_tm) / 2.0 if processing_time > eps else processing_tm\n    suitability = processing_tm / (avg_processing + eps) if avg_processing > eps else 1.0\n    \n    # Feature from Algorithm 2: Machine availability factor\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Combine both components: multiplicative urgency from Algorithm 1 and weighted sum from Algorithm 2\n    priority = 10.0 * deadline_risk + 5.0 * util_penalty + 0.1 * (1.0 / (efficiency + eps)) + 2.0 * suitability + 0.01 * machine_avail + 0.5 * (1.0 / (multiplicative_factor + eps))\n    \n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 470.6166666666667,
+          "ins_3": 1161.2333333333333,
+          "ins_4": 1249.1666666666667,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2287.8,
+          "ins_10": 1131.3666666666666,
+          "ins_11": 623.15,
+          "ins_12": 795.4833333333333,
+          "ins_13": 2239.866666666667,
+          "ins_14": 1230.95,
+          "ins_15": 2501.1666666666665,
+          "ins_16": 1135.6,
+          "ins_17": 1797.15,
+          "ins_18": 559.45,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1282.0166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1146.4058333333335,
+        "all_scores": [
+          -1146.4058333333335,
+          -1146.4058333333335,
+          -1146.4058333333335,
+          -1146.4058333333335
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1112.6975,
+        "algorithm": "The new algorithm combines multiplicative deadline urgency and sigmoid slack risk with adaptive deadline risk scaling, machine utilization penalty, processing efficiency, task-machine suitability, and machine availability, using a weighted sum optimized for tardiness minimization, but with refined weights and a capped priority to avoid extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    if status != 0:\n        return 10000.0\n    \n    # Feature 1: Multiplicative deadline urgency and sigmoid slack risk\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + 2.71828 ** (-normalized_slack))\n    multiplicative_factor = deadline_urgency * (slack_risk + eps)\n    \n    # Feature 2: Adaptive deadline risk with shop load factor\n    if slack < 0:\n        shop_load_factor = processing_time / (processing_tm + eps) if processing_tm > eps else 1.0\n        deadline_risk = abs(slack) * 10.0 * shop_load_factor\n    else:\n        if slack > eps:\n            deadline_risk = 1.0 / (slack + eps) * (1.0 + 0.1 * (processing_time / (processing_tm + eps)))\n        else:\n            deadline_risk = 1000.0\n    \n    # Feature 3: Machine utilization with idle time and queue length penalty\n    idle_time = max(0, available_time - (start_time + processing_time))\n    queue_penalty = num_neighboring_operation / (num_neighboring_machine + eps)\n    util_penalty = utilization + 0.05 * (1.0 / (idle_time + 1.0)) + 0.1 * queue_penalty\n    \n    # Feature 4: Processing time efficiency (inverse to prioritize shorter tasks)\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature 5: Task-machine suitability (higher if similar to processing_time)\n    avg_processing = (processing_time + processing_tm) / 2.0 if processing_time > eps else processing_tm\n    suitability = processing_tm / (avg_processing + eps) if avg_processing > eps else 1.0\n    \n    # Feature 6: Machine availability factor (higher for earlier available machines)\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Combined priority with adjusted weights (more emphasis on deadline risk and suitability)\n    priority = 8.0 * deadline_risk + 4.0 * util_penalty + 0.2 * (1.0 / (efficiency + eps)) + 3.0 * suitability + 0.02 * machine_avail + 0.3 * (1.0 / (multiplicative_factor + eps))\n    \n    # Cap priority to avoid overflow\n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 657.35,
+          "ins_2": 426.31666666666666,
+          "ins_3": 934.7833333333333,
+          "ins_4": 1234.7,
+          "ins_5": 355.55,
+          "ins_6": 1101.75,
+          "ins_7": 463.45,
+          "ins_8": 1310.5,
+          "ins_9": 2311.4,
+          "ins_10": 1157.8,
+          "ins_11": 575.3,
+          "ins_12": 883.4166666666666,
+          "ins_13": 1556.0333333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2604.4333333333334,
+          "ins_16": 1135.6,
+          "ins_17": 1851.8333333333333,
+          "ins_18": 517.3833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1095.4166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1135.879375,
+        "all_scores": [
+          -1112.6975,
+          -1138.0083333333334,
+          -1146.4058333333335,
+          -1146.4058333333335
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1112.6975,
+        "algorithm": "The new algorithm combines multiplicative deadline urgency and sigmoid slack risk with adaptive deadline risk scaling, machine utilization penalty, processing efficiency, task-machine suitability, and machine availability, using a weighted sum optimized for tardiness minimization, but with refined weights and a capped priority to avoid extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    if status != 0:\n        return 10000.0\n    \n    # Feature 1: Multiplicative deadline urgency and sigmoid slack risk\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + 2.71828 ** (-normalized_slack))\n    multiplicative_factor = deadline_urgency * (slack_risk + eps)\n    \n    # Feature 2: Adaptive deadline risk with shop load factor\n    if slack < 0:\n        shop_load_factor = processing_time / (processing_tm + eps) if processing_tm > eps else 1.0\n        deadline_risk = abs(slack) * 10.0 * shop_load_factor\n    else:\n        if slack > eps:\n            deadline_risk = 1.0 / (slack + eps) * (1.0 + 0.1 * (processing_time / (processing_tm + eps)))\n        else:\n            deadline_risk = 1000.0\n    \n    # Feature 3: Machine utilization with idle time and queue length penalty\n    idle_time = max(0, available_time - (start_time + processing_time))\n    queue_penalty = num_neighboring_operation / (num_neighboring_machine + eps)\n    util_penalty = utilization + 0.05 * (1.0 / (idle_time + 1.0)) + 0.1 * queue_penalty\n    \n    # Feature 4: Processing time efficiency (inverse to prioritize shorter tasks)\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature 5: Task-machine suitability (higher if similar to processing_time)\n    avg_processing = (processing_time + processing_tm) / 2.0 if processing_time > eps else processing_tm\n    suitability = processing_tm / (avg_processing + eps) if avg_processing > eps else 1.0\n    \n    # Feature 6: Machine availability factor (higher for earlier available machines)\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Combined priority with adjusted weights (more emphasis on deadline risk and suitability)\n    priority = 8.0 * deadline_risk + 4.0 * util_penalty + 0.2 * (1.0 / (efficiency + eps)) + 3.0 * suitability + 0.02 * machine_avail + 0.3 * (1.0 / (multiplicative_factor + eps))\n    \n    # Cap priority to avoid overflow\n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 657.35,
+          "ins_2": 426.31666666666666,
+          "ins_3": 934.7833333333333,
+          "ins_4": 1234.7,
+          "ins_5": 355.55,
+          "ins_6": 1101.75,
+          "ins_7": 463.45,
+          "ins_8": 1310.5,
+          "ins_9": 2311.4,
+          "ins_10": 1157.8,
+          "ins_11": 575.3,
+          "ins_12": 883.4166666666666,
+          "ins_13": 1556.0333333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2604.4333333333334,
+          "ins_16": 1135.6,
+          "ins_17": 1851.8333333333333,
+          "ins_18": 517.3833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1095.4166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1119.9604166666666,
+        "all_scores": [
+          -1112.6975,
+          -1120.8808333333332,
+          -1120.8808333333332,
+          -1125.3825000000002
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1112.6975,
+        "algorithm": "The new algorithm combines multiplicative deadline urgency and sigmoid slack risk with adaptive deadline risk scaling, machine utilization penalty, processing efficiency, task-machine suitability, and machine availability, using a weighted sum optimized for tardiness minimization, but with refined weights and a capped priority to avoid extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    if status != 0:\n        return 10000.0\n    \n    # Feature 1: Multiplicative deadline urgency and sigmoid slack risk\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + 2.71828 ** (-normalized_slack))\n    multiplicative_factor = deadline_urgency * (slack_risk + eps)\n    \n    # Feature 2: Adaptive deadline risk with shop load factor\n    if slack < 0:\n        shop_load_factor = processing_time / (processing_tm + eps) if processing_tm > eps else 1.0\n        deadline_risk = abs(slack) * 10.0 * shop_load_factor\n    else:\n        if slack > eps:\n            deadline_risk = 1.0 / (slack + eps) * (1.0 + 0.1 * (processing_time / (processing_tm + eps)))\n        else:\n            deadline_risk = 1000.0\n    \n    # Feature 3: Machine utilization with idle time and queue length penalty\n    idle_time = max(0, available_time - (start_time + processing_time))\n    queue_penalty = num_neighboring_operation / (num_neighboring_machine + eps)\n    util_penalty = utilization + 0.05 * (1.0 / (idle_time + 1.0)) + 0.1 * queue_penalty\n    \n    # Feature 4: Processing time efficiency (inverse to prioritize shorter tasks)\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature 5: Task-machine suitability (higher if similar to processing_time)\n    avg_processing = (processing_time + processing_tm) / 2.0 if processing_time > eps else processing_tm\n    suitability = processing_tm / (avg_processing + eps) if avg_processing > eps else 1.0\n    \n    # Feature 6: Machine availability factor (higher for earlier available machines)\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Combined priority with adjusted weights (more emphasis on deadline risk and suitability)\n    priority = 8.0 * deadline_risk + 4.0 * util_penalty + 0.2 * (1.0 / (efficiency + eps)) + 3.0 * suitability + 0.02 * machine_avail + 0.3 * (1.0 / (multiplicative_factor + eps))\n    \n    # Cap priority to avoid overflow\n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 657.35,
+          "ins_2": 426.31666666666666,
+          "ins_3": 934.7833333333333,
+          "ins_4": 1234.7,
+          "ins_5": 355.55,
+          "ins_6": 1101.75,
+          "ins_7": 463.45,
+          "ins_8": 1310.5,
+          "ins_9": 2311.4,
+          "ins_10": 1157.8,
+          "ins_11": 575.3,
+          "ins_12": 883.4166666666666,
+          "ins_13": 1556.0333333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2604.4333333333334,
+          "ins_16": 1135.6,
+          "ins_17": 1851.8333333333333,
+          "ins_18": 517.3833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1095.4166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1118.8349999999998,
+        "all_scores": [
+          -1112.6975,
+          -1120.8808333333332,
+          -1120.8808333333332,
+          -1120.8808333333332
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1112.6975,
+        "algorithm": "The new algorithm combines multiplicative deadline urgency and sigmoid slack risk with adaptive deadline risk scaling, machine utilization penalty, processing efficiency, task-machine suitability, and machine availability, using a weighted sum optimized for tardiness minimization, but with refined weights and a capped priority to avoid extreme values.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    if status != 0:\n        return 10000.0\n    \n    # Feature 1: Multiplicative deadline urgency and sigmoid slack risk\n    deadline_urgency = 1.0 / (delivery_time + eps)\n    slack = delivery_time - (start_time + processing_time)\n    normalized_slack = slack / (abs(slack) + eps) if abs(slack) > eps else 0.0\n    slack_risk = 1.0 / (1.0 + 2.71828 ** (-normalized_slack))\n    multiplicative_factor = deadline_urgency * (slack_risk + eps)\n    \n    # Feature 2: Adaptive deadline risk with shop load factor\n    if slack < 0:\n        shop_load_factor = processing_time / (processing_tm + eps) if processing_tm > eps else 1.0\n        deadline_risk = abs(slack) * 10.0 * shop_load_factor\n    else:\n        if slack > eps:\n            deadline_risk = 1.0 / (slack + eps) * (1.0 + 0.1 * (processing_time / (processing_tm + eps)))\n        else:\n            deadline_risk = 1000.0\n    \n    # Feature 3: Machine utilization with idle time and queue length penalty\n    idle_time = max(0, available_time - (start_time + processing_time))\n    queue_penalty = num_neighboring_operation / (num_neighboring_machine + eps)\n    util_penalty = utilization + 0.05 * (1.0 / (idle_time + 1.0)) + 0.1 * queue_penalty\n    \n    # Feature 4: Processing time efficiency (inverse to prioritize shorter tasks)\n    efficiency = 1.0 / (processing_tm + eps)\n    \n    # Feature 5: Task-machine suitability (higher if similar to processing_time)\n    avg_processing = (processing_time + processing_tm) / 2.0 if processing_time > eps else processing_tm\n    suitability = processing_tm / (avg_processing + eps) if avg_processing > eps else 1.0\n    \n    # Feature 6: Machine availability factor (higher for earlier available machines)\n    machine_avail = 1.0 / (available_time + eps) if available_time > eps else 1e9\n    \n    # Combined priority with adjusted weights (more emphasis on deadline risk and suitability)\n    priority = 8.0 * deadline_risk + 4.0 * util_penalty + 0.2 * (1.0 / (efficiency + eps)) + 3.0 * suitability + 0.02 * machine_avail + 0.3 * (1.0 / (multiplicative_factor + eps))\n    \n    # Cap priority to avoid overflow\n    if priority < 0:\n        priority = 0.0\n    if priority > 1e9:\n        priority = 1e9\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 657.35,
+          "ins_2": 426.31666666666666,
+          "ins_3": 934.7833333333333,
+          "ins_4": 1234.7,
+          "ins_5": 355.55,
+          "ins_6": 1101.75,
+          "ins_7": 463.45,
+          "ins_8": 1310.5,
+          "ins_9": 2311.4,
+          "ins_10": 1157.8,
+          "ins_11": 575.3,
+          "ins_12": 883.4166666666666,
+          "ins_13": 1556.0333333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2604.4333333333334,
+          "ins_16": 1135.6,
+          "ins_17": 1851.8333333333333,
+          "ins_18": 517.3833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1095.4166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1118.8349999999998,
+        "all_scores": [
+          -1112.6975,
+          -1120.8808333333332,
+          -1120.8808333333332,
+          -1120.8808333333332
+        ]
+      }
+    }
+  ],
+  "error_count": 13,
+  "total_tokens": 459684,
+  "method": "EDR_E",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 137,
+  "time_elapsed": 1796.9458711147308,
+  "llm_a_calls": 137,
+  "llm_a_input_tokens": 190934,
+  "llm_a_output_tokens": 88028,
+  "llm_s_calls": 124,
+  "llm_s_input_tokens": 160281,
+  "llm_s_output_tokens": 20441
+}

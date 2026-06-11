@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1938.9991666666667,
+        "all_scores": [
+          -1710.4533333333334,
+          -1939.7675,
+          -2047.3508333333332,
+          -2058.425
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1460.7741666666664,
+        "algorithm": "The new algorithm enhances EDD by integrating dynamic penalties for limited machine alternatives, normalized machine-specific utilization, and available start time into a weighted slack-based priority to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    edd_priority = delivery_time\n    \n    # Current time approximation (using available_time as reference)\n    current_time = available_time\n    \n    # Slack time considering available start time\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack < 0:\n        slack = 0\n    \n    # Dynamic penalty for limited machine alternatives\n    if num_neighboring_machine > 0:\n        machine_penalty = 1.0 / num_neighboring_machine\n    else:\n        machine_penalty = 10.0  # High penalty if no machines (should not happen)\n    \n    # Normalized machine utilization per machine type (using utilization as proxy for per-machine load)\n    if num_neighboring_machine > 0:\n        norm_utilization = utilization / num_neighboring_machine\n    else:\n        norm_utilization = 0.0\n    \n    # Processing time ratio weighted by machine-task fit (using processing_tm as average)\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1.0\n    \n    # Weighted combination: lower slack, higher machine penalty, higher norm utilization, and higher proc_ratio increase priority\n    # Incorporate EDD as base, then subtract urgency terms to make smaller value = higher priority\n    priority = edd_priority + slack - (1.0 + norm_utilization) * proc_ratio + machine_penalty\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 883.0,
+          "ins_2": 531.4833333333333,
+          "ins_3": 1096.6833333333334,
+          "ins_4": 1700.5166666666667,
+          "ins_5": 542.9,
+          "ins_6": 2502.0333333333333,
+          "ins_7": 740.9166666666666,
+          "ins_8": 1390.4666666666667,
+          "ins_9": 2411.0666666666666,
+          "ins_10": 1106.3,
+          "ins_11": 1297.95,
+          "ins_12": 1339.5333333333333,
+          "ins_13": 2123.5333333333333,
+          "ins_14": 1213.6666666666667,
+          "ins_15": 3357.133333333333,
+          "ins_16": 629.4833333333333,
+          "ins_17": 1929.7833333333333,
+          "ins_18": 1153.35,
+          "ins_19": 1087.5833333333333,
+          "ins_20": 2178.1
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1664.5706249999998,
+        "all_scores": [
+          -1460.7741666666664,
+          -1563.6091666666666,
+          -1710.4533333333334,
+          -1923.4458333333332
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1460.7741666666664,
+        "algorithm": "The new algorithm enhances EDD by integrating dynamic penalties for limited machine alternatives, normalized machine-specific utilization, and available start time into a weighted slack-based priority to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    edd_priority = delivery_time\n    \n    # Current time approximation (using available_time as reference)\n    current_time = available_time\n    \n    # Slack time considering available start time\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack < 0:\n        slack = 0\n    \n    # Dynamic penalty for limited machine alternatives\n    if num_neighboring_machine > 0:\n        machine_penalty = 1.0 / num_neighboring_machine\n    else:\n        machine_penalty = 10.0  # High penalty if no machines (should not happen)\n    \n    # Normalized machine utilization per machine type (using utilization as proxy for per-machine load)\n    if num_neighboring_machine > 0:\n        norm_utilization = utilization / num_neighboring_machine\n    else:\n        norm_utilization = 0.0\n    \n    # Processing time ratio weighted by machine-task fit (using processing_tm as average)\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1.0\n    \n    # Weighted combination: lower slack, higher machine penalty, higher norm utilization, and higher proc_ratio increase priority\n    # Incorporate EDD as base, then subtract urgency terms to make smaller value = higher priority\n    priority = edd_priority + slack - (1.0 + norm_utilization) * proc_ratio + machine_penalty\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 883.0,
+          "ins_2": 531.4833333333333,
+          "ins_3": 1096.6833333333334,
+          "ins_4": 1700.5166666666667,
+          "ins_5": 542.9,
+          "ins_6": 2502.0333333333333,
+          "ins_7": 740.9166666666666,
+          "ins_8": 1390.4666666666667,
+          "ins_9": 2411.0666666666666,
+          "ins_10": 1106.3,
+          "ins_11": 1297.95,
+          "ins_12": 1339.5333333333333,
+          "ins_13": 2123.5333333333333,
+          "ins_14": 1213.6666666666667,
+          "ins_15": 3357.133333333333,
+          "ins_16": 629.4833333333333,
+          "ins_17": 1929.7833333333333,
+          "ins_18": 1153.35,
+          "ins_19": 1087.5833333333333,
+          "ins_20": 2178.1
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1550.0124999999998,
+        "all_scores": [
+          -1460.7741666666664,
+          -1563.6091666666666,
+          -1587.8333333333333,
+          -1587.8333333333333
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1460.7741666666664,
+        "algorithm": "The new algorithm enhances EDD by integrating dynamic penalties for limited machine alternatives, normalized machine-specific utilization, and available start time into a weighted slack-based priority to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    edd_priority = delivery_time\n    \n    # Current time approximation (using available_time as reference)\n    current_time = available_time\n    \n    # Slack time considering available start time\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack < 0:\n        slack = 0\n    \n    # Dynamic penalty for limited machine alternatives\n    if num_neighboring_machine > 0:\n        machine_penalty = 1.0 / num_neighboring_machine\n    else:\n        machine_penalty = 10.0  # High penalty if no machines (should not happen)\n    \n    # Normalized machine utilization per machine type (using utilization as proxy for per-machine load)\n    if num_neighboring_machine > 0:\n        norm_utilization = utilization / num_neighboring_machine\n    else:\n        norm_utilization = 0.0\n    \n    # Processing time ratio weighted by machine-task fit (using processing_tm as average)\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1.0\n    \n    # Weighted combination: lower slack, higher machine penalty, higher norm utilization, and higher proc_ratio increase priority\n    # Incorporate EDD as base, then subtract urgency terms to make smaller value = higher priority\n    priority = edd_priority + slack - (1.0 + norm_utilization) * proc_ratio + machine_penalty\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 883.0,
+          "ins_2": 531.4833333333333,
+          "ins_3": 1096.6833333333334,
+          "ins_4": 1700.5166666666667,
+          "ins_5": 542.9,
+          "ins_6": 2502.0333333333333,
+          "ins_7": 740.9166666666666,
+          "ins_8": 1390.4666666666667,
+          "ins_9": 2411.0666666666666,
+          "ins_10": 1106.3,
+          "ins_11": 1297.95,
+          "ins_12": 1339.5333333333333,
+          "ins_13": 2123.5333333333333,
+          "ins_14": 1213.6666666666667,
+          "ins_15": 3357.133333333333,
+          "ins_16": 629.4833333333333,
+          "ins_17": 1929.7833333333333,
+          "ins_18": 1153.35,
+          "ins_19": 1087.5833333333333,
+          "ins_20": 2178.1
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1540.5797916666666,
+        "all_scores": [
+          -1460.7741666666664,
+          -1563.6091666666666,
+          -1567.8574999999998,
+          -1570.0783333333334
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1438.1441666666665,
+        "algorithm": "The algorithm uses a logarithmic penalty for due date urgency combined with an exponential decay of slack, a power-law machine congestion factor, and a hyperbolic tangent scaling of processing time ratio to produce a composite priority that minimizes tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    due_date_log = (delivery_time ** 0.5) / (1 + delivery_time ** 0.5) * 100\n    \n    # Exponential decay of slack: higher urgency when slack is small\n    current_time = available_time\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack <= 0:\n        slack_decay = 50  # Max urgency if already late\n    else:\n        slack_decay = 50 * (1 - 2.71828 ** (-slack / 10))  # Asymptotic decay\n    \n    # Power-law machine congestion: utilization raised to exponent, normalized by machine count\n    if num_neighboring_machine > 0:\n        avg_util = utilization / num_neighboring_machine\n    else:\n        avg_util = 0\n    congestion_power = (avg_util ** 2) * 30  # Quadratic emphasis on high utilization\n    \n    # Hyperbolic tangent scaling of processing time ratio\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1\n    proc_tanh = 2 / (1 + 2.71828 ** (-proc_ratio)) - 1  # Range [-1, 1]\n    proc_scale = proc_tanh * 20\n    \n    # Combine: smaller value = higher priority\n    priority = due_date_log - slack_decay + congestion_power - proc_scale\n    \n    # Ensure non-negative convention\n    if priority < 0:\n        priority = 0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 749.4333333333333,
+          "ins_2": 570.5,
+          "ins_3": 1334.1,
+          "ins_4": 1496.5333333333333,
+          "ins_5": 669.6166666666667,
+          "ins_6": 1824.4333333333334,
+          "ins_7": 806.55,
+          "ins_8": 1605.4666666666667,
+          "ins_9": 2713.4333333333334,
+          "ins_10": 1425.6,
+          "ins_11": 872.6833333333333,
+          "ins_12": 1031.1,
+          "ins_13": 1981.5166666666667,
+          "ins_14": 1212.8166666666666,
+          "ins_15": 3414.383333333333,
+          "ins_16": 887.1333333333333,
+          "ins_17": 1876.3333333333333,
+          "ins_18": 721.5166666666667,
+          "ins_19": 1612.5166666666667,
+          "ins_20": 1957.2166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1501.5943750000001,
+        "all_scores": [
+          -1438.1441666666665,
+          -1460.7741666666664,
+          -1543.85,
+          -1563.6091666666666
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1438.1441666666665,
+        "algorithm": "The algorithm uses a logarithmic penalty for due date urgency combined with an exponential decay of slack, a power-law machine congestion factor, and a hyperbolic tangent scaling of processing time ratio to produce a composite priority that minimizes tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    due_date_log = (delivery_time ** 0.5) / (1 + delivery_time ** 0.5) * 100\n    \n    # Exponential decay of slack: higher urgency when slack is small\n    current_time = available_time\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack <= 0:\n        slack_decay = 50  # Max urgency if already late\n    else:\n        slack_decay = 50 * (1 - 2.71828 ** (-slack / 10))  # Asymptotic decay\n    \n    # Power-law machine congestion: utilization raised to exponent, normalized by machine count\n    if num_neighboring_machine > 0:\n        avg_util = utilization / num_neighboring_machine\n    else:\n        avg_util = 0\n    congestion_power = (avg_util ** 2) * 30  # Quadratic emphasis on high utilization\n    \n    # Hyperbolic tangent scaling of processing time ratio\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1\n    proc_tanh = 2 / (1 + 2.71828 ** (-proc_ratio)) - 1  # Range [-1, 1]\n    proc_scale = proc_tanh * 20\n    \n    # Combine: smaller value = higher priority\n    priority = due_date_log - slack_decay + congestion_power - proc_scale\n    \n    # Ensure non-negative convention\n    if priority < 0:\n        priority = 0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 749.4333333333333,
+          "ins_2": 570.5,
+          "ins_3": 1334.1,
+          "ins_4": 1496.5333333333333,
+          "ins_5": 669.6166666666667,
+          "ins_6": 1824.4333333333334,
+          "ins_7": 806.55,
+          "ins_8": 1605.4666666666667,
+          "ins_9": 2713.4333333333334,
+          "ins_10": 1425.6,
+          "ins_11": 872.6833333333333,
+          "ins_12": 1031.1,
+          "ins_13": 1981.5166666666667,
+          "ins_14": 1212.8166666666666,
+          "ins_15": 3414.383333333333,
+          "ins_16": 887.1333333333333,
+          "ins_17": 1876.3333333333333,
+          "ins_18": 721.5166666666667,
+          "ins_19": 1612.5166666666667,
+          "ins_20": 1957.2166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1463.2908333333335,
+        "all_scores": [
+          -1438.1441666666665,
+          -1460.7741666666664,
+          -1471.1258333333335,
+          -1483.1191666666668
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1227.2108333333333,
+        "algorithm": "The new algorithm combines due date urgency from algorithm 1 with machine penalty and normalized utilization from algorithm 2, plus processing time ratio scaling, into a weighted slack-based priority to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    due_date_log = (delivery_time ** 0.5) / (1 + delivery_time ** 0.5) * 100\n    \n    # Current time approximation\n    current_time = available_time\n    \n    # Slack calculation with exponential decay from algorithm 1\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack <= 0:\n        slack_decay = 50  # Max urgency if late\n    else:\n        slack_decay = 50 * (1 - 2.71828 ** (-slack / 10))\n    \n    # Machine penalty from algorithm 2\n    if num_neighboring_machine > 0:\n        machine_penalty = 1.0 / num_neighboring_machine\n    else:\n        machine_penalty = 10.0\n    \n    # Normalized utilization per machine from algorithm 2\n    if num_neighboring_machine > 0:\n        norm_utilization = utilization / num_neighboring_machine\n    else:\n        norm_utilization = 0.0\n    \n    # Processing time ratio (safe division)\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1.0\n    \n    # Hyperbolic tangent scaling from algorithm 1 but using proc_ratio\n    proc_tanh = 2 / (1 + 2.71828 ** (-proc_ratio)) - 1\n    proc_scale = proc_tanh * 20\n    \n    # Composite priority: combine elements, smaller value = higher priority\n    priority = due_date_log - slack_decay - (1.0 + norm_utilization) * proc_ratio + machine_penalty - proc_scale\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 560.15,
+          "ins_2": 420.48333333333335,
+          "ins_3": 1186.0333333333333,
+          "ins_4": 1267.2833333333333,
+          "ins_5": 599.8833333333333,
+          "ins_6": 1657.5666666666666,
+          "ins_7": 489.0833333333333,
+          "ins_8": 1298.2833333333333,
+          "ins_9": 2494.0666666666666,
+          "ins_10": 1172.3666666666666,
+          "ins_11": 625.35,
+          "ins_12": 688.25,
+          "ins_13": 1732.9833333333333,
+          "ins_14": 1154.55,
+          "ins_15": 3383.9333333333334,
+          "ins_16": 737.65,
+          "ins_17": 2050.116666666667,
+          "ins_18": 766.2666666666667,
+          "ins_19": 964.7,
+          "ins_20": 1295.2166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1387.762083333333,
+        "all_scores": [
+          -1227.2108333333333,
+          -1438.1441666666665,
+          -1441.5849999999998,
+          -1444.1083333333331
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1227.2108333333333,
+        "algorithm": "The new algorithm combines due date urgency from algorithm 1 with machine penalty and normalized utilization from algorithm 2, plus processing time ratio scaling, into a weighted slack-based priority to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    due_date_log = (delivery_time ** 0.5) / (1 + delivery_time ** 0.5) * 100\n    \n    # Current time approximation\n    current_time = available_time\n    \n    # Slack calculation with exponential decay from algorithm 1\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack <= 0:\n        slack_decay = 50  # Max urgency if late\n    else:\n        slack_decay = 50 * (1 - 2.71828 ** (-slack / 10))\n    \n    # Machine penalty from algorithm 2\n    if num_neighboring_machine > 0:\n        machine_penalty = 1.0 / num_neighboring_machine\n    else:\n        machine_penalty = 10.0\n    \n    # Normalized utilization per machine from algorithm 2\n    if num_neighboring_machine > 0:\n        norm_utilization = utilization / num_neighboring_machine\n    else:\n        norm_utilization = 0.0\n    \n    # Processing time ratio (safe division)\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1.0\n    \n    # Hyperbolic tangent scaling from algorithm 1 but using proc_ratio\n    proc_tanh = 2 / (1 + 2.71828 ** (-proc_ratio)) - 1\n    proc_scale = proc_tanh * 20\n    \n    # Composite priority: combine elements, smaller value = higher priority\n    priority = due_date_log - slack_decay - (1.0 + norm_utilization) * proc_ratio + machine_penalty - proc_scale\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 560.15,
+          "ins_2": 420.48333333333335,
+          "ins_3": 1186.0333333333333,
+          "ins_4": 1267.2833333333333,
+          "ins_5": 599.8833333333333,
+          "ins_6": 1657.5666666666666,
+          "ins_7": 489.0833333333333,
+          "ins_8": 1298.2833333333333,
+          "ins_9": 2494.0666666666666,
+          "ins_10": 1172.3666666666666,
+          "ins_11": 625.35,
+          "ins_12": 688.25,
+          "ins_13": 1732.9833333333333,
+          "ins_14": 1154.55,
+          "ins_15": 3383.9333333333334,
+          "ins_16": 737.65,
+          "ins_17": 2050.116666666667,
+          "ins_18": 766.2666666666667,
+          "ins_19": 964.7,
+          "ins_20": 1295.2166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1384.5525000000002,
+        "all_scores": [
+          -1227.2108333333333,
+          -1434.7108333333335,
+          -1438.1441666666665,
+          -1438.1441666666665
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1211.970833333333,
+        "algorithm": "The new algorithm combines due date urgency, slack-based urgency with dynamic tardiness scaling, machine penalty using sigmoid-based normalization, adaptive weighting considering both machine count and processing time variability, and normalized utilization with exponential smoothing to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    due_date_log = (delivery_time ** 0.5) / (1 + delivery_time ** 0.5) * 100\n    \n    # Current time approximation\n    current_time = available_time\n    \n    # Slack calculation with dynamic tardiness scaling (improved from algorithm 1)\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack <= 0:\n        # Dynamic scaling for negative slack: higher urgency for larger tardiness\n        slack_decay = 50 + abs(slack) * 2  # Scales with tardiness, not clamped to 50\n        if slack_decay > 100:\n            slack_decay = 100\n    else:\n        # Exponential decay for positive slack\n        slack_decay = 50 * (1 - 2.71828 ** (-slack / 10))\n    \n    # Machine penalty with sigmoid normalization (combining algorithm 1 and 2)\n    if num_neighboring_machine > 0:\n        # Sigmoid-based penalty: fewer machines = higher penalty\n        machine_penalty = 20 / (1 + 2.71828 ** (-(1.0 / num_neighboring_machine) * 5))\n    else:\n        machine_penalty = 20.0  # Max penalty when no neighboring machine\n    \n    # Normalized utilization per machine\n    if num_neighboring_machine > 0:\n        norm_utilization = utilization / num_neighboring_machine\n    else:\n        norm_utilization = 0.0\n    \n    # Processing time ratio with safe division\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1.0\n    \n    # Hyperbolic tangent scaling of processing time ratio\n    proc_tanh = 2 / (1 + 2.71828 ** (-proc_ratio)) - 1\n    proc_scale = proc_tanh * 20\n    \n    # Adaptive weight considering both machine count and processing time variability\n    if num_neighboring_machine > 0 and processing_tm > 0:\n        # Weight adjusts based on machine count and processing time ratio variability\n        variability = abs(proc_ratio - 1.0)  # Measure of processing time deviation\n        adaptive_weight = (1.0 / (1.0 + num_neighboring_machine)) * (1.0 + variability)\n    else:\n        adaptive_weight = 1.0\n    \n    # Composite priority with exponential smoothing of utilization\n    priority = due_date_log - slack_decay + adaptive_weight * (machine_penalty + norm_utilization * 10 * (1 - 2.71828 ** (-1.0 / (1.0 + abs(current_time - delivery_time))))) - proc_scale\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 537.4666666666667,
+          "ins_2": 440.8333333333333,
+          "ins_3": 1119.6333333333334,
+          "ins_4": 1267.2833333333333,
+          "ins_5": 534.15,
+          "ins_6": 1656.4,
+          "ins_7": 561.5333333333333,
+          "ins_8": 1290.5833333333333,
+          "ins_9": 2508.0666666666666,
+          "ins_10": 1103.9,
+          "ins_11": 706.6,
+          "ins_12": 923.2666666666667,
+          "ins_13": 1830.55,
+          "ins_14": 1154.55,
+          "ins_15": 3075.4333333333334,
+          "ins_16": 690.75,
+          "ins_17": 2020.1166666666666,
+          "ins_18": 625.1,
+          "ins_19": 967.3666666666667,
+          "ins_20": 1225.8333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1326.7435416666667,
+        "all_scores": [
+          -1211.970833333333,
+          -1227.2108333333333,
+          -1433.0816666666665,
+          -1434.7108333333335
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1211.970833333333,
+        "algorithm": "The new algorithm combines due date urgency, slack-based urgency with dynamic tardiness scaling, machine penalty using sigmoid-based normalization, adaptive weighting considering both machine count and processing time variability, and normalized utilization with exponential smoothing to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    due_date_log = (delivery_time ** 0.5) / (1 + delivery_time ** 0.5) * 100\n    \n    # Current time approximation\n    current_time = available_time\n    \n    # Slack calculation with dynamic tardiness scaling (improved from algorithm 1)\n    slack = delivery_time - max(current_time, start_time) - processing_time\n    if slack <= 0:\n        # Dynamic scaling for negative slack: higher urgency for larger tardiness\n        slack_decay = 50 + abs(slack) * 2  # Scales with tardiness, not clamped to 50\n        if slack_decay > 100:\n            slack_decay = 100\n    else:\n        # Exponential decay for positive slack\n        slack_decay = 50 * (1 - 2.71828 ** (-slack / 10))\n    \n    # Machine penalty with sigmoid normalization (combining algorithm 1 and 2)\n    if num_neighboring_machine > 0:\n        # Sigmoid-based penalty: fewer machines = higher penalty\n        machine_penalty = 20 / (1 + 2.71828 ** (-(1.0 / num_neighboring_machine) * 5))\n    else:\n        machine_penalty = 20.0  # Max penalty when no neighboring machine\n    \n    # Normalized utilization per machine\n    if num_neighboring_machine > 0:\n        norm_utilization = utilization / num_neighboring_machine\n    else:\n        norm_utilization = 0.0\n    \n    # Processing time ratio with safe division\n    if processing_tm > 0:\n        proc_ratio = processing_time / processing_tm\n    else:\n        proc_ratio = 1.0\n    \n    # Hyperbolic tangent scaling of processing time ratio\n    proc_tanh = 2 / (1 + 2.71828 ** (-proc_ratio)) - 1\n    proc_scale = proc_tanh * 20\n    \n    # Adaptive weight considering both machine count and processing time variability\n    if num_neighboring_machine > 0 and processing_tm > 0:\n        # Weight adjusts based on machine count and processing time ratio variability\n        variability = abs(proc_ratio - 1.0)  # Measure of processing time deviation\n        adaptive_weight = (1.0 / (1.0 + num_neighboring_machine)) * (1.0 + variability)\n    else:\n        adaptive_weight = 1.0\n    \n    # Composite priority with exponential smoothing of utilization\n    priority = due_date_log - slack_decay + adaptive_weight * (machine_penalty + norm_utilization * 10 * (1 - 2.71828 ** (-1.0 / (1.0 + abs(current_time - delivery_time))))) - proc_scale\n    \n    # Ensure non-negative\n    if priority < 0:\n        priority = 0.0\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 537.4666666666667,
+          "ins_2": 440.8333333333333,
+          "ins_3": 1119.6333333333334,
+          "ins_4": 1267.2833333333333,
+          "ins_5": 534.15,
+          "ins_6": 1656.4,
+          "ins_7": 561.5333333333333,
+          "ins_8": 1290.5833333333333,
+          "ins_9": 2508.0666666666666,
+          "ins_10": 1103.9,
+          "ins_11": 706.6,
+          "ins_12": 923.2666666666667,
+          "ins_13": 1830.55,
+          "ins_14": 1154.55,
+          "ins_15": 3075.4333333333334,
+          "ins_16": 690.75,
+          "ins_17": 2020.1166666666666,
+          "ins_18": 625.1,
+          "ins_19": 967.3666666666667,
+          "ins_20": 1225.8333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1215.7808333333332,
+        "all_scores": [
+          -1211.970833333333,
+          -1211.970833333333,
+          -1211.970833333333,
+          -1227.2108333333333
+        ]
+      }
+    }
+  ],
+  "error_count": 7,
+  "total_tokens": 202034,
+  "method": "EDR_M",
+  "run_id": 3,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 70,
+  "time_elapsed": 1051.4487042427063,
+  "llm_a_calls": 70,
+  "llm_a_input_tokens": 84475,
+  "llm_a_output_tokens": 35604,
+  "llm_s_calls": 64,
+  "llm_s_input_tokens": 71197,
+  "llm_s_output_tokens": 10758
+}

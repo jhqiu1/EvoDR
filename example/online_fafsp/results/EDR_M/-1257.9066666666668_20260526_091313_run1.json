@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1680.0758333333335,
+        "algorithm": "The new algorithm combines EDD's direct due-date focus with a weighted urgency-contention score that uses exponential decay for slack and inverse waiting ratio, then applies a tardy penalty by subtracting a constant to yield smaller priority for higher urgency.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    if delivery_time > 0:\n        due_urgency = delivery_time\n    else:\n        due_urgency = 1.0  # small value for zero due date to maintain priority\n    \n    # Feature 2: Slack ratio - exponential decay to emphasize urgency\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0  # already late or urgent\n    else:\n        # Normalize slack by delivery_time if possible\n        if delivery_time > 0:\n            slack_ratio = slack / delivery_time\n        else:\n            slack_ratio = slack / (processing_time + eps)\n        slack_urgency = 1.0 / (slack_ratio + eps)  # smaller slack => higher urgency\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = start_time - available_time\n    if processing_time > 0:\n        waiting_ratio = max(0, waiting_time) / processing_time\n    else:\n        waiting_ratio = 0.0\n    waiting_urgency = waiting_ratio  # longer wait => higher priority\n    \n    # Feature 4: Machine contention\n    if num_neighboring_machine > 0:\n        machine_contention = utilization / num_neighboring_machine\n    else:\n        machine_contention = utilization\n    \n    # Feature 5: Operation density\n    if num_neighboring_machine > 0:\n        operation_density = num_neighboring_operation / num_neighboring_machine\n    else:\n        operation_density = 0.0\n    \n    # Combine features with weights tuned for tardiness minimization\n    # Focus on due date and slack, moderate waiting and contention\n    priority = (0.5 * due_urgency + \n                0.3 * slack_urgency + \n                0.2 * waiting_urgency +\n                0.1 * machine_contention + \n                0.05 * operation_density)\n    \n    # Tardy penalty: reduce priority value to give higher priority to late jobs\n    if status == 'late' or status == 'tardy' or status == 'overdue':\n        priority -= 2.0  # significant boost for tardy jobs\n    \n    # Ensure non-negative and avoid zero\n    priority = max(0.001, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 967.65,
+          "ins_2": 1083.5333333333333,
+          "ins_3": 1680.9166666666667,
+          "ins_4": 2153.766666666667,
+          "ins_5": 978.0333333333333,
+          "ins_6": 1690.2666666666667,
+          "ins_7": 969.9666666666667,
+          "ins_8": 2113.3166666666666,
+          "ins_9": 3343.3,
+          "ins_10": 1395.3,
+          "ins_11": 1287.0666666666666,
+          "ins_12": 1104.4666666666667,
+          "ins_13": 2184.7833333333333,
+          "ins_14": 1539.8833333333334,
+          "ins_15": 2536.35,
+          "ins_16": 1456.8666666666666,
+          "ins_17": 2335.1833333333334,
+          "ins_18": 913.9833333333333,
+          "ins_19": 1567.0333333333333,
+          "ins_20": 2299.85
+        }
+      },
+      "pop_stats": {
+        "mean_score": -2324.1070833333333,
+        "all_scores": [
+          -1680.0758333333335,
+          -1710.4533333333334,
+          -2647.6724999999997,
+          -3258.2266666666665
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1680.0758333333335,
+        "algorithm": "The new algorithm combines EDD's direct due-date focus with a weighted urgency-contention score that uses exponential decay for slack and inverse waiting ratio, then applies a tardy penalty by subtracting a constant to yield smaller priority for higher urgency.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    if delivery_time > 0:\n        due_urgency = delivery_time\n    else:\n        due_urgency = 1.0  # small value for zero due date to maintain priority\n    \n    # Feature 2: Slack ratio - exponential decay to emphasize urgency\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0  # already late or urgent\n    else:\n        # Normalize slack by delivery_time if possible\n        if delivery_time > 0:\n            slack_ratio = slack / delivery_time\n        else:\n            slack_ratio = slack / (processing_time + eps)\n        slack_urgency = 1.0 / (slack_ratio + eps)  # smaller slack => higher urgency\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = start_time - available_time\n    if processing_time > 0:\n        waiting_ratio = max(0, waiting_time) / processing_time\n    else:\n        waiting_ratio = 0.0\n    waiting_urgency = waiting_ratio  # longer wait => higher priority\n    \n    # Feature 4: Machine contention\n    if num_neighboring_machine > 0:\n        machine_contention = utilization / num_neighboring_machine\n    else:\n        machine_contention = utilization\n    \n    # Feature 5: Operation density\n    if num_neighboring_machine > 0:\n        operation_density = num_neighboring_operation / num_neighboring_machine\n    else:\n        operation_density = 0.0\n    \n    # Combine features with weights tuned for tardiness minimization\n    # Focus on due date and slack, moderate waiting and contention\n    priority = (0.5 * due_urgency + \n                0.3 * slack_urgency + \n                0.2 * waiting_urgency +\n                0.1 * machine_contention + \n                0.05 * operation_density)\n    \n    # Tardy penalty: reduce priority value to give higher priority to late jobs\n    if status == 'late' or status == 'tardy' or status == 'overdue':\n        priority -= 2.0  # significant boost for tardy jobs\n    \n    # Ensure non-negative and avoid zero\n    priority = max(0.001, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 967.65,
+          "ins_2": 1083.5333333333333,
+          "ins_3": 1680.9166666666667,
+          "ins_4": 2153.766666666667,
+          "ins_5": 978.0333333333333,
+          "ins_6": 1690.2666666666667,
+          "ins_7": 969.9666666666667,
+          "ins_8": 2113.3166666666666,
+          "ins_9": 3343.3,
+          "ins_10": 1395.3,
+          "ins_11": 1287.0666666666666,
+          "ins_12": 1104.4666666666667,
+          "ins_13": 2184.7833333333333,
+          "ins_14": 1539.8833333333334,
+          "ins_15": 2536.35,
+          "ins_16": 1456.8666666666666,
+          "ins_17": 2335.1833333333334,
+          "ins_18": 913.9833333333333,
+          "ins_19": 1567.0333333333333,
+          "ins_20": 2299.85
+        }
+      },
+      "pop_stats": {
+        "mean_score": -2056.7508333333335,
+        "all_scores": [
+          -1680.0758333333335,
+          -1710.4533333333334,
+          -2188.8016666666667,
+          -2647.6724999999997
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1680.0758333333335,
+        "algorithm": "The new algorithm combines EDD's direct due-date focus with a weighted urgency-contention score that uses exponential decay for slack and inverse waiting ratio, then applies a tardy penalty by subtracting a constant to yield smaller priority for higher urgency.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    if delivery_time > 0:\n        due_urgency = delivery_time\n    else:\n        due_urgency = 1.0  # small value for zero due date to maintain priority\n    \n    # Feature 2: Slack ratio - exponential decay to emphasize urgency\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0  # already late or urgent\n    else:\n        # Normalize slack by delivery_time if possible\n        if delivery_time > 0:\n            slack_ratio = slack / delivery_time\n        else:\n            slack_ratio = slack / (processing_time + eps)\n        slack_urgency = 1.0 / (slack_ratio + eps)  # smaller slack => higher urgency\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = start_time - available_time\n    if processing_time > 0:\n        waiting_ratio = max(0, waiting_time) / processing_time\n    else:\n        waiting_ratio = 0.0\n    waiting_urgency = waiting_ratio  # longer wait => higher priority\n    \n    # Feature 4: Machine contention\n    if num_neighboring_machine > 0:\n        machine_contention = utilization / num_neighboring_machine\n    else:\n        machine_contention = utilization\n    \n    # Feature 5: Operation density\n    if num_neighboring_machine > 0:\n        operation_density = num_neighboring_operation / num_neighboring_machine\n    else:\n        operation_density = 0.0\n    \n    # Combine features with weights tuned for tardiness minimization\n    # Focus on due date and slack, moderate waiting and contention\n    priority = (0.5 * due_urgency + \n                0.3 * slack_urgency + \n                0.2 * waiting_urgency +\n                0.1 * machine_contention + \n                0.05 * operation_density)\n    \n    # Tardy penalty: reduce priority value to give higher priority to late jobs\n    if status == 'late' or status == 'tardy' or status == 'overdue':\n        priority -= 2.0  # significant boost for tardy jobs\n    \n    # Ensure non-negative and avoid zero\n    priority = max(0.001, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 967.65,
+          "ins_2": 1083.5333333333333,
+          "ins_3": 1680.9166666666667,
+          "ins_4": 2153.766666666667,
+          "ins_5": 978.0333333333333,
+          "ins_6": 1690.2666666666667,
+          "ins_7": 969.9666666666667,
+          "ins_8": 2113.3166666666666,
+          "ins_9": 3343.3,
+          "ins_10": 1395.3,
+          "ins_11": 1287.0666666666666,
+          "ins_12": 1104.4666666666667,
+          "ins_13": 2184.7833333333333,
+          "ins_14": 1539.8833333333334,
+          "ins_15": 2536.35,
+          "ins_16": 1456.8666666666666,
+          "ins_17": 2335.1833333333334,
+          "ins_18": 913.9833333333333,
+          "ins_19": 1567.0333333333333,
+          "ins_20": 2299.85
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1818.873125,
+        "all_scores": [
+          -1680.0758333333335,
+          -1696.1616666666664,
+          -1710.4533333333334,
+          -2188.8016666666667
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1680.0758333333335,
+        "algorithm": "The new algorithm combines EDD's direct due-date focus with a weighted urgency-contention score that uses exponential decay for slack and inverse waiting ratio, then applies a tardy penalty by subtracting a constant to yield smaller priority for higher urgency.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    if delivery_time > 0:\n        due_urgency = delivery_time\n    else:\n        due_urgency = 1.0  # small value for zero due date to maintain priority\n    \n    # Feature 2: Slack ratio - exponential decay to emphasize urgency\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0  # already late or urgent\n    else:\n        # Normalize slack by delivery_time if possible\n        if delivery_time > 0:\n            slack_ratio = slack / delivery_time\n        else:\n            slack_ratio = slack / (processing_time + eps)\n        slack_urgency = 1.0 / (slack_ratio + eps)  # smaller slack => higher urgency\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = start_time - available_time\n    if processing_time > 0:\n        waiting_ratio = max(0, waiting_time) / processing_time\n    else:\n        waiting_ratio = 0.0\n    waiting_urgency = waiting_ratio  # longer wait => higher priority\n    \n    # Feature 4: Machine contention\n    if num_neighboring_machine > 0:\n        machine_contention = utilization / num_neighboring_machine\n    else:\n        machine_contention = utilization\n    \n    # Feature 5: Operation density\n    if num_neighboring_machine > 0:\n        operation_density = num_neighboring_operation / num_neighboring_machine\n    else:\n        operation_density = 0.0\n    \n    # Combine features with weights tuned for tardiness minimization\n    # Focus on due date and slack, moderate waiting and contention\n    priority = (0.5 * due_urgency + \n                0.3 * slack_urgency + \n                0.2 * waiting_urgency +\n                0.1 * machine_contention + \n                0.05 * operation_density)\n    \n    # Tardy penalty: reduce priority value to give higher priority to late jobs\n    if status == 'late' or status == 'tardy' or status == 'overdue':\n        priority -= 2.0  # significant boost for tardy jobs\n    \n    # Ensure non-negative and avoid zero\n    priority = max(0.001, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 967.65,
+          "ins_2": 1083.5333333333333,
+          "ins_3": 1680.9166666666667,
+          "ins_4": 2153.766666666667,
+          "ins_5": 978.0333333333333,
+          "ins_6": 1690.2666666666667,
+          "ins_7": 969.9666666666667,
+          "ins_8": 2113.3166666666666,
+          "ins_9": 3343.3,
+          "ins_10": 1395.3,
+          "ins_11": 1287.0666666666666,
+          "ins_12": 1104.4666666666667,
+          "ins_13": 2184.7833333333333,
+          "ins_14": 1539.8833333333334,
+          "ins_15": 2536.35,
+          "ins_16": 1456.8666666666666,
+          "ins_17": 2335.1833333333334,
+          "ins_18": 913.9833333333333,
+          "ins_19": 1567.0333333333333,
+          "ins_20": 2299.85
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1764.7293750000001,
+        "all_scores": [
+          -1680.0758333333335,
+          -1696.1616666666664,
+          -1710.4533333333334,
+          -1972.2266666666662
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1351.77,
+        "algorithm": "The new algorithm combines EDD's due-date urgency with adaptive bottleneck-aware contention and machine-specific processing time normalization, dynamically adjusting weights via sigmoid utilization response and applying a tardy penalty that scales with slack deficit to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    due_urgency = max(delivery_time, eps)\n    \n    # Feature 2: Slack urgency with exponential decay and scaling\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0\n    else:\n        slack_ratio = slack / max(delivery_time, eps)\n        slack_urgency = 1.0 / max(slack_ratio, eps)\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = max(0, start_time - available_time)\n    waiting_ratio = waiting_time / max(processing_time, eps)\n    waiting_urgency = waiting_ratio\n    \n    # Feature 4: Machine processing time normalization\n    tm_norm = processing_tm / max(processing_time, eps)\n    \n    # Feature 5: Bottleneck-aware machine contention (weighted by processing time)\n    machine_contention = utilization / max(num_neighboring_machine, 1)\n    bottleneck_score = machine_contention * tm_norm\n    \n    # Feature 6: Operation density scaled by processing time\n    op_density = num_neighboring_operation / max(num_neighboring_machine, 1)\n    op_density_weighted = op_density * tm_norm\n    \n    # Dynamic weight adjustment using sigmoid function on utilization\n    util_mid = 0.7\n    sigmoid_factor = 1.0 / (1.0 + np.exp(-5.0 * (utilization - util_mid))) if 'np' in dir() else (utilization if utilization > 0.5 else 0.5)\n    # Use simple linear for robustness\n    util_factor = max(0.0, min(1.0, (utilization - 0.3) / 0.4))  # scales from 0 at 0.3 to 1 at 0.7\n    \n    # Weights adapt: more due and slack focus under high utilization, more bottleneck under low\n    w_due = 0.4 + 0.2 * util_factor\n    w_slack = 0.2 + 0.2 * util_factor\n    w_wait = 0.2 - 0.1 * util_factor\n    w_bottleneck = 0.1 + 0.1 * (1 - util_factor)\n    w_density = 0.1 - 0.05 * util_factor\n    \n    priority = (w_due * due_urgency +\n                w_slack * slack_urgency +\n                w_wait * waiting_urgency +\n                w_bottleneck * bottleneck_score +\n                w_density * op_density_weighted)\n    \n    # Adaptive tardy penalty based on slack deficit\n    if slack <= 0:\n        tardy_penalty = abs(slack) / max(processing_time, eps) + 2.0\n    elif status in ['late', 'tardy', 'overdue']:\n        tardy_penalty = 2.0\n    else:\n        tardy_penalty = 0.0\n    \n    priority -= tardy_penalty\n    \n    result = max(0.001, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 504.1,
+          "ins_2": 563.8166666666667,
+          "ins_3": 1373.6333333333334,
+          "ins_4": 1467.6,
+          "ins_5": 678.6333333333333,
+          "ins_6": 1276.6,
+          "ins_7": 557.7333333333333,
+          "ins_8": 1582.8,
+          "ins_9": 2996.0,
+          "ins_10": 1393.15,
+          "ins_11": 959.3166666666667,
+          "ins_12": 1108.5333333333333,
+          "ins_13": 1973.5166666666667,
+          "ins_14": 1253.9666666666667,
+          "ins_15": 2533.8,
+          "ins_16": 647.1333333333333,
+          "ins_17": 1893.2166666666667,
+          "ins_18": 1264.1166666666666,
+          "ins_19": 1293.0,
+          "ins_20": 1714.7333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1604.203125,
+        "all_scores": [
+          -1351.77,
+          -1680.0758333333335,
+          -1688.8050000000003,
+          -1696.1616666666664
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1321.7233333333331,
+        "algorithm": "The new algorithm integrates due-date urgency, exponential-slack urgency, waiting ratio, bottleneck contention considering machine available time and queue length, and machine-specific processing time normalization, with weights dynamically adjusted via real-time utilization and average slack, plus an adaptive tardy penalty based on slack deficit.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    due_urgency = max(delivery_time, eps)\n    \n    # Feature 2: Slack urgency with exponential decay\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0\n    else:\n        slack_ratio = slack / max(delivery_time, eps)\n        slack_urgency = np.exp(-slack_ratio)  # exponential decay: smaller slack -> higher urgency\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = max(0, start_time - available_time)\n    waiting_ratio = waiting_time / max(processing_time, eps)\n    # Inverse waiting ratio to avoid near-zero denominator issues but preserve original effect\n    waiting_urgency = waiting_ratio\n    \n    # Feature 4: Bottleneck-aware machine contention (using available_time and queue length)\n    # Using processing_tm as a proxy for machine capability normalized by job processing time\n    tm_norm = processing_tm / max(processing_time, eps)\n    # Contention score based on utilization and number of machines\n    if num_neighboring_machine > 0:\n        machine_contention = (utilization / num_neighboring_machine) * tm_norm\n    else:\n        machine_contention = utilization * tm_norm\n    # Add available_time factor: longer available time implies less urgency on that machine\n    # Normalize by a reference time (e.g., average processing_time)\n    avail_factor = 1.0 / (1.0 + available_time / max(processing_time, eps))\n    machine_contention *= avail_factor\n\n    # Feature 5: Operation density weighted by machine count and processing time\n    if num_neighboring_machine > 0:\n        op_density = (num_neighboring_operation / num_neighboring_machine) * tm_norm\n    else:\n        op_density = num_neighboring_operation * tm_norm\n\n    # Dynamic weight adjustment based on real-time utilization and average slack\n    # utilization factor: scales from 0 at 0.3 to 1 at 0.7\n    util_factor = max(0.0, min(1.0, (utilization - 0.3) / 0.4))\n    # slack factor: if average slack is small (urgent), increase weight on due_date and slack\n    avg_slack = max(slack, 0.0) / max(delivery_time, eps)\n    slack_factor = 1.0 / (1.0 + avg_slack)  # high when slack is low\n    \n    # Combine util_factor and slack_factor to adjust weights\n    adapt_factor = 0.5 * util_factor + 0.5 * slack_factor\n    \n    # Weights: more due/slack when high utilization or low slack, more contention/density otherwise\n    w_due = 0.4 + 0.2 * adapt_factor\n    w_slack = 0.2 + 0.2 * adapt_factor\n    w_wait = 0.2 - 0.1 * adapt_factor\n    w_bottleneck = 0.1 + 0.1 * (1 - adapt_factor)\n    w_density = 0.1 - 0.05 * adapt_factor\n    \n    # Normalize weights to sum to 1 (optional but keeps priority scale stable)\n    total_weight = w_due + w_slack + w_wait + w_bottleneck + w_density\n    if total_weight > 0:\n        w_due /= total_weight\n        w_slack /= total_weight\n        w_wait /= total_weight\n        w_bottleneck /= total_weight\n        w_density /= total_weight\n    \n    priority = (w_due * due_urgency +\n                w_slack * slack_urgency +\n                w_wait * waiting_urgency +\n                w_bottleneck * machine_contention +\n                w_density * op_density)\n    \n    # Adaptive tardy penalty based on slack deficit\n    if slack <= 0:\n        tardy_penalty = abs(slack) / max(processing_time, eps) + 2.0\n    elif status in ['late', 'tardy', 'overdue']:\n        tardy_penalty = 2.0\n    else:\n        tardy_penalty = 0.0\n    \n    priority -= tardy_penalty\n    \n    result = max(0.001, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 773.0833333333334,
+          "ins_2": 476.81666666666666,
+          "ins_3": 1420.3666666666666,
+          "ins_4": 1295.9,
+          "ins_5": 551.75,
+          "ins_6": 1393.75,
+          "ins_7": 619.5333333333333,
+          "ins_8": 1647.5833333333333,
+          "ins_9": 2654.983333333333,
+          "ins_10": 1188.3666666666666,
+          "ins_11": 1068.8333333333333,
+          "ins_12": 1062.75,
+          "ins_13": 1944.25,
+          "ins_14": 1252.9166666666667,
+          "ins_15": 2569.3333333333335,
+          "ins_16": 647.1333333333333,
+          "ins_17": 2062.5666666666666,
+          "ins_18": 951.9166666666666,
+          "ins_19": 1381.3166666666666,
+          "ins_20": 1471.3166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1510.5935416666666,
+        "all_scores": [
+          -1321.7233333333331,
+          -1351.77,
+          -1680.0758333333335,
+          -1688.8050000000003
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1257.9066666666668,
+        "algorithm": "The new algorithm combines EDD due-date urgency, exponential-slack urgency, waiting time ratio, bottleneck contention with machine available time and queue length, and operation density, using dynamic weights adjusted by sigmoid utilization and average slack, plus an adaptive tardy penalty that scales with slack deficit and includes a machine-specific processing time normalization factor.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    due_urgency = max(delivery_time, eps)\n    \n    # Feature 2: Slack urgency with exponential decay\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0\n    else:\n        slack_ratio = slack / max(due_urgency, eps)\n        slack_urgency = np.exp(-slack_ratio)\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = max(0, start_time - available_time)\n    waiting_urgency = waiting_time / max(processing_time, eps)\n    \n    # Feature 4: Machine-specific processing time normalization\n    tm_norm = processing_tm / max(processing_time, eps)\n    \n    # Feature 5: Bottleneck-aware machine contention (with available_time and queue length)\n    if num_neighboring_machine > 0:\n        machine_contention = (utilization / num_neighboring_machine) * tm_norm\n    else:\n        machine_contention = utilization * tm_norm\n    avail_factor = 1.0 / (1.0 + available_time / max(processing_time, eps))\n    machine_contention *= avail_factor\n    \n    # Feature 6: Operation density weighted by machine count and processing time\n    if num_neighboring_machine > 0:\n        op_density = (num_neighboring_operation / num_neighboring_machine) * tm_norm\n    else:\n        op_density = num_neighboring_operation * tm_norm\n    \n    # Dynamic weight adjustment using sigmoid utilization and average slack\n    util_mid = 0.6\n    sigmoid_factor = 1.0 / (1.0 + np.exp(-5.0 * (utilization - util_mid)))\n    avg_slack = max(slack, 0.0) / max(due_urgency, eps)\n    slack_factor = 1.0 / (1.0 + avg_slack)\n    adapt_factor = 0.5 * sigmoid_factor + 0.5 * slack_factor\n    \n    # Weights assignment\n    w_due = 0.4 + 0.2 * adapt_factor\n    w_slack = 0.2 + 0.2 * adapt_factor\n    w_wait = 0.2 - 0.1 * adapt_factor\n    w_bottleneck = 0.1 + 0.1 * (1 - adapt_factor)\n    w_density = 0.1 - 0.05 * adapt_factor\n    \n    # Normalize weights to sum to 1\n    total_weight = w_due + w_slack + w_wait + w_bottleneck + w_density\n    if total_weight > 0:\n        w_due /= total_weight\n        w_slack /= total_weight\n        w_wait /= total_weight\n        w_bottleneck /= total_weight\n        w_density /= total_weight\n    \n    priority = (w_due * due_urgency +\n                w_slack * slack_urgency +\n                w_wait * waiting_urgency +\n                w_bottleneck * machine_contention +\n                w_density * op_density)\n    \n    # Adaptive tardy penalty based on slack deficit\n    if slack <= 0:\n        tardy_penalty = abs(slack) / max(processing_time, eps) + 2.0\n    elif status in ['late', 'tardy', 'overdue']:\n        tardy_penalty = 2.0\n    else:\n        tardy_penalty = 0.0\n    \n    priority -= tardy_penalty\n    result = max(0.001, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 959.6333333333333,
+          "ins_2": 549.0666666666667,
+          "ins_3": 1179.1,
+          "ins_4": 1133.25,
+          "ins_5": 462.81666666666666,
+          "ins_6": 1367.3666666666666,
+          "ins_7": 647.75,
+          "ins_8": 1599.7166666666667,
+          "ins_9": 2899.1666666666665,
+          "ins_10": 1195.9166666666667,
+          "ins_11": 807.0,
+          "ins_12": 727.85,
+          "ins_13": 1962.4666666666667,
+          "ins_14": 1399.2833333333333,
+          "ins_15": 2505.633333333333,
+          "ins_16": 639.2333333333333,
+          "ins_17": 1746.95,
+          "ins_18": 728.15,
+          "ins_19": 1196.8666666666666,
+          "ins_20": 1450.9166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1307.6477083333334,
+        "all_scores": [
+          -1257.9066666666668,
+          -1321.7233333333331,
+          -1321.7233333333331,
+          -1329.2375
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1257.9066666666668,
+        "algorithm": "The new algorithm combines EDD due-date urgency, exponential-slack urgency, waiting time ratio, bottleneck contention with machine available time and queue length, and operation density, using dynamic weights adjusted by sigmoid utilization and average slack, plus an adaptive tardy penalty that scales with slack deficit and includes a machine-specific processing time normalization factor.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    due_urgency = max(delivery_time, eps)\n    \n    # Feature 2: Slack urgency with exponential decay\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0\n    else:\n        slack_ratio = slack / max(due_urgency, eps)\n        slack_urgency = np.exp(-slack_ratio)\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = max(0, start_time - available_time)\n    waiting_urgency = waiting_time / max(processing_time, eps)\n    \n    # Feature 4: Machine-specific processing time normalization\n    tm_norm = processing_tm / max(processing_time, eps)\n    \n    # Feature 5: Bottleneck-aware machine contention (with available_time and queue length)\n    if num_neighboring_machine > 0:\n        machine_contention = (utilization / num_neighboring_machine) * tm_norm\n    else:\n        machine_contention = utilization * tm_norm\n    avail_factor = 1.0 / (1.0 + available_time / max(processing_time, eps))\n    machine_contention *= avail_factor\n    \n    # Feature 6: Operation density weighted by machine count and processing time\n    if num_neighboring_machine > 0:\n        op_density = (num_neighboring_operation / num_neighboring_machine) * tm_norm\n    else:\n        op_density = num_neighboring_operation * tm_norm\n    \n    # Dynamic weight adjustment using sigmoid utilization and average slack\n    util_mid = 0.6\n    sigmoid_factor = 1.0 / (1.0 + np.exp(-5.0 * (utilization - util_mid)))\n    avg_slack = max(slack, 0.0) / max(due_urgency, eps)\n    slack_factor = 1.0 / (1.0 + avg_slack)\n    adapt_factor = 0.5 * sigmoid_factor + 0.5 * slack_factor\n    \n    # Weights assignment\n    w_due = 0.4 + 0.2 * adapt_factor\n    w_slack = 0.2 + 0.2 * adapt_factor\n    w_wait = 0.2 - 0.1 * adapt_factor\n    w_bottleneck = 0.1 + 0.1 * (1 - adapt_factor)\n    w_density = 0.1 - 0.05 * adapt_factor\n    \n    # Normalize weights to sum to 1\n    total_weight = w_due + w_slack + w_wait + w_bottleneck + w_density\n    if total_weight > 0:\n        w_due /= total_weight\n        w_slack /= total_weight\n        w_wait /= total_weight\n        w_bottleneck /= total_weight\n        w_density /= total_weight\n    \n    priority = (w_due * due_urgency +\n                w_slack * slack_urgency +\n                w_wait * waiting_urgency +\n                w_bottleneck * machine_contention +\n                w_density * op_density)\n    \n    # Adaptive tardy penalty based on slack deficit\n    if slack <= 0:\n        tardy_penalty = abs(slack) / max(processing_time, eps) + 2.0\n    elif status in ['late', 'tardy', 'overdue']:\n        tardy_penalty = 2.0\n    else:\n        tardy_penalty = 0.0\n    \n    priority -= tardy_penalty\n    result = max(0.001, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 959.6333333333333,
+          "ins_2": 549.0666666666667,
+          "ins_3": 1179.1,
+          "ins_4": 1133.25,
+          "ins_5": 462.81666666666666,
+          "ins_6": 1367.3666666666666,
+          "ins_7": 647.75,
+          "ins_8": 1599.7166666666667,
+          "ins_9": 2899.1666666666665,
+          "ins_10": 1195.9166666666667,
+          "ins_11": 807.0,
+          "ins_12": 727.85,
+          "ins_13": 1962.4666666666667,
+          "ins_14": 1399.2833333333333,
+          "ins_15": 2505.633333333333,
+          "ins_16": 639.2333333333333,
+          "ins_17": 1746.95,
+          "ins_18": 728.15,
+          "ins_19": 1196.8666666666666,
+          "ins_20": 1450.9166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1288.7508333333333,
+        "all_scores": [
+          -1257.9066666666668,
+          -1257.9066666666668,
+          -1317.4666666666667,
+          -1321.7233333333331
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1257.9066666666668,
+        "algorithm": "The new algorithm combines EDD due-date urgency, exponential-slack urgency, waiting time ratio, bottleneck contention with machine available time and queue length, and operation density, using dynamic weights adjusted by sigmoid utilization and average slack, plus an adaptive tardy penalty that scales with slack deficit and includes a machine-specific processing time normalization factor.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    due_urgency = max(delivery_time, eps)\n    \n    # Feature 2: Slack urgency with exponential decay\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0\n    else:\n        slack_ratio = slack / max(due_urgency, eps)\n        slack_urgency = np.exp(-slack_ratio)\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = max(0, start_time - available_time)\n    waiting_urgency = waiting_time / max(processing_time, eps)\n    \n    # Feature 4: Machine-specific processing time normalization\n    tm_norm = processing_tm / max(processing_time, eps)\n    \n    # Feature 5: Bottleneck-aware machine contention (with available_time and queue length)\n    if num_neighboring_machine > 0:\n        machine_contention = (utilization / num_neighboring_machine) * tm_norm\n    else:\n        machine_contention = utilization * tm_norm\n    avail_factor = 1.0 / (1.0 + available_time / max(processing_time, eps))\n    machine_contention *= avail_factor\n    \n    # Feature 6: Operation density weighted by machine count and processing time\n    if num_neighboring_machine > 0:\n        op_density = (num_neighboring_operation / num_neighboring_machine) * tm_norm\n    else:\n        op_density = num_neighboring_operation * tm_norm\n    \n    # Dynamic weight adjustment using sigmoid utilization and average slack\n    util_mid = 0.6\n    sigmoid_factor = 1.0 / (1.0 + np.exp(-5.0 * (utilization - util_mid)))\n    avg_slack = max(slack, 0.0) / max(due_urgency, eps)\n    slack_factor = 1.0 / (1.0 + avg_slack)\n    adapt_factor = 0.5 * sigmoid_factor + 0.5 * slack_factor\n    \n    # Weights assignment\n    w_due = 0.4 + 0.2 * adapt_factor\n    w_slack = 0.2 + 0.2 * adapt_factor\n    w_wait = 0.2 - 0.1 * adapt_factor\n    w_bottleneck = 0.1 + 0.1 * (1 - adapt_factor)\n    w_density = 0.1 - 0.05 * adapt_factor\n    \n    # Normalize weights to sum to 1\n    total_weight = w_due + w_slack + w_wait + w_bottleneck + w_density\n    if total_weight > 0:\n        w_due /= total_weight\n        w_slack /= total_weight\n        w_wait /= total_weight\n        w_bottleneck /= total_weight\n        w_density /= total_weight\n    \n    priority = (w_due * due_urgency +\n                w_slack * slack_urgency +\n                w_wait * waiting_urgency +\n                w_bottleneck * machine_contention +\n                w_density * op_density)\n    \n    # Adaptive tardy penalty based on slack deficit\n    if slack <= 0:\n        tardy_penalty = abs(slack) / max(processing_time, eps) + 2.0\n    elif status in ['late', 'tardy', 'overdue']:\n        tardy_penalty = 2.0\n    else:\n        tardy_penalty = 0.0\n    \n    priority -= tardy_penalty\n    result = max(0.001, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 959.6333333333333,
+          "ins_2": 549.0666666666667,
+          "ins_3": 1179.1,
+          "ins_4": 1133.25,
+          "ins_5": 462.81666666666666,
+          "ins_6": 1367.3666666666666,
+          "ins_7": 647.75,
+          "ins_8": 1599.7166666666667,
+          "ins_9": 2899.1666666666665,
+          "ins_10": 1195.9166666666667,
+          "ins_11": 807.0,
+          "ins_12": 727.85,
+          "ins_13": 1962.4666666666667,
+          "ins_14": 1399.2833333333333,
+          "ins_15": 2505.633333333333,
+          "ins_16": 639.2333333333333,
+          "ins_17": 1746.95,
+          "ins_18": 728.15,
+          "ins_19": 1196.8666666666666,
+          "ins_20": 1450.9166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1257.9066666666668,
+        "all_scores": [
+          -1257.9066666666668,
+          -1257.9066666666668,
+          -1257.9066666666668,
+          -1257.9066666666668
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1257.9066666666668,
+        "algorithm": "The new algorithm combines EDD due-date urgency, exponential-slack urgency, waiting time ratio, bottleneck contention with machine available time and queue length, and operation density, using dynamic weights adjusted by sigmoid utilization and average slack, plus an adaptive tardy penalty that scales with slack deficit and includes a machine-specific processing time normalization factor.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    eps = 1e-9\n    \n    # Feature 1: Due date urgency (EDD core)\n    due_urgency = max(delivery_time, eps)\n    \n    # Feature 2: Slack urgency with exponential decay\n    slack = delivery_time - start_time - processing_time\n    if slack <= 0:\n        slack_urgency = 0.0\n    else:\n        slack_ratio = slack / max(due_urgency, eps)\n        slack_urgency = np.exp(-slack_ratio)\n    \n    # Feature 3: Waiting time ratio\n    waiting_time = max(0, start_time - available_time)\n    waiting_urgency = waiting_time / max(processing_time, eps)\n    \n    # Feature 4: Machine-specific processing time normalization\n    tm_norm = processing_tm / max(processing_time, eps)\n    \n    # Feature 5: Bottleneck-aware machine contention (with available_time and queue length)\n    if num_neighboring_machine > 0:\n        machine_contention = (utilization / num_neighboring_machine) * tm_norm\n    else:\n        machine_contention = utilization * tm_norm\n    avail_factor = 1.0 / (1.0 + available_time / max(processing_time, eps))\n    machine_contention *= avail_factor\n    \n    # Feature 6: Operation density weighted by machine count and processing time\n    if num_neighboring_machine > 0:\n        op_density = (num_neighboring_operation / num_neighboring_machine) * tm_norm\n    else:\n        op_density = num_neighboring_operation * tm_norm\n    \n    # Dynamic weight adjustment using sigmoid utilization and average slack\n    util_mid = 0.6\n    sigmoid_factor = 1.0 / (1.0 + np.exp(-5.0 * (utilization - util_mid)))\n    avg_slack = max(slack, 0.0) / max(due_urgency, eps)\n    slack_factor = 1.0 / (1.0 + avg_slack)\n    adapt_factor = 0.5 * sigmoid_factor + 0.5 * slack_factor\n    \n    # Weights assignment\n    w_due = 0.4 + 0.2 * adapt_factor\n    w_slack = 0.2 + 0.2 * adapt_factor\n    w_wait = 0.2 - 0.1 * adapt_factor\n    w_bottleneck = 0.1 + 0.1 * (1 - adapt_factor)\n    w_density = 0.1 - 0.05 * adapt_factor\n    \n    # Normalize weights to sum to 1\n    total_weight = w_due + w_slack + w_wait + w_bottleneck + w_density\n    if total_weight > 0:\n        w_due /= total_weight\n        w_slack /= total_weight\n        w_wait /= total_weight\n        w_bottleneck /= total_weight\n        w_density /= total_weight\n    \n    priority = (w_due * due_urgency +\n                w_slack * slack_urgency +\n                w_wait * waiting_urgency +\n                w_bottleneck * machine_contention +\n                w_density * op_density)\n    \n    # Adaptive tardy penalty based on slack deficit\n    if slack <= 0:\n        tardy_penalty = abs(slack) / max(processing_time, eps) + 2.0\n    elif status in ['late', 'tardy', 'overdue']:\n        tardy_penalty = 2.0\n    else:\n        tardy_penalty = 0.0\n    \n    priority -= tardy_penalty\n    result = max(0.001, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 959.6333333333333,
+          "ins_2": 549.0666666666667,
+          "ins_3": 1179.1,
+          "ins_4": 1133.25,
+          "ins_5": 462.81666666666666,
+          "ins_6": 1367.3666666666666,
+          "ins_7": 647.75,
+          "ins_8": 1599.7166666666667,
+          "ins_9": 2899.1666666666665,
+          "ins_10": 1195.9166666666667,
+          "ins_11": 807.0,
+          "ins_12": 727.85,
+          "ins_13": 1962.4666666666667,
+          "ins_14": 1399.2833333333333,
+          "ins_15": 2505.633333333333,
+          "ins_16": 639.2333333333333,
+          "ins_17": 1746.95,
+          "ins_18": 728.15,
+          "ins_19": 1196.8666666666666,
+          "ins_20": 1450.9166666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1257.9066666666668,
+        "all_scores": [
+          -1257.9066666666668,
+          -1257.9066666666668,
+          -1257.9066666666668,
+          -1257.9066666666668
+        ]
+      }
+    }
+  ],
+  "error_count": 8,
+  "total_tokens": 271674,
+  "method": "EDR_M",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 73,
+  "time_elapsed": 1142.0468270778656,
+  "llm_a_calls": 73,
+  "llm_a_input_tokens": 129884,
+  "llm_a_output_tokens": 47132,
+  "llm_s_calls": 65,
+  "llm_s_input_tokens": 83073,
+  "llm_s_output_tokens": 11585
+}

@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1789.0722916666668,
+        "all_scores": [
+          -1710.4533333333334,
+          -1745.3458333333333,
+          -1847.5425,
+          -1852.9474999999998
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1532.34,
+        "algorithm": "Combine EDD with a slack-based priority that considers remaining work and available time, assigning higher priority to jobs with smaller delivery_time, adjusted by the ratio of remaining processing to available slack to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    if slack <= 0:\n        # If already late, prioritize by delivery_time directly\n        priority = delivery_time\n    else:\n        # Remaining processing time (estimated by processing_time + processing_tm as a proxy)\n        remaining_processing = processing_time + processing_tm\n        # Slack ratio: lower ratio means tighter schedule, higher priority\n        if remaining_processing <= epsilon:\n            priority = delivery_time  # No work left, use due date\n        else:\n            ratio = remaining_processing / max(slack, epsilon)\n            # Combine with delivery_time to break ties; smaller value = higher priority\n            priority = delivery_time * (1 + ratio)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 848.25,
+          "ins_2": 605.5166666666667,
+          "ins_3": 1225.35,
+          "ins_4": 1285.2166666666667,
+          "ins_5": 568.3333333333334,
+          "ins_6": 1397.6166666666666,
+          "ins_7": 603.2166666666667,
+          "ins_8": 1489.1333333333334,
+          "ins_9": 2893.633333333333,
+          "ins_10": 2055.9333333333334,
+          "ins_11": 1150.0666666666666,
+          "ins_12": 1410.0166666666667,
+          "ins_13": 2944.2,
+          "ins_14": 907.5,
+          "ins_15": 3730.4166666666665,
+          "ins_16": 1260.1666666666667,
+          "ins_17": 2476.0666666666666,
+          "ins_18": 955.5,
+          "ins_19": 1063.5333333333333,
+          "ins_20": 1777.1333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1683.3712499999997,
+        "all_scores": [
+          -1532.34,
+          -1710.4533333333334,
+          -1745.3458333333333,
+          -1745.3458333333333
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1338.1683333333335,
+        "algorithm": "Use Earliest Due Date with a slack-adjusted priority that weights the due date by a normalized ratio of remaining processing time to available slack, ensuring higher priority for tighter schedules while avoiding extreme values via a transformation to the (0,1] interval.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    remaining_processing = processing_time + processing_tm\n    if slack <= epsilon:\n        priority = delivery_time\n    else:\n        if remaining_processing <= epsilon:\n            priority = delivery_time\n        else:\n            ratio = remaining_processing / slack\n            # Transform ratio to (0,1] using a sigmoid-like function, then multiply by delivery_time\n            normalized_weight = 1.0 / (1.0 + ratio)\n            priority = delivery_time * (2.0 - normalized_weight)  # Smaller for tighter jobs\n    return priority\n\n",
+        "instances": {
+          "ins_1": 850.5833333333334,
+          "ins_2": 605.5166666666667,
+          "ins_3": 1248.65,
+          "ins_4": 1285.2166666666667,
+          "ins_5": 481.45,
+          "ins_6": 1173.0,
+          "ins_7": 450.53333333333336,
+          "ins_8": 1489.1333333333334,
+          "ins_9": 2912.9,
+          "ins_10": 1711.45,
+          "ins_11": 883.65,
+          "ins_12": 1063.8833333333334,
+          "ins_13": 2261.233333333333,
+          "ins_14": 907.5,
+          "ins_15": 2238.3166666666666,
+          "ins_16": 1419.8666666666666,
+          "ins_17": 2214.383333333333,
+          "ins_18": 910.2,
+          "ins_19": 949.1666666666666,
+          "ins_20": 1706.7333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1410.8845833333332,
+        "all_scores": [
+          -1338.1683333333335,
+          -1353.1958333333332,
+          -1453.4075,
+          -1498.7666666666667
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1308.3483333333334,
+        "algorithm": "The new algorithm uses a slack-based priority where urgency is measured by the ratio of remaining processing time to available slack, and applies a logarithmic transformation to map this ratio to a (0,1] priority range, then multiplies by the due date to ensure smaller values for tighter jobs while handling zero slack or zero remaining processing time.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    remaining_processing = processing_time + processing_tm\n    \n    if slack <= epsilon or remaining_processing <= epsilon:\n        priority = delivery_time\n    else:\n        ratio = remaining_processing / slack\n        # Logarithmic transformation to map ratio to (0,1]; ln(1+ratio) ensures positive\n        normalized_weight = 1.0 / (1.0 + ratio)  # Keep original weight for comparison\n        # Use logarithmic scaling: priority = delivery_time * (log(1 + max_ratio) - log(1 + ratio)) / log(1 + max_ratio)\n        # Since ratio can be large, we use a sigmoid-like transform: 1/(1+ln(1+ratio)) to stay in (0,1]\n        transformed = 1.0 / (1.0 + (ratio ** 0.5))  # Square root dampens extreme values\n        priority = delivery_time * (2.0 - transformed)  # Smaller for tighter jobs, range ~ [delivery_time, 2*delivery_time]\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 897.9833333333333,
+          "ins_2": 479.28333333333336,
+          "ins_3": 1049.9166666666667,
+          "ins_4": 1285.2166666666667,
+          "ins_5": 481.45,
+          "ins_6": 1173.0,
+          "ins_7": 420.23333333333335,
+          "ins_8": 1741.2666666666667,
+          "ins_9": 2912.9,
+          "ins_10": 1602.4666666666667,
+          "ins_11": 862.3,
+          "ins_12": 725.7833333333333,
+          "ins_13": 2707.483333333333,
+          "ins_14": 1088.45,
+          "ins_15": 2160.266666666667,
+          "ins_16": 1133.6333333333334,
+          "ins_17": 2163.516666666667,
+          "ins_18": 881.4166666666666,
+          "ins_19": 1024.4333333333334,
+          "ins_20": 1375.9666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1345.3889583333334,
+        "all_scores": [
+          -1308.3483333333334,
+          -1338.1683333333335,
+          -1353.1958333333332,
+          -1381.8433333333332
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1308.3483333333334,
+        "algorithm": "The new algorithm uses a slack-based priority where urgency is measured by the ratio of remaining processing time to available slack, and applies a logarithmic transformation to map this ratio to a (0,1] priority range, then multiplies by the due date to ensure smaller values for tighter jobs while handling zero slack or zero remaining processing time.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    remaining_processing = processing_time + processing_tm\n    \n    if slack <= epsilon or remaining_processing <= epsilon:\n        priority = delivery_time\n    else:\n        ratio = remaining_processing / slack\n        # Logarithmic transformation to map ratio to (0,1]; ln(1+ratio) ensures positive\n        normalized_weight = 1.0 / (1.0 + ratio)  # Keep original weight for comparison\n        # Use logarithmic scaling: priority = delivery_time * (log(1 + max_ratio) - log(1 + ratio)) / log(1 + max_ratio)\n        # Since ratio can be large, we use a sigmoid-like transform: 1/(1+ln(1+ratio)) to stay in (0,1]\n        transformed = 1.0 / (1.0 + (ratio ** 0.5))  # Square root dampens extreme values\n        priority = delivery_time * (2.0 - transformed)  # Smaller for tighter jobs, range ~ [delivery_time, 2*delivery_time]\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 897.9833333333333,
+          "ins_2": 479.28333333333336,
+          "ins_3": 1049.9166666666667,
+          "ins_4": 1285.2166666666667,
+          "ins_5": 481.45,
+          "ins_6": 1173.0,
+          "ins_7": 420.23333333333335,
+          "ins_8": 1741.2666666666667,
+          "ins_9": 2912.9,
+          "ins_10": 1602.4666666666667,
+          "ins_11": 862.3,
+          "ins_12": 725.7833333333333,
+          "ins_13": 2707.483333333333,
+          "ins_14": 1088.45,
+          "ins_15": 2160.266666666667,
+          "ins_16": 1133.6333333333334,
+          "ins_17": 2163.516666666667,
+          "ins_18": 881.4166666666666,
+          "ins_19": 1024.4333333333334,
+          "ins_20": 1375.9666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1321.169375,
+        "all_scores": [
+          -1308.3483333333334,
+          -1308.3483333333334,
+          -1329.8124999999998,
+          -1338.1683333333335
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1296.2691666666667,
+        "algorithm": "The new algorithm uses a slack-based priority with a modified sigmoid transformation that incorporates machine utilization and neighboring operation count to better scale the urgency, ensuring smaller values for tighter jobs and handling zero slack or processing time gracefully.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    remaining_processing = processing_time + processing_tm\n    \n    if slack <= epsilon or remaining_processing <= epsilon:\n        priority = delivery_time\n    else:\n        ratio = remaining_processing / slack\n        # Incorporate utilization and neighboring operations to adjust urgency\n        utilization_factor = 1.0 + utilization\n        neighbor_factor = 1.0 + (num_neighboring_operation / (num_neighboring_machine + epsilon))\n        # Modified sigmoid transformation with dampening and scaling\n        transformed = 1.0 / (1.0 + (ratio ** 0.5) * utilization_factor * neighbor_factor)\n        # Map to range [delivery_time, 2*delivery_time] with smaller for tighter jobs\n        priority = delivery_time * (2.0 - transformed)\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1256.5,
+          "ins_2": 551.9166666666666,
+          "ins_3": 997.5833333333334,
+          "ins_4": 1230.4833333333333,
+          "ins_5": 439.95,
+          "ins_6": 1128.4,
+          "ins_7": 491.28333333333336,
+          "ins_8": 1485.8666666666666,
+          "ins_9": 2355.65,
+          "ins_10": 1604.8166666666666,
+          "ins_11": 873.35,
+          "ins_12": 837.9666666666667,
+          "ins_13": 2508.2833333333333,
+          "ins_14": 1079.8,
+          "ins_15": 2790.366666666667,
+          "ins_16": 556.0333333333333,
+          "ins_17": 2156.6833333333334,
+          "ins_18": 1018.9833333333333,
+          "ins_19": 1121.3333333333333,
+          "ins_20": 1440.1333333333334
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1304.7639583333332,
+        "all_scores": [
+          -1296.2691666666667,
+          -1306.0899999999997,
+          -1308.3483333333334,
+          -1308.3483333333334
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1250.615833333333,
+        "algorithm": "The new algorithm combines adaptive hyperbolic tangent scaling with exponential decay based on slack ratio, machine utilization, and neighboring operation count to produce a calibrated priority that minimizes tardiness by assigning smaller values to more urgent jobs.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    remaining_processing = processing_time + processing_tm\n    \n    if slack <= epsilon or remaining_processing <= epsilon:\n        priority = delivery_time\n    else:\n        ratio = remaining_processing / slack\n        \n        # Prevent division by zero for machine count\n        machine_factor = 1.0 + (num_neighboring_operation / (num_neighboring_machine + epsilon))\n        utilization_factor = 1.0 + utilization\n        \n        # Adaptive hyperbolic tangent for smooth urgency scaling\n        tanh_input = ratio * utilization_factor * machine_factor\n        transformed = (1.0 - (ratio ** 0.5)) * 0.5 * (1.0 + (2.0 / (1.0 + (tanh_input ** 0.7)) - 1.0))\n        \n        # Clamp transformed value between 0 and 1\n        transformed = max(0.0, min(1.0, transformed))\n        \n        # Map to priority range: smaller values for urgent jobs\n        priority = delivery_time * (2.0 - transformed)\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1165.1333333333334,
+          "ins_2": 577.1833333333333,
+          "ins_3": 1111.2333333333333,
+          "ins_4": 1406.5166666666667,
+          "ins_5": 439.95,
+          "ins_6": 989.15,
+          "ins_7": 310.65,
+          "ins_8": 1326.5666666666666,
+          "ins_9": 2747.4,
+          "ins_10": 1504.7,
+          "ins_11": 875.0,
+          "ins_12": 870.15,
+          "ins_13": 1931.5666666666666,
+          "ins_14": 1079.8,
+          "ins_15": 2787.9333333333334,
+          "ins_16": 648.2666666666667,
+          "ins_17": 1946.1333333333334,
+          "ins_18": 938.3666666666667,
+          "ins_19": 972.05,
+          "ins_20": 1384.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1284.398125,
+        "all_scores": [
+          -1250.615833333333,
+          -1294.438333333333,
+          -1296.2691666666667,
+          -1296.2691666666667
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1250.615833333333,
+        "algorithm": "The new algorithm combines adaptive hyperbolic tangent scaling with exponential decay based on slack ratio, machine utilization, and neighboring operation count to produce a calibrated priority that minimizes tardiness by assigning smaller values to more urgent jobs.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    remaining_processing = processing_time + processing_tm\n    \n    if slack <= epsilon or remaining_processing <= epsilon:\n        priority = delivery_time\n    else:\n        ratio = remaining_processing / slack\n        \n        # Prevent division by zero for machine count\n        machine_factor = 1.0 + (num_neighboring_operation / (num_neighboring_machine + epsilon))\n        utilization_factor = 1.0 + utilization\n        \n        # Adaptive hyperbolic tangent for smooth urgency scaling\n        tanh_input = ratio * utilization_factor * machine_factor\n        transformed = (1.0 - (ratio ** 0.5)) * 0.5 * (1.0 + (2.0 / (1.0 + (tanh_input ** 0.7)) - 1.0))\n        \n        # Clamp transformed value between 0 and 1\n        transformed = max(0.0, min(1.0, transformed))\n        \n        # Map to priority range: smaller values for urgent jobs\n        priority = delivery_time * (2.0 - transformed)\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1165.1333333333334,
+          "ins_2": 577.1833333333333,
+          "ins_3": 1111.2333333333333,
+          "ins_4": 1406.5166666666667,
+          "ins_5": 439.95,
+          "ins_6": 989.15,
+          "ins_7": 310.65,
+          "ins_8": 1326.5666666666666,
+          "ins_9": 2747.4,
+          "ins_10": 1504.7,
+          "ins_11": 875.0,
+          "ins_12": 870.15,
+          "ins_13": 1931.5666666666666,
+          "ins_14": 1079.8,
+          "ins_15": 2787.9333333333334,
+          "ins_16": 648.2666666666667,
+          "ins_17": 1946.1333333333334,
+          "ins_18": 938.3666666666667,
+          "ins_19": 972.05,
+          "ins_20": 1384.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1282.5779166666666,
+        "all_scores": [
+          -1250.615833333333,
+          -1290.13,
+          -1294.438333333333,
+          -1295.1275
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1250.615833333333,
+        "algorithm": "The new algorithm combines adaptive hyperbolic tangent scaling with exponential decay based on slack ratio, machine utilization, and neighboring operation count to produce a calibrated priority that minimizes tardiness by assigning smaller values to more urgent jobs.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    remaining_processing = processing_time + processing_tm\n    \n    if slack <= epsilon or remaining_processing <= epsilon:\n        priority = delivery_time\n    else:\n        ratio = remaining_processing / slack\n        \n        # Prevent division by zero for machine count\n        machine_factor = 1.0 + (num_neighboring_operation / (num_neighboring_machine + epsilon))\n        utilization_factor = 1.0 + utilization\n        \n        # Adaptive hyperbolic tangent for smooth urgency scaling\n        tanh_input = ratio * utilization_factor * machine_factor\n        transformed = (1.0 - (ratio ** 0.5)) * 0.5 * (1.0 + (2.0 / (1.0 + (tanh_input ** 0.7)) - 1.0))\n        \n        # Clamp transformed value between 0 and 1\n        transformed = max(0.0, min(1.0, transformed))\n        \n        # Map to priority range: smaller values for urgent jobs\n        priority = delivery_time * (2.0 - transformed)\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1165.1333333333334,
+          "ins_2": 577.1833333333333,
+          "ins_3": 1111.2333333333333,
+          "ins_4": 1406.5166666666667,
+          "ins_5": 439.95,
+          "ins_6": 989.15,
+          "ins_7": 310.65,
+          "ins_8": 1326.5666666666666,
+          "ins_9": 2747.4,
+          "ins_10": 1504.7,
+          "ins_11": 875.0,
+          "ins_12": 870.15,
+          "ins_13": 1931.5666666666666,
+          "ins_14": 1079.8,
+          "ins_15": 2787.9333333333334,
+          "ins_16": 648.2666666666667,
+          "ins_17": 1946.1333333333334,
+          "ins_18": 938.3666666666667,
+          "ins_19": 972.05,
+          "ins_20": 1384.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1255.4958333333332,
+        "all_scores": [
+          -1250.615833333333,
+          -1250.615833333333,
+          -1260.2841666666666,
+          -1260.4675
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1250.615833333333,
+        "algorithm": "The new algorithm combines adaptive hyperbolic tangent scaling with exponential decay based on slack ratio, machine utilization, and neighboring operation count to produce a calibrated priority that minimizes tardiness by assigning smaller values to more urgent jobs.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    epsilon = 1e-6\n    slack = delivery_time - available_time\n    remaining_processing = processing_time + processing_tm\n    \n    if slack <= epsilon or remaining_processing <= epsilon:\n        priority = delivery_time\n    else:\n        ratio = remaining_processing / slack\n        \n        # Prevent division by zero for machine count\n        machine_factor = 1.0 + (num_neighboring_operation / (num_neighboring_machine + epsilon))\n        utilization_factor = 1.0 + utilization\n        \n        # Adaptive hyperbolic tangent for smooth urgency scaling\n        tanh_input = ratio * utilization_factor * machine_factor\n        transformed = (1.0 - (ratio ** 0.5)) * 0.5 * (1.0 + (2.0 / (1.0 + (tanh_input ** 0.7)) - 1.0))\n        \n        # Clamp transformed value between 0 and 1\n        transformed = max(0.0, min(1.0, transformed))\n        \n        # Map to priority range: smaller values for urgent jobs\n        priority = delivery_time * (2.0 - transformed)\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1165.1333333333334,
+          "ins_2": 577.1833333333333,
+          "ins_3": 1111.2333333333333,
+          "ins_4": 1406.5166666666667,
+          "ins_5": 439.95,
+          "ins_6": 989.15,
+          "ins_7": 310.65,
+          "ins_8": 1326.5666666666666,
+          "ins_9": 2747.4,
+          "ins_10": 1504.7,
+          "ins_11": 875.0,
+          "ins_12": 870.15,
+          "ins_13": 1931.5666666666666,
+          "ins_14": 1079.8,
+          "ins_15": 2787.9333333333334,
+          "ins_16": 648.2666666666667,
+          "ins_17": 1946.1333333333334,
+          "ins_18": 938.3666666666667,
+          "ins_19": 972.05,
+          "ins_20": 1384.5666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1252.4989583333331,
+        "all_scores": [
+          -1250.615833333333,
+          -1250.615833333333,
+          -1250.615833333333,
+          -1258.148333333333
+        ]
+      }
+    }
+  ],
+  "error_count": 24,
+  "total_tokens": 160684,
+  "method": "EDR_S_none",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 147,
+  "time_elapsed": 1644.4767365455627,
+  "llm_a_calls": 147,
+  "llm_a_input_tokens": 114103,
+  "llm_a_output_tokens": 46581,
+  "llm_s_calls": 0,
+  "llm_s_input_tokens": 0,
+  "llm_s_output_tokens": 0
+}

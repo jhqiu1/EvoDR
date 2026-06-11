@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1710.4533333333334,
+        "algorithm": "The earlier the delivery date, the higher the production priority of the task.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    \"\"\"EDD (Earliest Due Date) heuristic rule.\n    Prioritization by delivery time (smaller delivery_time = higher priority).\n    \"\"\"\n    # Prioritization by delivery time\n    priority = delivery_time\n\n    # Return priority results\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1474.7666666666667,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1774.604375,
+        "all_scores": [
+          -1710.4533333333334,
+          -1727.7283333333332,
+          -1766.1258333333335,
+          -1894.1100000000001
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1658.0333333333333,
+        "algorithm": "The new algorithm combines EDD with processing time, machine utilization, and earliest start time to compute a composite priority value.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Secondary factor: processing time (shorter jobs get slightly higher priority when due dates equal)\n    # Use processing_time as tie-breaker, scale it to avoid dominating delivery_time\n    priority += processing_time * 0.001\n    \n    # Incorporate machine utilization: higher utilization adds to priority (lower priority) to balance load\n    priority += utilization * 0.01\n    \n    # Incorporate earliest start time: reduce priority value (increase priority) for jobs that can start earlier\n    # If available_time is very small, it should not cause division by zero\n    if available_time > 0:\n        priority -= 1.0 / (available_time + 1) * 100  # small reduction for early start\n    else:\n        priority -= 100  # maximum reduction for immediate start\n    \n    # Ensure priority is non-negative (optional, but good for consistency)\n    if priority < 0:\n        priority = 0\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 1146.1333333333334,
+          "ins_3": 1372.3,
+          "ins_4": 1604.7,
+          "ins_5": 988.2,
+          "ins_6": 1840.3166666666666,
+          "ins_7": 626.1166666666667,
+          "ins_8": 2012.3666666666666,
+          "ins_9": 3244.0833333333335,
+          "ins_10": 2217.2833333333333,
+          "ins_11": 1056.0833333333333,
+          "ins_12": 969.4,
+          "ins_13": 2202.35,
+          "ins_14": 1520.0333333333333,
+          "ins_15": 2576.3166666666666,
+          "ins_16": 1394.6,
+          "ins_17": 1916.9,
+          "ins_18": 953.3,
+          "ins_19": 1608.55,
+          "ins_20": 2609.8333333333335
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1689.3777083333332,
+        "all_scores": [
+          -1658.0333333333333,
+          -1661.2958333333331,
+          -1710.4533333333334,
+          -1727.7283333333332
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1657.2675,
+        "algorithm": "The new algorithm combines EDD with processing time, machine utilization, and start time by computing a composite priority as delivery_time plus weighted processing time and utilization, then subtracting a scaled exponential of start_time to favor early jobs, all normalized to non-negative.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Add small weight for processing time (shorter jobs get slightly higher priority)\n    priority += processing_time * 0.001\n    \n    # Add machine utilization factor: higher utilization increases priority (lower priority)\n    priority += utilization * 0.01\n    \n    # Subtract start_time influence: earlier start time reduces priority (higher priority)\n    # Use exponential decay to avoid negative values\n    start_factor = 1.0 / (1.0 + start_time)  # ranges from 1 to 0\n    priority -= start_factor * 10.0  # scale to have noticeable effect\n    \n    # Ensure non-negative result\n    result = max(0.0, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 938.1,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1519.7166666666667,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1322.5166666666667,
+          "ins_11": 978.85,
+          "ins_12": 969.4,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2436.2833333333333,
+          "ins_16": 1354.9166666666667,
+          "ins_17": 2746.366666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2609.8333333333335
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1658.5902083333335,
+        "all_scores": [
+          -1657.2675,
+          -1657.7641666666666,
+          -1658.0333333333333,
+          -1661.2958333333331
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1657.2675,
+        "algorithm": "The new algorithm combines EDD with processing time, machine utilization, and start time by computing a composite priority as delivery_time plus weighted processing time and utilization, then subtracting a scaled exponential of start_time to favor early jobs, all normalized to non-negative.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Add small weight for processing time (shorter jobs get slightly higher priority)\n    priority += processing_time * 0.001\n    \n    # Add machine utilization factor: higher utilization increases priority (lower priority)\n    priority += utilization * 0.01\n    \n    # Subtract start_time influence: earlier start time reduces priority (higher priority)\n    # Use exponential decay to avoid negative values\n    start_factor = 1.0 / (1.0 + start_time)  # ranges from 1 to 0\n    priority -= start_factor * 10.0  # scale to have noticeable effect\n    \n    # Ensure non-negative result\n    result = max(0.0, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 1301.8,
+          "ins_2": 938.1,
+          "ins_3": 1454.2666666666667,
+          "ins_4": 1519.7166666666667,
+          "ins_5": 910.1,
+          "ins_6": 1900.5666666666666,
+          "ins_7": 859.2,
+          "ins_8": 1913.7333333333333,
+          "ins_9": 3390.366666666667,
+          "ins_10": 1322.5166666666667,
+          "ins_11": 978.85,
+          "ins_12": 969.4,
+          "ins_13": 2253.1,
+          "ins_14": 1600.8166666666666,
+          "ins_15": 2436.2833333333333,
+          "ins_16": 1354.9166666666667,
+          "ins_17": 2746.366666666667,
+          "ins_18": 921.8666666666667,
+          "ins_19": 1763.55,
+          "ins_20": 2609.8333333333335
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1657.3916666666667,
+        "all_scores": [
+          -1657.2675,
+          -1657.2675,
+          -1657.2675,
+          -1657.7641666666666
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1112.1766666666665,
+        "algorithm": "The new algorithm computes a composite priority as delivery_time plus weighted processing time and weighted machine utilization, minus a linearly scaled start-time-to-due-date urgency term, then adds a machine-specific processing time adjustment to favor faster machines, and finally normalizes to non-negative.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Increase weight for processing time to strongly favor shorter tasks\n    priority += processing_time * 0.1\n    \n    # Machine utilization factor remains\n    priority += utilization * 0.01\n    \n    # Add machine-task processing time adjustment: normalized processing time on current machine\n    # Use processing_tm as processing time on this machine (assuming it's provided)\n    if processing_tm > 0 and processing_time > 0:\n        machine_adj = processing_tm / processing_time  # ratio closer to 1 means average\n        priority += machine_adj * 1.0  # scale to affect priority\n    elif processing_tm > 0:\n        priority += processing_tm * 0.001\n    else:\n        priority += 0.0\n    \n    # Replace exponential start-time factor with linearly scaled earliest start time relative to due date\n    # If delivery_time > 0, use relative start_time/delivery_time, else just use start_time scaled\n    if delivery_time > 0:\n        start_factor = start_time / delivery_time  # ratio of urgency\n    else:\n        start_factor = start_time / (1.0 + start_time)  # fallback to avoid division by zero\n    # Subtract to increase priority for earlier jobs (smaller start_factor => higher priority)\n    priority -= start_factor * 10.0\n    \n    # Ensure non-negative result\n    result = max(0.0, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 418.95,
+          "ins_3": 1446.1166666666666,
+          "ins_4": 1157.8666666666666,
+          "ins_5": 404.95,
+          "ins_6": 1219.8666666666666,
+          "ins_7": 440.5,
+          "ins_8": 1310.5,
+          "ins_9": 2261.35,
+          "ins_10": 1061.8666666666666,
+          "ins_11": 763.0833333333334,
+          "ins_12": 796.2333333333333,
+          "ins_13": 1614.6666666666667,
+          "ins_14": 960.15,
+          "ins_15": 2480.883333333333,
+          "ins_16": 624.1666666666666,
+          "ins_17": 2038.7333333333333,
+          "ins_18": 516.8833333333333,
+          "ins_19": 1050.0,
+          "ins_20": 1176.6166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1520.9947916666665,
+        "all_scores": [
+          -1112.1766666666665,
+          -1657.2675,
+          -1657.2675,
+          -1657.2675
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1110.8791666666666,
+        "algorithm": "The new algorithm computes priority as delivery_time plus a weighted processing time and utilization, adds a machine speed factor favoring faster machines, and includes an inverse-exponential urgency term based on start_time relative to delivery_time, then normalizes to non-negative.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Weighted processing time: stronger weight to favor shorter tasks\n    priority += processing_time * 0.15\n    \n    # Machine utilization factor: small weight\n    priority += utilization * 0.01\n    \n    # Machine speed factor: use processing_tm relative to processing_time if both positive\n    if processing_tm > 0 and processing_time > 0:\n        machine_adj = processing_tm / processing_time  # ratio < 1 if machine is faster\n        priority += machine_adj * 0.5  # scale to affect priority (smaller ratio gives lower priority)\n    elif processing_tm > 0:\n        priority += processing_tm * 0.001\n    else:\n        priority += 0.0\n    \n    # Inverse-exponential urgency factor based on start_time relative to delivery_time\n    # Higher urgency (start_time close to delivery_time) increases priority (smaller value)\n    if delivery_time > 0:\n        urgency_factor = start_time / delivery_time  # ratio between 0 and potentially >1\n        # Use exponential decay: exp(-urgency_factor) gives higher priority for urgent jobs\n        priority -= 5.0 * (1.0 - 2.71828 ** (-urgency_factor))  # subtract to lower priority value for urgent jobs\n    else:\n        # Fallback if delivery_time is zero\n        if start_time > 0:\n            urgency_factor = 1.0 / (1.0 + start_time)\n        else:\n            urgency_factor = 1.0\n        priority -= 5.0 * (1.0 - 2.71828 ** (-urgency_factor))\n    \n    # Ensure non-negative result\n    result = max(0.0, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 448.0,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1228.6666666666667,
+          "ins_5": 404.95,
+          "ins_6": 1219.8666666666666,
+          "ins_7": 489.46666666666664,
+          "ins_8": 1310.5,
+          "ins_9": 2360.5,
+          "ins_10": 1139.5833333333333,
+          "ins_11": 763.0833333333334,
+          "ins_12": 916.0833333333334,
+          "ins_13": 1614.6666666666667,
+          "ins_14": 960.15,
+          "ins_15": 2600.7166666666667,
+          "ins_16": 624.1666666666666,
+          "ins_17": 1635.9833333333333,
+          "ins_18": 587.9666666666667,
+          "ins_19": 1050.0,
+          "ins_20": 1176.6166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1114.6547916666664,
+        "all_scores": [
+          -1110.8791666666666,
+          -1110.8791666666666,
+          -1112.1766666666665,
+          -1124.6841666666664
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1110.8791666666666,
+        "algorithm": "The new algorithm computes priority as delivery_time plus a weighted processing time and utilization, adds a machine speed factor favoring faster machines, and includes an inverse-exponential urgency term based on start_time relative to delivery_time, then normalizes to non-negative.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Weighted processing time: stronger weight to favor shorter tasks\n    priority += processing_time * 0.15\n    \n    # Machine utilization factor: small weight\n    priority += utilization * 0.01\n    \n    # Machine speed factor: use processing_tm relative to processing_time if both positive\n    if processing_tm > 0 and processing_time > 0:\n        machine_adj = processing_tm / processing_time  # ratio < 1 if machine is faster\n        priority += machine_adj * 0.5  # scale to affect priority (smaller ratio gives lower priority)\n    elif processing_tm > 0:\n        priority += processing_tm * 0.001\n    else:\n        priority += 0.0\n    \n    # Inverse-exponential urgency factor based on start_time relative to delivery_time\n    # Higher urgency (start_time close to delivery_time) increases priority (smaller value)\n    if delivery_time > 0:\n        urgency_factor = start_time / delivery_time  # ratio between 0 and potentially >1\n        # Use exponential decay: exp(-urgency_factor) gives higher priority for urgent jobs\n        priority -= 5.0 * (1.0 - 2.71828 ** (-urgency_factor))  # subtract to lower priority value for urgent jobs\n    else:\n        # Fallback if delivery_time is zero\n        if start_time > 0:\n            urgency_factor = 1.0 / (1.0 + start_time)\n        else:\n            urgency_factor = 1.0\n        priority -= 5.0 * (1.0 - 2.71828 ** (-urgency_factor))\n    \n    # Ensure non-negative result\n    result = max(0.0, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 448.0,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1228.6666666666667,
+          "ins_5": 404.95,
+          "ins_6": 1219.8666666666666,
+          "ins_7": 489.46666666666664,
+          "ins_8": 1310.5,
+          "ins_9": 2360.5,
+          "ins_10": 1139.5833333333333,
+          "ins_11": 763.0833333333334,
+          "ins_12": 916.0833333333334,
+          "ins_13": 1614.6666666666667,
+          "ins_14": 960.15,
+          "ins_15": 2600.7166666666667,
+          "ins_16": 624.1666666666666,
+          "ins_17": 1635.9833333333333,
+          "ins_18": 587.9666666666667,
+          "ins_19": 1050.0,
+          "ins_20": 1176.6166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1110.8791666666666,
+        "all_scores": [
+          -1110.8791666666666,
+          -1110.8791666666666,
+          -1110.8791666666666,
+          -1110.8791666666666
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1110.8791666666666,
+        "algorithm": "The new algorithm computes priority as delivery_time plus a weighted processing time and utilization, adds a machine speed factor favoring faster machines, and includes an inverse-exponential urgency term based on start_time relative to delivery_time, then normalizes to non-negative.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Weighted processing time: stronger weight to favor shorter tasks\n    priority += processing_time * 0.15\n    \n    # Machine utilization factor: small weight\n    priority += utilization * 0.01\n    \n    # Machine speed factor: use processing_tm relative to processing_time if both positive\n    if processing_tm > 0 and processing_time > 0:\n        machine_adj = processing_tm / processing_time  # ratio < 1 if machine is faster\n        priority += machine_adj * 0.5  # scale to affect priority (smaller ratio gives lower priority)\n    elif processing_tm > 0:\n        priority += processing_tm * 0.001\n    else:\n        priority += 0.0\n    \n    # Inverse-exponential urgency factor based on start_time relative to delivery_time\n    # Higher urgency (start_time close to delivery_time) increases priority (smaller value)\n    if delivery_time > 0:\n        urgency_factor = start_time / delivery_time  # ratio between 0 and potentially >1\n        # Use exponential decay: exp(-urgency_factor) gives higher priority for urgent jobs\n        priority -= 5.0 * (1.0 - 2.71828 ** (-urgency_factor))  # subtract to lower priority value for urgent jobs\n    else:\n        # Fallback if delivery_time is zero\n        if start_time > 0:\n            urgency_factor = 1.0 / (1.0 + start_time)\n        else:\n            urgency_factor = 1.0\n        priority -= 5.0 * (1.0 - 2.71828 ** (-urgency_factor))\n    \n    # Ensure non-negative result\n    result = max(0.0, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 448.0,
+          "ins_3": 1186.4666666666667,
+          "ins_4": 1228.6666666666667,
+          "ins_5": 404.95,
+          "ins_6": 1219.8666666666666,
+          "ins_7": 489.46666666666664,
+          "ins_8": 1310.5,
+          "ins_9": 2360.5,
+          "ins_10": 1139.5833333333333,
+          "ins_11": 763.0833333333334,
+          "ins_12": 916.0833333333334,
+          "ins_13": 1614.6666666666667,
+          "ins_14": 960.15,
+          "ins_15": 2600.7166666666667,
+          "ins_16": 624.1666666666666,
+          "ins_17": 1635.9833333333333,
+          "ins_18": 587.9666666666667,
+          "ins_19": 1050.0,
+          "ins_20": 1176.6166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1110.8791666666666,
+        "all_scores": [
+          -1110.8791666666666,
+          -1110.8791666666666,
+          -1110.8791666666666,
+          -1110.8791666666666
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1083.1225,
+        "algorithm": "The new algorithm computes priority as a linear combination of delivery_time, scaled by machine speed and utilization, with additive penalties for processing_time and start_time, then normalizes to non-negative.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Machine speed factor: ratio of processing_tm to processing_time, handling zero divisors\n    if processing_time > 0 and processing_tm > 0:\n        machine_speed = processing_tm / processing_time  # <1 if machine is faster\n        priority += machine_speed * 0.3  # smaller ratio reduces priority\n    elif processing_tm > 0:\n        priority += processing_tm * 0.002\n    else:\n        priority += 0.0\n    \n    # Utilization penalty: higher utilization increases priority (higher value = lower priority)\n    priority += utilization * 0.05\n    \n    # Processing_time penalty: longer jobs get higher priority (less urgent)\n    priority += processing_time * 0.1\n    \n    # Start_time penalty: later start times increase priority (less urgent)\n    priority += start_time * 0.02\n    \n    # Ensure non-negative result\n    result = max(0.0, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 448.0,
+          "ins_3": 1067.1833333333334,
+          "ins_4": 1228.6666666666667,
+          "ins_5": 404.95,
+          "ins_6": 1219.8666666666666,
+          "ins_7": 439.3333333333333,
+          "ins_8": 1310.5,
+          "ins_9": 2360.5,
+          "ins_10": 1139.5833333333333,
+          "ins_11": 763.0833333333334,
+          "ins_12": 762.95,
+          "ins_13": 1556.15,
+          "ins_14": 960.15,
+          "ins_15": 2426.65,
+          "ins_16": 624.1666666666666,
+          "ins_17": 1635.9833333333333,
+          "ins_18": 587.9666666666667,
+          "ins_19": 1050.0,
+          "ins_20": 1176.6166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1100.0602083333333,
+        "all_scores": [
+          -1083.1225,
+          -1095.36,
+          -1110.8791666666666,
+          -1110.8791666666666
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1083.1225,
+        "algorithm": "The new algorithm computes priority as a linear combination of delivery_time, scaled by machine speed and utilization, with additive penalties for processing_time and start_time, then normalizes to non-negative.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    priority = delivery_time\n    \n    # Machine speed factor: ratio of processing_tm to processing_time, handling zero divisors\n    if processing_time > 0 and processing_tm > 0:\n        machine_speed = processing_tm / processing_time  # <1 if machine is faster\n        priority += machine_speed * 0.3  # smaller ratio reduces priority\n    elif processing_tm > 0:\n        priority += processing_tm * 0.002\n    else:\n        priority += 0.0\n    \n    # Utilization penalty: higher utilization increases priority (higher value = lower priority)\n    priority += utilization * 0.05\n    \n    # Processing_time penalty: longer jobs get higher priority (less urgent)\n    priority += processing_time * 0.1\n    \n    # Start_time penalty: later start times increase priority (less urgent)\n    priority += start_time * 0.02\n    \n    # Ensure non-negative result\n    result = max(0.0, priority)\n    \n    return priority\n\n",
+        "instances": {
+          "ins_1": 500.15,
+          "ins_2": 448.0,
+          "ins_3": 1067.1833333333334,
+          "ins_4": 1228.6666666666667,
+          "ins_5": 404.95,
+          "ins_6": 1219.8666666666666,
+          "ins_7": 439.3333333333333,
+          "ins_8": 1310.5,
+          "ins_9": 2360.5,
+          "ins_10": 1139.5833333333333,
+          "ins_11": 763.0833333333334,
+          "ins_12": 762.95,
+          "ins_13": 1556.15,
+          "ins_14": 960.15,
+          "ins_15": 2426.65,
+          "ins_16": 624.1666666666666,
+          "ins_17": 1635.9833333333333,
+          "ins_18": 587.9666666666667,
+          "ins_19": 1050.0,
+          "ins_20": 1176.6166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1088.8045833333333,
+        "all_scores": [
+          -1083.1225,
+          -1083.1225,
+          -1093.6133333333337,
+          -1095.36
+        ]
+      }
+    }
+  ],
+  "error_count": 6,
+  "total_tokens": 313336,
+  "method": "EvoDR",
+  "run_id": 2,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 130,
+  "time_elapsed": 1455.4952137470245,
+  "llm_a_calls": 130,
+  "llm_a_input_tokens": 112943,
+  "llm_a_output_tokens": 53270,
+  "llm_s_calls": 125,
+  "llm_s_input_tokens": 126762,
+  "llm_s_output_tokens": 20361
+}

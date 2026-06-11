@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1677.0966666666668,
+        "algorithm": "The algorithm prioritizes jobs by delivery time (lowest first) to minimize tardiness, with a tie-breaking rule using processing time.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if processing_time != 0:\n        priority = delivery_time + processing_time / 1000000.0  # Avoid floating point issues\n    else:\n        priority = delivery_time\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1322.0166666666667,
+          "ins_2": 1111.6,
+          "ins_3": 1286.75,
+          "ins_4": 1500.1166666666666,
+          "ins_5": 1137.5333333333333,
+          "ins_6": 1737.3,
+          "ins_7": 604.85,
+          "ins_8": 1804.8,
+          "ins_9": 3581.2166666666667,
+          "ins_10": 2302.5833333333335,
+          "ins_11": 1174.0833333333333,
+          "ins_12": 1553.3,
+          "ins_13": 2096.65,
+          "ins_14": 1192.1833333333334,
+          "ins_15": 2649.0666666666666,
+          "ins_16": 1369.3166666666666,
+          "ins_17": 2148.0833333333335,
+          "ins_18": 1181.5166666666667,
+          "ins_19": 1648.5166666666667,
+          "ins_20": 2140.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1733.0647916666667,
+        "all_scores": [
+          -1677.0966666666668,
+          -1706.5325,
+          -1710.4533333333334,
+          -1838.1766666666667
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1677.0966666666668,
+        "algorithm": "The algorithm prioritizes jobs by delivery time (lowest first) to minimize tardiness, with a tie-breaking rule using processing time.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    if processing_time != 0:\n        priority = delivery_time + processing_time / 1000000.0  # Avoid floating point issues\n    else:\n        priority = delivery_time\n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1322.0166666666667,
+          "ins_2": 1111.6,
+          "ins_3": 1286.75,
+          "ins_4": 1500.1166666666666,
+          "ins_5": 1137.5333333333333,
+          "ins_6": 1737.3,
+          "ins_7": 604.85,
+          "ins_8": 1804.8,
+          "ins_9": 3581.2166666666667,
+          "ins_10": 2302.5833333333335,
+          "ins_11": 1174.0833333333333,
+          "ins_12": 1553.3,
+          "ins_13": 2096.65,
+          "ins_14": 1192.1833333333334,
+          "ins_15": 2649.0666666666666,
+          "ins_16": 1369.3166666666666,
+          "ins_17": 2148.0833333333335,
+          "ins_18": 1181.5166666666667,
+          "ins_19": 1648.5166666666667,
+          "ins_20": 2140.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1677.0966666666668,
+        "all_scores": [
+          -1677.0966666666668,
+          -1677.0966666666668,
+          -1677.0966666666668,
+          -1677.0966666666668
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1626.6524999999997,
+        "algorithm": "The algorithm combines Earliest Due Date (EDD) with a tardiness penalty that dynamically adjusts priority based on lateness severity and uses a processing time tie-breaker from the first algorithm, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    current_time = max(available_time, start_time)\n    \n    # Base priority: due date (EDD rule)\n    priority = float(delivery_time)\n    \n    # Calculate tardiness if job is late\n    if current_time > delivery_time:\n        tardiness = current_time - delivery_time\n        # Apply exponential penalty to increase priority (reduce value) for late jobs\n        penalty = tardiness * (1.0 + utilization)  # Utilize utilization factor for severity\n        priority = delivery_time - penalty\n    else:\n        # If not late, add a small offset to maintain order\n        priority = delivery_time + (delivery_time - current_time) / 1000000.0\n    \n    # Tie-breaking with processing time (shorter = higher priority)\n    if processing_time > 0:\n        priority += processing_time / 1000000.0\n    else:\n        priority += 1e-10\n    \n    # Ensure positive priority\n    if priority <= 0:\n        priority = 1e-10\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 1293.4833333333333,
+          "ins_2": 1111.6,
+          "ins_3": 1286.75,
+          "ins_4": 1608.1833333333334,
+          "ins_5": 1111.5,
+          "ins_6": 1737.3,
+          "ins_7": 692.0166666666667,
+          "ins_8": 1804.8,
+          "ins_9": 3581.2166666666667,
+          "ins_10": 1340.8833333333334,
+          "ins_11": 1155.7333333333333,
+          "ins_12": 1348.4666666666667,
+          "ins_13": 2159.633333333333,
+          "ins_14": 1192.1833333333334,
+          "ins_15": 2585.516666666667,
+          "ins_16": 1421.6166666666666,
+          "ins_17": 2148.0833333333335,
+          "ins_18": 1181.5166666666667,
+          "ins_19": 1632.1166666666666,
+          "ins_20": 2140.45
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1659.5283333333332,
+        "all_scores": [
+          -1626.6524999999997,
+          -1657.2675,
+          -1677.0966666666668,
+          -1677.0966666666668
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1558.1191666666666,
+        "algorithm": "The algorithm uses a criticality ratio based on slack time to due date divided by remaining processing steps, scaled by workload urgency from utilization and machine queue size, to prioritize jobs that are most at risk of being late.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    current_time = max(available_time, start_time)\n    \n    # Slack time: time left until due date\n    slack = delivery_time - current_time\n    \n    # Remaining operations (at least 1 to avoid division by zero)\n    remaining_ops = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Average processing time per remaining operation, using processing_tm as total work indicator\n    if remaining_ops > 0 and processing_tm > 0:\n        avg_processing_per_op = processing_tm / remaining_ops\n    else:\n        avg_processing_per_op = processing_time if processing_time > 0 else 1\n    \n    # Criticality ratio: if slack is very negative, job is already late; prioritize late jobs heavily\n    if slack <= 0:\n        # High urgency for late jobs, use absolute lateness scaled by workload\n        base_priority = 0.0  # Minimum possible (highest priority)\n        # Add a small penalty to differentiate late jobs: larger lateness = lower value (higher priority)\n        lateness = -slack\n        penalty = lateness * (1.0 + utilization)\n        priority = base_priority + penalty / 1000000.0\n    else:\n        # Compute workload factor: utilization and machine neighors indicate congestion\n        workload_factor = 1.0 + utilization + (num_neighboring_machine / 10.0)\n        # Criticality: smaller slack relative to remaining work means higher priority\n        criticality = (avg_processing_per_op * workload_factor) / (slack + 1e-10)\n        # Priority is criticality, with a small tie-breaking using due date to favor earlier due dates\n        priority = criticality + delivery_time / 1000000.0\n    \n    # Ensure priority is positive (smaller = higher priority)\n    if priority <= 0:\n        priority = 1e-10\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 866.9833333333333,
+          "ins_2": 456.53333333333336,
+          "ins_3": 1357.45,
+          "ins_4": 1559.0166666666667,
+          "ins_5": 767.2833333333333,
+          "ins_6": 1163.0166666666667,
+          "ins_7": 784.4333333333333,
+          "ins_8": 1438.5333333333333,
+          "ins_9": 2819.0,
+          "ins_10": 2008.6,
+          "ins_11": 1194.0833333333333,
+          "ins_12": 1388.6166666666666,
+          "ins_13": 2647.0666666666666,
+          "ins_14": 1182.3333333333333,
+          "ins_15": 3064.5333333333333,
+          "ins_16": 1482.6666666666667,
+          "ins_17": 2719.766666666667,
+          "ins_18": 1126.2,
+          "ins_19": 997.3166666666667,
+          "ins_20": 2138.95
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1608.4264583333334,
+        "all_scores": [
+          -1558.1191666666666,
+          -1622.2816666666665,
+          -1626.6524999999997,
+          -1626.6524999999997
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1514.4225,
+        "algorithm": "The new algorithm combines the slack-based criticality ratio from algorithm 1 with the exponential tardiness penalty and load balancing from algorithm 2, using a weighted sum where the priority is computed as a normalized criticality for on-time jobs and a scaled exponential penalty for late jobs, with tie-breaking by due date and machine load.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    current_time = max(available_time, start_time)\n    slack = delivery_time - current_time\n    \n    # Calculate remaining operations, at least 1 to avoid division by zero\n    remaining_ops = num_neighboring_operation if num_neighboring_operation > 0 else 1\n    \n    # Calculate average processing per operation\n    if remaining_ops > 0 and processing_tm > 0:\n        avg_processing_per_op = processing_tm / remaining_ops\n    else:\n        avg_processing_per_op = processing_time if processing_time > 0 else 1\n    \n    # Workload factor from algorithm 1\n    workload_factor = 1.0 + utilization + (num_neighboring_machine / 10.0)\n    \n    if slack <= 0:\n        # Late job: use exponential penalty inspired by algorithm 2, scaled by tardiness\n        tardiness = current_time - delivery_time\n        penalty = 1.0 + tardiness / (processing_time + 1e-10)\n        priority = -penalty * workload_factor  # negative gives highest priority for very late\n    else:\n        # On-time job: criticality ratio from algorithm 1\n        criticality = (avg_processing_per_op * workload_factor) / (slack + 1e-10)\n        priority = criticality + delivery_time / 1000000.0\n    \n    # Add small processing time bias (shorter = higher priority) from algorithm 2\n    if processing_time > 0:\n        priority += processing_time / 1000000.0\n    \n    # Add machine load bias (higher load = slightly lower priority) from algorithm 2\n    if num_neighboring_machine > 0:\n        load_factor = 1.0 / (num_neighboring_machine + 1e-10)\n        priority += load_factor / 100000.0\n    \n    # Add tie-breaker from algorithm 2\n    if num_neighboring_operation > 0:\n        priority += num_neighboring_operation / 10000000.0\n    \n    # Ensure positive priority\n    if priority <= 0:\n        priority = 1e-10\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 901.9833333333333,
+          "ins_2": 456.53333333333336,
+          "ins_3": 1355.55,
+          "ins_4": 1559.0166666666667,
+          "ins_5": 767.2833333333333,
+          "ins_6": 1163.0166666666667,
+          "ins_7": 874.3666666666667,
+          "ins_8": 1268.9666666666667,
+          "ins_9": 2485.5,
+          "ins_10": 2008.6,
+          "ins_11": 1194.0833333333333,
+          "ins_12": 1832.45,
+          "ins_13": 2722.9,
+          "ins_14": 1182.3333333333333,
+          "ins_15": 3041.05,
+          "ins_16": 1482.6666666666667,
+          "ins_17": 2719.766666666667,
+          "ins_18": 1126.2,
+          "ins_19": 997.3166666666667,
+          "ins_20": 1148.8666666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1528.8979166666666,
+        "all_scores": [
+          -1514.4225,
+          -1514.4225,
+          -1543.3733333333332,
+          -1543.3733333333332
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1284.3949999999998,
+        "algorithm": "The new algorithm uses a weighted slack-to-processing ratio for on-time jobs and a quadratic tardiness penalty for late jobs, with normalized due date and load balancing tie-breakers.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    current_time = max(available_time, start_time)\n    slack = delivery_time - current_time\n    \n    # Safe calculation of remaining operations\n    remaining_ops = max(num_neighboring_operation, 1)\n    \n    # Safe average processing per operation\n    if processing_tm > 0 and remaining_ops > 0:\n        avg_processing = processing_tm / remaining_ops\n    else:\n        avg_processing = max(processing_time, 1)\n    \n    # Load factor with safety\n    load_factor = 1.0 + utilization + (num_neighboring_machine / 10.0)\n    \n    if slack <= 0:\n        # Late job: quadratic tardiness penalty, scaled by load\n        tardiness = max(current_time - delivery_time, 0)\n        penalty = (1.0 + tardiness / max(processing_time, 1e-10)) ** 2\n        priority = -penalty * load_factor\n    else:\n        # On-time job: criticality ratio with due date bias\n        criticality = (avg_processing * load_factor) / max(slack, 1e-10)\n        priority = criticality + (delivery_time / 100000.0)\n    \n    # Add small processing time bias (shorter = higher priority)\n    priority += max(processing_time, 0) / 100000.0\n    \n    # Add load balancing bias (higher machine load = slightly lower priority)\n    if num_neighboring_machine > 0:\n        priority += (1.0 / (num_neighboring_machine + 1e-10)) / 1000.0\n    \n    # Add tie-breaker for remaining operations (fewer ops = higher priority)\n    if num_neighboring_operation > 0:\n        priority += num_neighboring_operation / 1000000.0\n    else:\n        priority += 0.0001  # minimal positive bias\n    \n    # Ensure positive priority\n    result = max(priority, 1e-10)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 720.05,
+          "ins_2": 456.31666666666666,
+          "ins_3": 1122.55,
+          "ins_4": 1297.8,
+          "ins_5": 463.73333333333335,
+          "ins_6": 1114.9833333333333,
+          "ins_7": 1134.0833333333333,
+          "ins_8": 1319.7666666666667,
+          "ins_9": 2417.133333333333,
+          "ins_10": 1752.85,
+          "ins_11": 666.8833333333333,
+          "ins_12": 1224.5,
+          "ins_13": 2423.766666666667,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2318.516666666667,
+          "ins_16": 913.7833333333333,
+          "ins_17": 1962.4833333333333,
+          "ins_18": 705.35,
+          "ins_19": 972.1166666666667,
+          "ins_20": 1617.8166666666666
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1456.9156249999999,
+        "all_scores": [
+          -1284.3949999999998,
+          -1514.4225,
+          -1514.4225,
+          -1514.4225
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1266.4125,
+        "algorithm": "The new algorithm combines the exponential slack-based criticality for on-time jobs with a hybrid quadratic-exponential tardiness penalty for late jobs, normalizes features using adaptive load and operation counts, and applies due date and processing time tie-breakers.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    current_time = max(available_time, start_time)\n    slack = delivery_time - current_time\n    \n    # Safe remaining operations count\n    remaining_ops = max(num_neighboring_operation, 1)\n    \n    # Safe average processing time per operation\n    if remaining_ops > 0 and processing_tm > 0:\n        avg_processing_per_op = processing_tm / remaining_ops\n    else:\n        avg_processing_per_op = max(processing_time, 1) if processing_time > 0 else 1\n    \n    # Workload factor combining utilization and machine count\n    workload_factor = 1.0 + utilization + (num_neighboring_machine / 10.0)\n    \n    if slack <= 0:\n        # Late job: quadratic-exponential penalty\n        tardiness = current_time - delivery_time\n        base_penalty = (1.0 + tardiness / max(processing_time, 1e-10)) ** 2\n        exponential_penalty = 1.0 + (tardiness / max(processing_time, 1e-10))\n        priority = -(base_penalty * exponential_penalty * workload_factor)\n    else:\n        # On-time job: exponential criticality ratio with normalization\n        criticality = (avg_processing_per_op * workload_factor) / max(slack, 1e-10)\n        normalized_criticality = 1.0 - (1.0 / (criticality + 1.0))\n        priority = normalized_criticality + (delivery_time / 100000.0)\n    \n    # Tie-breaker: shorter processing time higher priority (small positive bias)\n    if processing_time > 0:\n        priority += 1.0 / (processing_time * 100000.0)\n    \n    # Tie-breaker: lower machine load slightly higher priority\n    if num_neighboring_machine > 0:\n        priority += (1.0 / (num_neighboring_machine + 1e-10)) / 10000.0\n    \n    # Tie-breaker: fewer remaining operations slightly higher priority\n    priority += num_neighboring_operation / 10000000.0\n    \n    # Ensure positive priority for convention (smaller value = higher priority)\n    # For late jobs, priority is negative, which is already smaller and thus higher priority\n    # For on-time jobs, ensure positivity\n    if slack > 0 and priority < 1e-10:\n        priority = 1e-10\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 599.75,
+          "ins_2": 486.31666666666666,
+          "ins_3": 1122.55,
+          "ins_4": 1249.1666666666667,
+          "ins_5": 463.73333333333335,
+          "ins_6": 1114.9833333333333,
+          "ins_7": 1115.2166666666667,
+          "ins_8": 1438.5333333333333,
+          "ins_9": 2388.1666666666665,
+          "ins_10": 1984.6833333333334,
+          "ins_11": 623.15,
+          "ins_12": 1224.5,
+          "ins_13": 2411.9,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2198.4666666666667,
+          "ins_16": 913.7833333333333,
+          "ins_17": 1725.1666666666667,
+          "ins_18": 591.35,
+          "ins_19": 972.1166666666667,
+          "ins_20": 1621.3
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1279.8993749999997,
+        "all_scores": [
+          -1266.4125,
+          -1284.3949999999998,
+          -1284.3949999999998,
+          -1284.3949999999998
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1197.7216666666668,
+        "algorithm": "The new algorithm uses a linear slack-based criticality for on-time jobs combined with a cubic tardiness penalty for late jobs, with features normalized by exponential machine load and logarithmic operation count, and applies due date and processing time tie-breakers.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    current_time = max(available_time, start_time)\n    slack = delivery_time - current_time\n    \n    # Safe remaining operations count\n    remaining_ops = max(num_neighboring_operation, 1)\n    \n    # Safe average processing time per operation\n    if remaining_ops > 0 and processing_tm > 0:\n        avg_processing_per_op = processing_tm / remaining_ops\n    else:\n        avg_processing_per_op = max(processing_time, 1) if processing_time > 0 else 1\n    \n    # Workload factor using exponential machine load\n    workload_factor = 1.0 + (1.0 - (1.0 / (1.0 + utilization + (num_neighboring_machine / 10.0))))\n    \n    if slack <= 0:\n        # Late job: cubic tardiness penalty\n        tardiness = current_time - delivery_time\n        base_penalty = (1.0 + tardiness / max(processing_time, 1e-10)) ** 3\n        priority = -(base_penalty * workload_factor)\n    else:\n        # On-time job: linear criticality with logarithmic operation count normalization\n        criticality = (avg_processing_per_op * (1.0 + (1.0 / (1.0 + utilization + (num_neighboring_machine / 10.0))))) / max(slack, 1e-10)\n        log_ops = 1.0 + (1.0 / (1.0 + remaining_ops))\n        normalized_criticality = 1.0 - (1.0 / (criticality + 1.0)) * log_ops\n        priority = normalized_criticality + (delivery_time / 100000.0)\n    \n    # Tie-breaker: shorter processing time higher priority\n    if processing_time > 0:\n        priority += 1.0 / (processing_time * 100000.0)\n    \n    # Tie-breaker: lower machine load slightly higher priority\n    if num_neighboring_machine > 0:\n        priority += (1.0 / (num_neighboring_machine + 1e-10)) / 10000.0\n    \n    # Tie-breaker: fewer remaining operations slightly higher priority\n    priority += num_neighboring_operation / 10000000.0\n    \n    # Ensure positive priority for on-time jobs\n    if slack > 0 and priority < 1e-10:\n        priority = 1e-10\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 591.3,
+          "ins_2": 441.06666666666666,
+          "ins_3": 1009.5666666666667,
+          "ins_4": 1217.1833333333334,
+          "ins_5": 386.1,
+          "ins_6": 1076.1833333333334,
+          "ins_7": 600.0166666666667,
+          "ins_8": 1298.2833333333333,
+          "ins_9": 2498.7166666666667,
+          "ins_10": 2002.6666666666667,
+          "ins_11": 815.6166666666667,
+          "ins_12": 788.0833333333334,
+          "ins_13": 2488.233333333333,
+          "ins_14": 1081.95,
+          "ins_15": 2397.65,
+          "ins_16": 678.25,
+          "ins_17": 1663.2833333333333,
+          "ins_18": 711.0333333333333,
+          "ins_19": 780.45,
+          "ins_20": 1428.8
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1249.2397916666666,
+        "all_scores": [
+          -1197.7216666666668,
+          -1266.4125,
+          -1266.4125,
+          -1266.4125
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1188.6749999999997,
+        "algorithm": "The new algorithm uses an exponential slack-based criticality for on-time jobs combined with a quadratic tardiness penalty for late jobs, with features normalized by sigmoid machine load and square root operation count, and applies due date and processing time tie-breakers.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    current_time = max(available_time, start_time)\n    slack = delivery_time - current_time\n    \n    # Safe remaining operations count\n    remaining_ops = max(num_neighboring_operation, 1)\n    \n    # Safe average processing time per operation\n    if remaining_ops > 0 and processing_tm > 0:\n        avg_processing_per_op = processing_tm / remaining_ops\n    else:\n        avg_processing_per_op = max(processing_time, 1) if processing_time > 0 else 1\n    \n    # Workload factor using sigmoid machine load\n    load_factor = 1.0 / (1.0 + (2.71828 ** (-utilization - (num_neighboring_machine / 5.0))))\n    \n    if slack <= 0:\n        # Late job: quadratic tardiness penalty\n        tardiness = current_time - delivery_time\n        base_penalty = (1.0 + tardiness / max(processing_time, 1e-10)) ** 2\n        priority = -(base_penalty * (1.0 + load_factor))\n    else:\n        # On-time job: exponential criticality with square root operation count normalization\n        criticality = (avg_processing_per_op * (1.0 + load_factor)) / max(slack, 1e-10)\n        sqrt_ops = 1.0 + (1.0 / (1.0 + (remaining_ops ** 0.5)))\n        normalized_criticality = 1.0 - (1.0 / (criticality + 1.0)) * sqrt_ops\n        priority = normalized_criticality + (delivery_time / 50000.0)\n    \n    # Tie-breaker: shorter processing time higher priority\n    if processing_time > 0:\n        priority += 1.0 / (processing_time * 100000.0)\n    \n    # Tie-breaker: lower machine load slightly higher priority\n    if num_neighboring_machine > 0:\n        priority += (1.0 / (num_neighboring_machine + 1e-10)) / 5000.0\n    \n    # Tie-breaker: fewer remaining operations slightly higher priority\n    priority += num_neighboring_operation / 5000000.0\n    \n    # Ensure positive priority for on-time jobs\n    if slack > 0 and priority < 1e-10:\n        priority = 1e-10\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 506.73333333333335,
+          "ins_2": 470.6166666666667,
+          "ins_3": 994.4833333333333,
+          "ins_4": 1249.1666666666667,
+          "ins_5": 492.31666666666666,
+          "ins_6": 1052.5333333333333,
+          "ins_7": 913.45,
+          "ins_8": 1440.9,
+          "ins_9": 2360.5,
+          "ins_10": 1888.65,
+          "ins_11": 623.15,
+          "ins_12": 823.65,
+          "ins_13": 2447.9,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2295.9666666666667,
+          "ins_16": 549.0833333333334,
+          "ins_17": 1655.5333333333333,
+          "ins_18": 569.8666666666667,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1505.6
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1195.46,
+        "all_scores": [
+          -1188.6749999999997,
+          -1197.7216666666668,
+          -1197.7216666666668,
+          -1197.7216666666668
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1158.0275,
+        "algorithm": "The new algorithm combines exponential slack-based criticality for on-time jobs with a quadratic tardiness penalty for late jobs, normalizes features using a weighted sigmoid machine load and logarithmic operation count, and applies due date and processing time tie-breakers.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    current_time = max(available_time, start_time)\n    slack = delivery_time - current_time\n    \n    # Safe remaining operations count\n    remaining_ops = max(num_neighboring_operation, 1)\n    \n    # Safe average processing time per operation\n    if remaining_ops > 0 and processing_tm > 0:\n        avg_processing_per_op = processing_tm / remaining_ops\n    else:\n        avg_processing_per_op = max(processing_time, 1) if processing_time > 0 else 1\n    \n    # Workload factor using sigmoid machine load (from No.1)\n    load_factor = 1.0 / (1.0 + (2.71828 ** (-utilization - (num_neighboring_machine / 5.0))))\n    # Additional logarithmic normalization for remaining ops (from No.2)\n    log_ops = 1.0 + (1.0 / (1.0 + remaining_ops))\n    \n    if slack <= 0:\n        # Late job: quadratic tardiness penalty (from No.1)\n        tardiness = current_time - delivery_time\n        base_penalty = (1.0 + tardiness / max(processing_time, 1e-10)) ** 2\n        priority = -(base_penalty * (1.0 + load_factor))\n    else:\n        # On-time job: exponential criticality with logarithmic normalization\n        criticality = (avg_processing_per_op * (1.0 + load_factor)) / max(slack, 1e-10)\n        normalized_criticality = 1.0 - (1.0 / (criticality + 1.0)) * log_ops\n        priority = normalized_criticality + (delivery_time / 50000.0)\n    \n    # Tie-breaker: shorter processing time higher priority\n    if processing_time > 0:\n        priority += 1.0 / (processing_time * 100000.0)\n    \n    # Tie-breaker: lower machine load slightly higher priority\n    if num_neighboring_machine > 0:\n        priority += (1.0 / (num_neighboring_machine + 1e-10)) / 5000.0\n    \n    # Tie-breaker: fewer remaining operations slightly higher priority\n    priority += num_neighboring_operation / 5000000.0\n    \n    # Ensure positive priority for on-time jobs\n    if slack > 0 and priority < 1e-10:\n        priority = 1e-10\n    \n    result = priority\n    return priority\n\n",
+        "instances": {
+          "ins_1": 506.73333333333335,
+          "ins_2": 470.6166666666667,
+          "ins_3": 975.2333333333333,
+          "ins_4": 1249.1666666666667,
+          "ins_5": 355.55,
+          "ins_6": 1052.5333333333333,
+          "ins_7": 501.56666666666666,
+          "ins_8": 1310.5,
+          "ins_9": 2360.5,
+          "ins_10": 1888.65,
+          "ins_11": 623.15,
+          "ins_12": 873.45,
+          "ins_13": 2447.9,
+          "ins_14": 1083.4166666666667,
+          "ins_15": 2295.9666666666667,
+          "ins_16": 549.0833333333334,
+          "ins_17": 1655.5333333333333,
+          "ins_18": 569.8666666666667,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1541.15
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1173.3512499999997,
+        "all_scores": [
+          -1158.0275,
+          -1158.0275,
+          -1188.6749999999997,
+          -1188.6749999999997
+        ]
+      }
+    }
+  ],
+  "error_count": 8,
+  "total_tokens": 191963,
+  "method": "EDR_S_fixed",
+  "run_id": 3,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 131,
+  "time_elapsed": 1522.3549485206604,
+  "llm_a_calls": 131,
+  "llm_a_input_tokens": 131439,
+  "llm_a_output_tokens": 60043,
+  "llm_s_calls": 1,
+  "llm_s_input_tokens": 351,
+  "llm_s_output_tokens": 130
+}

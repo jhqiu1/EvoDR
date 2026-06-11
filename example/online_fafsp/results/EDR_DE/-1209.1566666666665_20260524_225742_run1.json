@@ -1,0 +1,98 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1209.1566666666665,
+        "algorithm": "The new algorithm extends EDD with a slack-based measure, machine load balancing, and a processing time penalty to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    slack = delivery_time - start_time - processing_time\n    \n    # Machine load balancing: penalize highly utilized machines\n    # utilization is expected to be between 0 and 1; add small epsilon to avoid division by zero\n    load_penalty = utilization if utilization > 0 else 0.0\n    \n    # Processing time penalty: favor faster machine-task pairings\n    # processing_tm represents processing time on specific machine; longer = worse\n    time_penalty = processing_tm if processing_tm > 0 else 0.0\n    \n    # Combine terms: lower priority value = higher urgency\n    # Use slack as primary (negative slack indicates lateness risk), then add load and time penalties\n    # Weight factors (1, 0.5, 0.5) are heuristic and can be tuned\n    priority = slack + 0.5 * load_penalty + 0.5 * time_penalty\n    \n    # Ensure priority is defined and returned\n    return priority\n\n",
+        "instances": {
+          "ins_1": 667.7833333333333,
+          "ins_2": 456.53333333333336,
+          "ins_3": 934.7833333333333,
+          "ins_4": 1234.7,
+          "ins_5": 338.56666666666666,
+          "ins_6": 1177.0,
+          "ins_7": 643.9166666666666,
+          "ins_8": 1148.15,
+          "ins_9": 2461.05,
+          "ins_10": 1159.6333333333334,
+          "ins_11": 621.4666666666667,
+          "ins_12": 859.0333333333333,
+          "ins_13": 2105.9166666666665,
+          "ins_14": 1240.95,
+          "ins_15": 3434.6,
+          "ins_16": 1102.2666666666667,
+          "ins_17": 2192.05,
+          "ins_18": 553.6166666666667,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1001.1333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1541.8641666666667,
+        "all_scores": [
+          -1209.1566666666665,
+          -1425.2050000000002,
+          -1710.4533333333334,
+          -1822.6416666666669
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1209.1566666666665,
+        "algorithm": "The new algorithm extends EDD with a slack-based measure, machine load balancing, and a processing time penalty to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    slack = delivery_time - start_time - processing_time\n    \n    # Machine load balancing: penalize highly utilized machines\n    # utilization is expected to be between 0 and 1; add small epsilon to avoid division by zero\n    load_penalty = utilization if utilization > 0 else 0.0\n    \n    # Processing time penalty: favor faster machine-task pairings\n    # processing_tm represents processing time on specific machine; longer = worse\n    time_penalty = processing_tm if processing_tm > 0 else 0.0\n    \n    # Combine terms: lower priority value = higher urgency\n    # Use slack as primary (negative slack indicates lateness risk), then add load and time penalties\n    # Weight factors (1, 0.5, 0.5) are heuristic and can be tuned\n    priority = slack + 0.5 * load_penalty + 0.5 * time_penalty\n    \n    # Ensure priority is defined and returned\n    return priority\n\n",
+        "instances": {
+          "ins_1": 667.7833333333333,
+          "ins_2": 456.53333333333336,
+          "ins_3": 934.7833333333333,
+          "ins_4": 1234.7,
+          "ins_5": 338.56666666666666,
+          "ins_6": 1177.0,
+          "ins_7": 643.9166666666666,
+          "ins_8": 1148.15,
+          "ins_9": 2461.05,
+          "ins_10": 1159.6333333333334,
+          "ins_11": 621.4666666666667,
+          "ins_12": 859.0333333333333,
+          "ins_13": 2105.9166666666665,
+          "ins_14": 1240.95,
+          "ins_15": 3434.6,
+          "ins_16": 1102.2666666666667,
+          "ins_17": 2192.05,
+          "ins_18": 553.6166666666667,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1001.1333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1365.12625,
+        "all_scores": [
+          -1209.1566666666665,
+          -1393.4766666666667,
+          -1425.2050000000002,
+          -1432.6666666666667
+        ]
+      }
+    }
+  ],
+  "error_count": 0,
+  "total_tokens": 38641,
+  "method": "EDR_DE",
+  "run_id": 1,
+  "params": {
+    "pop_size": 4,
+    "iterations": 2
+  },
+  "api_calls": 21,
+  "time_elapsed": 318.3019449710846,
+  "llm_a_calls": 21,
+  "llm_a_input_tokens": 11448,
+  "llm_a_output_tokens": 6535,
+  "llm_s_calls": 21,
+  "llm_s_input_tokens": 17118,
+  "llm_s_output_tokens": 3540
+}

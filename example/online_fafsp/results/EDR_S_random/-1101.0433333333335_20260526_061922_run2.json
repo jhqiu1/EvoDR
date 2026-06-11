@@ -1,0 +1,410 @@
+{
+  "generations": [
+    {
+      "gen": 1,
+      "best_individual": {
+        "score": -1703.735,
+        "algorithm": "The new algorithm combines EDD's due-date focus with a dynamic slack-based urgency component, normalizing by remaining processing time and machine utilization to produce a smaller-value-higher-priority composite metric.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    base_priority = delivery_time\n    \n    # Current time (use start_time as decision time)\n    current_time = start_time\n    \n    # Slack: time until due date minus remaining processing time\n    slack = delivery_time - current_time - processing_tm\n    \n    # Dynamic urgency: higher when slack is negative (tardy)\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        # If no processing time, treat slack directly (negative is urgent)\n        slack_ratio = slack if slack < 0 else 0\n    \n    # Urgency component: emphasize negative slack\n    urgency = -min(0, slack_ratio)  # Positive value for urgency\n    \n    # Machine loading factor: avoid busy machines\n    if num_neighboring_machine > 0:\n        machine_factor = utilization / num_neighboring_machine\n    else:\n        machine_factor = utilization  # If no neighbors, use raw utilization\n    \n    # Combine: base (EDD) plus urgency, slightly scaled by machine factor\n    priority = base_priority + urgency * (1 + machine_factor)\n    \n    # Ensure non-negative priority\n    result = max(0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1340.4,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1718.94375,
+        "all_scores": [
+          -1703.735,
+          -1710.4533333333334,
+          -1716.2408333333333,
+          -1745.3458333333333
+        ]
+      }
+    },
+    {
+      "gen": 2,
+      "best_individual": {
+        "score": -1703.735,
+        "algorithm": "The new algorithm combines EDD's due-date focus with a dynamic slack-based urgency component, normalizing by remaining processing time and machine utilization to produce a smaller-value-higher-priority composite metric.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    base_priority = delivery_time\n    \n    # Current time (use start_time as decision time)\n    current_time = start_time\n    \n    # Slack: time until due date minus remaining processing time\n    slack = delivery_time - current_time - processing_tm\n    \n    # Dynamic urgency: higher when slack is negative (tardy)\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        # If no processing time, treat slack directly (negative is urgent)\n        slack_ratio = slack if slack < 0 else 0\n    \n    # Urgency component: emphasize negative slack\n    urgency = -min(0, slack_ratio)  # Positive value for urgency\n    \n    # Machine loading factor: avoid busy machines\n    if num_neighboring_machine > 0:\n        machine_factor = utilization / num_neighboring_machine\n    else:\n        machine_factor = utilization  # If no neighbors, use raw utilization\n    \n    # Combine: base (EDD) plus urgency, slightly scaled by machine factor\n    priority = base_priority + urgency * (1 + machine_factor)\n    \n    # Ensure non-negative priority\n    result = max(0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 908.2,
+          "ins_2": 1334.7666666666667,
+          "ins_3": 1364.6333333333334,
+          "ins_4": 1610.75,
+          "ins_5": 1411.5166666666667,
+          "ins_6": 1587.4833333333333,
+          "ins_7": 910.1833333333333,
+          "ins_8": 1762.7333333333333,
+          "ins_9": 3238.9166666666665,
+          "ins_10": 1948.8166666666666,
+          "ins_11": 1475.9833333333333,
+          "ins_12": 1011.65,
+          "ins_13": 2595.5666666666666,
+          "ins_14": 1340.4,
+          "ins_15": 3615.15,
+          "ins_16": 1013.3166666666667,
+          "ins_17": 1828.25,
+          "ins_18": 1151.5166666666667,
+          "ins_19": 1671.5,
+          "ins_20": 2293.366666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1703.735,
+        "all_scores": [
+          -1703.735,
+          -1703.735,
+          -1703.735,
+          -1703.735
+        ]
+      }
+    },
+    {
+      "gen": 3,
+      "best_individual": {
+        "score": -1281.2783333333334,
+        "algorithm": "The algorithm computes priority as the product of delivery time and a normalized machine congestion factor, adjusted by a hyperbolic tangent of the slack ratio to capture urgency, ensuring smaller values for higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    \n    # Current time\n    current_time = start_time\n    \n    # Slack: time until due date minus remaining processing time\n    slack = delivery_time - current_time - processing_tm\n    \n    # Normalized slack ratio (handle zero processing time)\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        slack_ratio = slack if slack < 0 else 0\n    \n    # Urgency via hyperbolic tangent: maps slack_ratio to (-1, 1), negative slack gives positive urgency\n    urgency = (1.0 - math.tanh(slack_ratio)) / 2.0  # Range (0, 1], higher for negative slack\n    \n    # Machine congestion factor: based on utilization and number of neighboring machines\n    if num_neighboring_machine > 0:\n        congestion_factor = utilization / num_neighboring_machine\n    else:\n        congestion_factor = utilization\n    \n    # Base priority from delivery time, scaled by congestion and urgency\n    # Use exponential decay of congestion to avoid overly large values\n    congestion_scale = math.exp(-congestion_factor)  # Range (0, 1], lower congestion gives higher scale\n    \n    # Combine: priority = delivery_time * (1 + urgency) * congestion_scale\n    # Smaller delivery_time, higher urgency, or lower congestion yields smaller priority\n    priority = delivery_time * (1.0 + urgency) * congestion_scale\n    \n    # Ensure non-negative\n    result = max(0.0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 388.71666666666664,
+          "ins_2": 456.6166666666667,
+          "ins_3": 876.7166666666667,
+          "ins_4": 1264.0833333333333,
+          "ins_5": 321.25,
+          "ins_6": 1361.0166666666667,
+          "ins_7": 533.7666666666667,
+          "ins_8": 1275.4166666666667,
+          "ins_9": 2724.6666666666665,
+          "ins_10": 1688.7166666666667,
+          "ins_11": 1321.6666666666667,
+          "ins_12": 989.4166666666666,
+          "ins_13": 2614.766666666667,
+          "ins_14": 1159.3833333333334,
+          "ins_15": 2530.05,
+          "ins_16": 1304.7666666666667,
+          "ins_17": 1769.8333333333333,
+          "ins_18": 610.05,
+          "ins_19": 954.7,
+          "ins_20": 1479.9666666666667
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1598.1208333333332,
+        "all_scores": [
+          -1281.2783333333334,
+          -1703.735,
+          -1703.735,
+          -1703.735
+        ]
+      }
+    },
+    {
+      "gen": 4,
+      "best_individual": {
+        "score": -1180.1275,
+        "algorithm": "The improved algorithm computes priority as the product of delivery time, a hyperbolic-tangent-based urgency from slack ratio, and an exponential decay of machine utilization weighted by inverse of neighboring machine count, with an additional utilization penalty to balance workload, ensuring smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    \n    # Current time\n    current_time = start_time\n    \n    # Slack: time until due date minus remaining processing time\n    slack = delivery_time - current_time - processing_tm\n    \n    # Normalized slack ratio (handle zero processing time)\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        slack_ratio = slack if slack < 0 else 0\n    \n    # Urgency via hyperbolic tangent\n    urgency = (1.0 - math.tanh(slack_ratio)) / 2.0  # Range (0, 1]\n    \n    # Machine congestion factor: based on utilization and number of neighboring machines\n    if num_neighboring_machine > 0:\n        congestion_factor = utilization / num_neighboring_machine\n    else:\n        congestion_factor = utilization\n    \n    # Exponential decay of congestion (lower congestion gives higher scale)\n    congestion_scale = math.exp(-congestion_factor)\n    \n    # Workload balancing: add a penalty for high utilization on the machine\n    # Use utilization directly to increase priority for busy machines (smaller priority for less busy machines)\n    utilization_penalty = 1.0 + utilization  # Range [1.0, 2.0]\n    \n    # Combine: priority = delivery_time * (1 + urgency) * congestion_scale * utilization_penalty\n    priority = delivery_time * (1.0 + urgency) * congestion_scale * utilization_penalty\n    \n    # Ensure non-negative\n    result = max(0.0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 646.05,
+          "ins_2": 449.6333333333333,
+          "ins_3": 1005.5666666666667,
+          "ins_4": 1155.7833333333333,
+          "ins_5": 347.95,
+          "ins_6": 1033.5,
+          "ins_7": 406.81666666666666,
+          "ins_8": 1599.35,
+          "ins_9": 3066.366666666667,
+          "ins_10": 1177.2333333333333,
+          "ins_11": 1022.25,
+          "ins_12": 769.4833333333333,
+          "ins_13": 1533.7833333333333,
+          "ins_14": 1135.9166666666667,
+          "ins_15": 2517.3,
+          "ins_16": 1300.55,
+          "ins_17": 1887.35,
+          "ins_18": 589.2166666666667,
+          "ins_19": 1053.2166666666667,
+          "ins_20": 905.2333333333333
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1221.5425,
+        "all_scores": [
+          -1180.1275,
+          -1212.3641666666667,
+          -1212.4,
+          -1281.2783333333334
+        ]
+      }
+    },
+    {
+      "gen": 5,
+      "best_individual": {
+        "score": -1150.8933333333334,
+        "algorithm": "The new algorithm calculates priority as the sum of delivery time, a linear urgency inversely proportional to the slack ratio with a safeguard for non-positive slack, a machine load factor using the square root of utilization divided by neighbor count, and a small constant to avoid zero priority, where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    \n    # Current time\n    current_time = start_time\n    \n    # Slack calculation\n    slack = delivery_time - current_time - processing_tm\n    \n    # Linear urgency: inversely proportional to slack ratio, clamped for non-positive slack\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        slack_ratio = slack if slack != 0 else 1e-9  # Avoid division by zero\n    \n    if slack_ratio > 0:\n        urgency = 1.0 / (1.0 + slack_ratio)  # Range (0, 1] for positive slack\n    else:\n        urgency = 2.0 - slack_ratio  # Greater urgency (>=2) for non-positive slack\n    \n    # Machine load factor: square root of utilization divided by number of neighboring machines\n    if num_neighboring_machine > 0:\n        load_factor = math.sqrt(utilization) / num_neighboring_machine\n    else:\n        load_factor = math.sqrt(utilization) if utilization > 0 else 0.0\n    \n    # Small constant to avoid zero priority\n    epsilon = 1e-6\n    \n    # Priority: sum of delivery time, urgency, load_factor, and epsilon\n    priority = delivery_time + urgency + load_factor + epsilon\n    \n    # Ensure non-negative\n    result = max(0.0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 624.3166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1006.7166666666667,
+          "ins_4": 1231.85,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 526.6166666666667,
+          "ins_8": 1418.2166666666667,
+          "ins_9": 2394.5666666666666,
+          "ins_10": 1030.1666666666667,
+          "ins_11": 623.15,
+          "ins_12": 727.05,
+          "ins_13": 2285.883333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2633.4333333333334,
+          "ins_16": 1165.6,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1183.65
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1185.0320833333335,
+        "all_scores": [
+          -1150.8933333333334,
+          -1180.1275,
+          -1197.4808333333335,
+          -1211.6266666666666
+        ]
+      }
+    },
+    {
+      "gen": 6,
+      "best_individual": {
+        "score": -1150.8933333333334,
+        "algorithm": "The new algorithm calculates priority as the sum of delivery time, a linear urgency inversely proportional to the slack ratio with a safeguard for non-positive slack, a machine load factor using the square root of utilization divided by neighbor count, and a small constant to avoid zero priority, where smaller values indicate higher priority.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    \n    # Current time\n    current_time = start_time\n    \n    # Slack calculation\n    slack = delivery_time - current_time - processing_tm\n    \n    # Linear urgency: inversely proportional to slack ratio, clamped for non-positive slack\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        slack_ratio = slack if slack != 0 else 1e-9  # Avoid division by zero\n    \n    if slack_ratio > 0:\n        urgency = 1.0 / (1.0 + slack_ratio)  # Range (0, 1] for positive slack\n    else:\n        urgency = 2.0 - slack_ratio  # Greater urgency (>=2) for non-positive slack\n    \n    # Machine load factor: square root of utilization divided by number of neighboring machines\n    if num_neighboring_machine > 0:\n        load_factor = math.sqrt(utilization) / num_neighboring_machine\n    else:\n        load_factor = math.sqrt(utilization) if utilization > 0 else 0.0\n    \n    # Small constant to avoid zero priority\n    epsilon = 1e-6\n    \n    # Priority: sum of delivery time, urgency, load_factor, and epsilon\n    priority = delivery_time + urgency + load_factor + epsilon\n    \n    # Ensure non-negative\n    result = max(0.0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 624.3166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1006.7166666666667,
+          "ins_4": 1231.85,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 526.6166666666667,
+          "ins_8": 1418.2166666666667,
+          "ins_9": 2394.5666666666666,
+          "ins_10": 1030.1666666666667,
+          "ins_11": 623.15,
+          "ins_12": 727.05,
+          "ins_13": 2285.883333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2633.4333333333334,
+          "ins_16": 1165.6,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1183.65
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1162.970625,
+        "all_scores": [
+          -1150.8933333333334,
+          -1150.8933333333334,
+          -1169.9683333333335,
+          -1180.1275
+        ]
+      }
+    },
+    {
+      "gen": 7,
+      "best_individual": {
+        "score": -1131.4275000000002,
+        "algorithm": "The new algorithm computes priority as a weighted sum of delivery time, a slack-based urgency with exponential decay for positive slack and a quadratic penalty for non-positive slack, a machine load factor derived from utilization and neighbor count, a normalized processing time penalty, and a small epsilon, all scaled by dynamically adjusted weights to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    \n    # Current time\n    current_time = start_time\n    \n    # Slack calculation with safety\n    slack = delivery_time - current_time - processing_tm\n    \n    # Linear urgency with exponential decay for positive slack, quadratic for non-positive\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        slack_ratio = slack if slack != 0 else 1e-9\n    \n    if slack_ratio > 0:\n        urgency = 1.0 / (1.0 + math.exp(slack_ratio))  # Exponential decay in (0, 0.5]\n    else:\n        urgency = 2.0 + slack_ratio * slack_ratio  # Quadratic penalty for negative slack\n    \n    # Machine load factor: square root of utilization divided by neighbor count\n    if num_neighboring_machine > 0:\n        load_factor = math.sqrt(utilization) / num_neighboring_machine\n    else:\n        load_factor = math.sqrt(utilization) if utilization > 0 else 0.0\n    \n    # Processing time penalty normalized to [0, 1]\n    processing_penalty = processing_tm / (1.0 + processing_tm)\n    \n    # Small constant to avoid zero priority\n    epsilon = 1e-6\n    \n    # Weighted combination: delivery time weight 0.5, urgency weight 0.3, load 0.1, penalty 0.1\n    priority = (0.5 * delivery_time) + (0.3 * urgency) + (0.1 * load_factor) + (0.1 * processing_penalty) + epsilon\n    \n    # Ensure non-negative\n    result = max(0.0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1006.7166666666667,
+          "ins_4": 1277.4833333333333,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 298.98333333333335,
+          "ins_8": 1310.5,
+          "ins_9": 2394.5666666666666,
+          "ins_10": 1030.1666666666667,
+          "ins_11": 623.15,
+          "ins_12": 727.05,
+          "ins_13": 2285.883333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2633.4333333333334,
+          "ins_16": 1165.6,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1183.65
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1142.50375,
+        "all_scores": [
+          -1131.4275000000002,
+          -1136.8008333333335,
+          -1150.8933333333334,
+          -1150.8933333333334
+        ]
+      }
+    },
+    {
+      "gen": 8,
+      "best_individual": {
+        "score": -1131.4275000000002,
+        "algorithm": "The new algorithm computes priority as a weighted sum of delivery time, a slack-based urgency with exponential decay for positive slack and a quadratic penalty for non-positive slack, a machine load factor derived from utilization and neighbor count, a normalized processing time penalty, and a small epsilon, all scaled by dynamically adjusted weights to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n    \n    # Current time\n    current_time = start_time\n    \n    # Slack calculation with safety\n    slack = delivery_time - current_time - processing_tm\n    \n    # Linear urgency with exponential decay for positive slack, quadratic for non-positive\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        slack_ratio = slack if slack != 0 else 1e-9\n    \n    if slack_ratio > 0:\n        urgency = 1.0 / (1.0 + math.exp(slack_ratio))  # Exponential decay in (0, 0.5]\n    else:\n        urgency = 2.0 + slack_ratio * slack_ratio  # Quadratic penalty for negative slack\n    \n    # Machine load factor: square root of utilization divided by neighbor count\n    if num_neighboring_machine > 0:\n        load_factor = math.sqrt(utilization) / num_neighboring_machine\n    else:\n        load_factor = math.sqrt(utilization) if utilization > 0 else 0.0\n    \n    # Processing time penalty normalized to [0, 1]\n    processing_penalty = processing_tm / (1.0 + processing_tm)\n    \n    # Small constant to avoid zero priority\n    epsilon = 1e-6\n    \n    # Weighted combination: delivery time weight 0.5, urgency weight 0.3, load 0.1, penalty 0.1\n    priority = (0.5 * delivery_time) + (0.3 * urgency) + (0.1 * load_factor) + (0.1 * processing_penalty) + epsilon\n    \n    # Ensure non-negative\n    result = max(0.0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1006.7166666666667,
+          "ins_4": 1277.4833333333333,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 298.98333333333335,
+          "ins_8": 1310.5,
+          "ins_9": 2394.5666666666666,
+          "ins_10": 1030.1666666666667,
+          "ins_11": 623.15,
+          "ins_12": 727.05,
+          "ins_13": 2285.883333333333,
+          "ins_14": 1230.95,
+          "ins_15": 2633.4333333333334,
+          "ins_16": 1165.6,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 557.4833333333333,
+          "ins_19": 849.9833333333333,
+          "ins_20": 1183.65
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1132.9747916666668,
+        "all_scores": [
+          -1131.4275000000002,
+          -1131.4275000000002,
+          -1132.2433333333333,
+          -1136.8008333333335
+        ]
+      }
+    },
+    {
+      "gen": 9,
+      "best_individual": {
+        "score": -1128.8325,
+        "algorithm": "The new algorithm computes priority as a weighted sum of delivery time, a slack-based urgency with exponential decay for positive slack and quadratic penalty for non-positive slack, a machine load factor adjusted by utilization and neighbor count, a normalized processing time penalty, a dynamic arrival urgency based on average arrival interval and available machine capacity, and a small epsilon to minimize tardiness.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n\n    # Current time\n    current_time = start_time\n\n    # Slack calculation with safety\n    slack = delivery_time - current_time - processing_tm\n\n    # Linear urgency with exponential decay for positive slack, quadratic for non-positive\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        slack_ratio = slack if slack != 0 else 1e-9\n\n    if slack_ratio > 0:\n        urgency = 1.0 / (1.0 + math.exp(slack_ratio))  # Exponential decay in (0, 0.5]\n    else:\n        urgency = 2.0 + slack_ratio * slack_ratio  # Quadratic penalty for negative slack\n\n    # Machine load factor: square root of utilization divided by neighbor count\n    if num_neighboring_machine > 0:\n        load_factor = math.sqrt(utilization) / num_neighboring_machine\n    else:\n        load_factor = math.sqrt(utilization) if utilization > 0 else 0.0\n\n    # Processing time penalty normalized to [0, 1]\n    processing_penalty = processing_tm / (1.0 + processing_tm)\n\n    # Dynamic arrival urgency: factor in job arrival patterns and available machine capacity\n    # average arrival interval = processing_tm / load_factor (since shop load factor = 1, assume processing_time/1)\n    # Use available_time as a proxy for machine capacity; higher available_time means lower capacity urgency\n    avg_arrival_interval = processing_tm if processing_tm > 0 else 1.0\n    if available_time > 0:\n        arrival_urgency = 1.0 / (1.0 + avg_arrival_interval * available_time)  # larger when capacity tight\n    else:\n        arrival_urgency = 1.0 / (1.0 + avg_arrival_interval)  # default\n\n    # Small constant to avoid zero priority\n    epsilon = 1e-6\n\n    # Weighted combination: delivery time weight 0.4, urgency 0.25, load 0.1, penalty 0.1, arrival 0.15\n    priority = (0.4 * delivery_time) + (0.25 * urgency) + (0.1 * load_factor) + (0.1 * processing_penalty) + (0.15 * arrival_urgency) + epsilon\n\n    # Ensure non-negative\n    result = max(0.0, priority)\n    return priority\n\n",
+        "instances": {
+          "ins_1": 524.7166666666667,
+          "ins_2": 425.15,
+          "ins_3": 1188.2833333333333,
+          "ins_4": 1277.4833333333333,
+          "ins_5": 355.55,
+          "ins_6": 945.35,
+          "ins_7": 298.98333333333335,
+          "ins_8": 1370.5,
+          "ins_9": 2372.2833333333333,
+          "ins_10": 1374.9833333333333,
+          "ins_11": 742.6166666666667,
+          "ins_12": 727.05,
+          "ins_13": 1746.2833333333333,
+          "ins_14": 1092.1166666666666,
+          "ins_15": 2381.8333333333335,
+          "ins_16": 1165.6,
+          "ins_17": 1802.1833333333334,
+          "ins_18": 658.0166666666667,
+          "ins_19": 944.0166666666667,
+          "ins_20": 1183.65
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1130.9827083333334,
+        "all_scores": [
+          -1128.8325,
+          -1131.4275000000002,
+          -1131.4275000000002,
+          -1132.2433333333333
+        ]
+      }
+    },
+    {
+      "gen": 10,
+      "best_individual": {
+        "score": -1101.0433333333335,
+        "algorithm": "The new algorithm computes priority as a weighted sum of delivery time, a slack-based urgency with hyperbolic tangent decay for positive slack and exponential penalty for negative slack, a machine load factor adjusted by utilization and neighbor count, a linear processing time penalty normalized by total work, a dynamic arrival urgency based on average arrival interval and machine capacity squared, and a large epsilon to minimize tardiness, with weights 0.3, 0.35, 0.15, 0.05, 0.15 respectively.",
+        "code": "def cal_priority(status, num_neighboring_machine, processing_time, start_time, delivery_time, available_time, num_neighboring_operation, utilization, processing_tm):\n    import math\n\n    # Current time\n    current_time = start_time\n\n    # Slack calculation\n    slack = delivery_time - current_time - processing_tm\n\n    # Urgency with hyperbolic tangent decay for positive slack, exponential penalty for negative\n    if processing_tm > 0:\n        slack_ratio = slack / processing_tm\n    else:\n        slack_ratio = slack if slack != 0 else 1e-9\n\n    if slack_ratio > 0:\n        urgency = 0.5 * (1 - math.tanh(slack_ratio))  # Hyperbolic tangent decay in (0, 0.5]\n    else:\n        urgency = math.exp(-slack_ratio)  # Exponential penalty for negative slack\n\n    # Machine load factor: utilization divided by (neighbor count + 1)\n    load_factor = utilization / (num_neighboring_machine + 1.0)\n\n    # Processing time penalty linear normalized to [0, max_time]\n    max_processing = processing_tm + 1.0  # Avoid division by zero\n    processing_penalty = processing_tm / (num_neighboring_operation + max_processing + 1.0)\n\n    # Dynamic arrival urgency: factor in job arrival patterns and machine capacity squared\n    avg_arrival_interval = processing_tm if processing_tm > 0 else 1.0\n    capacity_factor = available_time * available_time + 1.0\n    arrival_urgency = 1.0 / (1.0 + avg_arrival_interval * capacity_factor)\n\n    # Large epsilon to avoid zero priority\n    epsilon = 0.1\n\n    # Weighted combination: delivery time weight 0.3, urgency 0.35, load 0.15, penalty 0.05, arrival 0.15\n    priority = (0.3 * delivery_time) + (0.35 * urgency) + (0.15 * load_factor) + (0.05 * processing_penalty) + (0.15 * arrival_urgency) + epsilon\n\n    # Ensure non-negative\n    priority = max(0.0, priority)\n\n    return priority\n\n",
+        "instances": {
+          "ins_1": 556.4666666666667,
+          "ins_2": 449.6333333333333,
+          "ins_3": 1066.85,
+          "ins_4": 1277.4833333333333,
+          "ins_5": 279.0,
+          "ins_6": 945.35,
+          "ins_7": 411.9,
+          "ins_8": 1370.5,
+          "ins_9": 2414.5666666666666,
+          "ins_10": 1053.5,
+          "ins_11": 623.15,
+          "ins_12": 732.7,
+          "ins_13": 1680.4,
+          "ins_14": 1102.2333333333333,
+          "ins_15": 2632.7833333333333,
+          "ins_16": 1151.3333333333333,
+          "ins_17": 1865.7166666666667,
+          "ins_18": 575.6666666666666,
+          "ins_19": 849.9833333333333,
+          "ins_20": 981.65
+        }
+      },
+      "pop_stats": {
+        "mean_score": -1123.1827083333335,
+        "all_scores": [
+          -1101.0433333333335,
+          -1128.8325,
+          -1131.4275000000002,
+          -1131.4275000000002
+        ]
+      }
+    }
+  ],
+  "error_count": 8,
+  "total_tokens": 186192,
+  "method": "EDR_S_random",
+  "run_id": 2,
+  "params": {
+    "pop_size": 4,
+    "iterations": 10
+  },
+  "api_calls": 132,
+  "time_elapsed": 1574.7166030406952,
+  "llm_a_calls": 132,
+  "llm_a_input_tokens": 127926,
+  "llm_a_output_tokens": 57784,
+  "llm_s_calls": 1,
+  "llm_s_input_tokens": 351,
+  "llm_s_output_tokens": 131
+}
