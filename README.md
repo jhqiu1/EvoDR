@@ -60,12 +60,3 @@ export LLM_MODEL="gpt-4o-mini"
 cd example/online_fafsp
 python run_evodr.py
 ```
-
-## Key Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `max_generations` | 20 | Number of evolutionary generations |
-| `max_sample_nums` | 200 | Total LLM call budget |
-| `pop_size` | 4-6 | Population size |
-| Temperature range | (0.3, 1.5) | Adaptive sampling temperature |
