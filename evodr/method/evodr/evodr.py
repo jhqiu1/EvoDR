@@ -46,9 +46,9 @@ class EVODR:
                  **kwargs):
         """Evolutionary of Heuristics with Dynamic Rules.
         Args:
-            llm             : an instance of 'llm4.base.LLM', which provides the way to query LLM.
-            evaluation      : an instance of 'llm4.base.Evaluator', which defines the way to calculate the score of a generated function.
-            profiler        : an instance of 'llm4.method.evodr.EVODRProfiler'. If you do not want to use it, you can pass a 'None'.
+            llm             : an instance of 'evodr.base.LLM', which provides the way to query LLM.
+            evaluation      : an instance of 'evodr.base.Evaluator', which defines the way to calculate the score of a generated function.
+            profiler        : an instance of 'evodr.method.evodr.EVODRProfiler'. If you do not want to use it, you can pass a 'None'.
             max_generations : terminate after evolving 'max_generations' generations or reach 'max_sample_nums',
                               pass 'None' to disable this termination condition.
             max_sample_nums : terminate after evaluating max_sample_nums functions (no matter the function is valid or not) or reach 'max_generations',
@@ -667,8 +667,13 @@ class EVODR:
         return [indiv for indiv in list(self._population) if self._is_valid_individual(indiv)]
 
     def _evaluate_individual(self, indiv: Function) -> bool:
-        """Evaluate individual using f1 operator (LLM-S).
-        Add opinion dict with 'evaluation' and 'suggestion' to the individual.
+        """Attach LLM-S semantic feedback (F1 operator) to an individual.
+
+        Objective fitness (indiv.score) is computed separately by the simulator
+        and is the sole basis for best-solution update, parent selection, and
+        survival selection. The opinion returned here ('evaluation' and
+        'suggestion') is only injected into the generation prompt for the next
+        offspring, and never affects fitness values or selection decisions.
         """
         try:
             # Skip LLM-S for EDR-S-none ablation

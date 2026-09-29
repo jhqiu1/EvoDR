@@ -2,7 +2,13 @@
 
 ## Overview
 
-This guide explains how to adapt the EVODR (Evolutionary of Heuristics with Dynamic Rules) method from the Online FAFSP problem to a new optimization problem. It covers both file structure changes and parameter modifications at the code level.
+This guide explains how to adapt EvoDR (Evolving Dispatching Rules) from the Online FAFSP problem to a new optimization problem. It covers both file structure changes and parameter modifications at the code level.
+
+## Transferability at Two Levels
+
+At the **framework** level, EvoDR is problem-agnostic: LLM-A generates rule code, LLM-S provides semantic feedback, elite knowledge guides the initial population, and objective fitness drives selection. This skeleton applies to any task that can be expressed as priority-based dispatching, and does not require predefined symbol sets or handcrafted search spaces.
+
+At the **domain** level, the heterogeneous-graph state features and the action space are specific to the target problem. Migrating to a new domain therefore requires re-specifying the problem description, the state features, and the action space (as detailed below); the core evolutionary framework itself remains unchanged.
 
 ---
 
@@ -12,7 +18,7 @@ This section identifies which folders and scripts need to be modified when migra
 
 ### 1. Replace Elite Rule for Population Initialization
 
-**Folder/Script to modify**: `llm4/method/evodr/evodr.py`
+**Folder/Script to modify**: `evodr/method/evodr/evodr.py`
 
 - **Exact Location**: Method `_get_edd_function()` 
 - **Related Method**: `_init_edd_baseline()` 
@@ -21,9 +27,9 @@ This section identifies which folders and scripts need to be modified when migra
 
 ### 2. Replace Evaluation Method
 
-**Folder/Script to modify**: Create a new folder under `llm4/task/optimization/` for your problem
+**Folder/Script to modify**: Create a new folder under `evodr/task/optimization/` for your problem
 
-- Current example: `llm4/task/optimization/online_fafsp/`
+- Current example: `evodr/task/optimization/online_fafsp/`
 - You need to:
   1. Create a new folder structure similar to `online_fafsp`
   2. Implement a new `evaluation.py` file with your problem's evaluation logic
@@ -41,7 +47,7 @@ This section identifies which folders and scripts need to be modified when migra
 
 ### 4. Replace Prompts and LLM Role Definitions
 
-**Folder/Script to modify**: `llm4/method/evodr/`
+**Folder/Script to modify**: `evodr/method/evodr/`
 
 - **Files**:
   - `sampler.py`: Contains LLM-A and LLM-S role descriptions
@@ -58,7 +64,7 @@ This section provides specific code locations for modifying key EVODR parameters
 
 ### 1. Temperature Parameters
 
-**File**: `llm4/method/evodr/evodr.py`
+**File**: `evodr/method/evodr/evodr.py`
 
 **Location**: In the `__init__` method
 
@@ -133,7 +139,7 @@ evodr = EVODR(
 
 ### 4. Initialization Population Size
 
-**File**: `llm4/method/evodr/evodr.py`
+**File**: `evodr/method/evodr/evodr.py`
 
 **Location**: In the `__init__` method (look for `initial_sample_nums_max`)
 
@@ -161,7 +167,7 @@ evaluation = Online_fafsp_Evaluation(
 
 ## Quick Start for New Problem
 
-1. **Create new task folder** under `llm4/task/optimization/[your_problem]/`
+1. **Create new task folder** under `evodr/task/optimization/[your_problem]/`
 2. **Implement** `evaluation.py` and `template.py` for your problem
 3. **Create run script** similar to `example/online_fafsp/run_evodr.py`
 4. **Adjust parameters** in the run script based on your problem's needs

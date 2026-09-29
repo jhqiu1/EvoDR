@@ -5,6 +5,10 @@ Code for "EvoDR: Evolving Dispatching Rules via Large Language Model for Dynamic
 > **Note:** This repository contains a partial implementation for review purposes.  
 > The complete codebase (including baseline methods, ablation scripts, and robustness evaluation) will be released upon paper acceptance.
 
+## LLM-S and Hybrid Evaluation
+
+EvoDR keeps two independent channels: objective fitness computed by the simulator is the sole basis for individual selection, while the semantic feedback produced by LLM-S only guides the generation of new rules. The `ablations/` folder contains the EDR-S variants used in the paper's ablation study; the small suggestion pool there (4 generic suggestions) is the one used for the reported Table VI results. See [`EVODR.md`](EVODR.md) for how to migrate the framework to a new problem domain.
+
 ## Repository Structure
 
 ```
