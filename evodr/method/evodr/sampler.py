@@ -258,10 +258,16 @@ class EVODRSampler:
         """
         import re
         # Try patterns like "evalution: [...]" or "suggestion: [...]"
-        patterns = [
-            rf'{field_name}\s*:\s*\[(.*?)\](?=\n|$)',
-            rf'{field_name}\s*:\s*(.*?)(?=\n\w+:|$)',
-        ]
+        # Note: the scheduling-expert prompt template uses the spelling "evalution:"
+        # (a typo), and the LLM faithfully echoes it, so we must match BOTH
+        # "evalution" and "evaluation" when looking for the evaluation field.
+        names = [field_name]
+        if field_name.lower() == 'evaluation':
+            names.append('evalution')  # the typo used in the prompt / model output
+        patterns = []
+        for nm in names:
+            patterns.append(rf'{nm}\s*:\s*\[(.*?)\](?=\n|$)')
+            patterns.append(rf'{nm}\s*:\s*(.*?)(?=\n\w+:|$)')
         
         for pattern in patterns:
             match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
