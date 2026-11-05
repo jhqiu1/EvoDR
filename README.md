@@ -1,15 +1,75 @@
-# EvoDR
+# EvoDR: Evolving Dispatching Rules via Large Language Model for Dynamic Flexible Assembly Flow Shop Scheduling
 
-Code for "EvoDR: Evolving Dispatching Rules via Large Language Model for Dynamic Flexible Assembly Flow Shop Scheduling".
+**EvoDR** automatically evolves priority dispatching rules (PDRs) for the **dynamic flexible assembly flow shop scheduling problem (FAFSP)** with dual kitting constraints — component kitting before assembly and multi-product consolidated delivery per order. A dual-expert mechanism lets **LLM-A** generate executable rule code while **LLM-S** provides scheduling-specific analysis and improvement suggestions; objective fitness remains the sole basis for selection, and semantic feedback only steers rule generation.
 
-> **Note:** This repository contains a partial implementation for review purposes.  
-> The complete codebase (including baseline methods, ablation scripts, and robustness evaluation) will be released upon paper acceptance.
+> This repository contains the core EvoDR framework with a runnable FAFSP example. The comparative AHD baselines (GP/GEP/FunSearch/EOH/MCTS-AHD/ReEvo) and the robustness datasets (24 scenarios) are not included. The `ablations/` folder contains the EDR-S variants used in the paper's ablation study; the small suggestion pool there (4 generic suggestions) is the one used for the reported Table VI results.
 
-## LLM-S and Hybrid Evaluation
+## 📖 Introduction
 
-EvoDR keeps two independent channels: objective fitness computed by the simulator is the sole basis for individual selection, while the semantic feedback produced by LLM-S only guides the generation of new rules. The `ablations/` folder contains the EDR-S variants used in the paper's ablation study; the small suggestion pool there (4 generic suggestions) is the one used for the reported Table VI results. See [`EVODR.md`](EVODR.md) for how to migrate the framework to a new problem domain.
+### 🎨 Design Paradigm
 
-## Repository Structure
+Dynamic scheduling under kitting constraints calls for real-time dispatching. Three design routes are compared:
+
+1. 👤 **Expert PDRs** (EDD, FIFO+SPT, ...) — fast and interpretable, but highly sensitive to operating conditions and degrade under high load
+2. 🔧 **GP-based automatic design** — restricted to fixed terminal sets, hard to exploit dynamic state semantics
+3. 🚀 **EvoDR (Ours)** — co-evolves rules and design knowledge in language space, adapting to dynamic scheduling features
+
+### 🏗️ EvoDR Framework
+
+- 🔥 **Elite Knowledge Guided Initialization.** An elite rule (EDD) is analyzed by LLM-S; its strengths, limitations, and improvement directions are injected into the initial population.
+- 🧠 **Dual-Expert Co-Evolution.** LLM-A generates PDRs from prompts (C1/C2/M1/M2); LLM-S evaluates rules against dynamic features and population context, returning structured suggestions.
+- ⚖️ **Hybrid Evaluation.** Two independent channels: objective fitness from the simulator (the sole basis for best-solution update, parent and survival selection) and a semantic channel from LLM-S (only injected into the next generation prompt).
+- 🔁 **Four Evolutionary Operators.** C1 dominance-fusion crossover, C2 exploratory crossover, M1 directed optimization (driven by LLM-S suggestions), M2 parameter tuning.
+
+### 📐 Problem and Scale
+
+Scheduling decisions are modeled as priority ranking of feasible job–machine pairs on a heterogeneous graph, triggered at every job completion or order arrival. Per instance:
+
+| Item | Range |
+|---|---|
+| Customer orders (incl. 20–50 dynamic arrivals) | 30–60 |
+| Products (assembly jobs) | 39–110 |
+| Component tasks | 78–250 |
+| Total jobs | 117–355 |
+| Assembly lines (main + sub) | 9–17 (3+6 to 5+12) |
+| Feasible job–machine pairs per decision step | 577–3253 |
+
+### 🏆 Key Results
+
+- **vs. AHD methods** (GP, GEP, RandSample, FunSearch, EOH, MCTS-AHD, ReEvo; 20 industrial instances, 200 samples each): average tardiness 3.17–16.81% lower; +18.63% over EDD on the test set; Friedman + Wilcoxon confirmed (all p ≤ 0.0025, Bonferroni-corrected).
+- **Robustness** (480 instances, 24 scenarios varying resource scale, flexibility, arrival volume, and load factor): best or near-best performance in the vast majority of scenarios; lowest overall average tardiness with ARI 35.62% over EDD.
+- **Cost**: ~$0.189 and 0.46M tokens per offline design run with GPT-4o-mini; online dispatching requires only a single priority ranking per decision step — no LLM calls, sub-millisecond response.
+
+## 📦 Requirements
+
+- Python >= 3.10
+- `numpy`, `pandas`, `scipy`, `matplotlib`, `PyYAML`
+- `openai` (for GPT-4o-mini or other OpenAI-compatible APIs)
+
+```bash
+pip install -r requirements.txt
+```
+
+## ⚡ Quick Start
+
+1. **Set your LLM credentials**:
+
+```bash
+export LLM_API_KEY="your-api-key"
+export LLM_BASE_URL="https://api.openai.com/v1"
+export LLM_MODEL="gpt-4o-mini"
+```
+
+2. **Run EvoDR**:
+
+```bash
+cd example/online_fafsp
+python run_evodr.py
+```
+
+The run executes elite-guided initialization and co-evolution on the bundled 20-instance FAFSP set (`data_test/m13-m26-f0.5-arrive20-u1.txt`). See [`EVODR.md`](EVODR.md) for how to migrate the framework to a new problem domain.
+
+## 📁 Repository Structure
 
 ```
 evodr/
@@ -22,45 +82,40 @@ evodr/
 │   ├── prompt_sche.py  # LLM-S evaluation prompt design
 │   ├── sampler.py      # LLM sampling and response parsing
 │   ├── profiler.py     # Experiment logging
-│   └── ablations/      # Ablation variants
+│   └── ablations/      # Ablation variants (EDR-C/E/M/DE/D/S series)
 ├── task/optimization/online_fafsp/  # Scheduling simulator
 │   ├── schedule.py     # Event-driven scheduler
-│   ├── state.py        # System state (heterogeneous graph MDP)
+│   ├── state.py        # System state (heterogeneous graph MDP, 9 features)
 │   ├── evaluation.py   # Fitness evaluation
 │   ├── get_instance.py # Data loading
 │   ├── heuristic.py    # Classical PDR baselines
 │   └── template.py     # PDR code template
-└── tools/              # Utilities
+└── tools/
     ├── llm/            # LLM API wrappers (OpenAI, vLLM, Ollama)
     └── profiler/       # Logging profilers
 
 example/online_fafsp/
 ├── run_evodr.py        # Main run script
-└── data_test/          # Small-scale test instance
+└── data_test/          # Bundled instance set (20 instances)
 ```
 
-## Requirements
+## 🔖 Citation
 
-- Python >= 3.10
-- numpy, pandas, scipy, matplotlib, PyYAML
-- openai (for GPT-4o-mini or other OpenAI-compatible APIs)
+If you find EvoDR helpful for your research or applied projects, please cite:
 
-Install:
-```bash
-pip install -r requirements.txt
+```bibtex
+@article{qiu2026evodr,
+  title={EvoDR: Evolving Dispatching Rules via Large Language Model for Dynamic Flexible Assembly Flow Shop Scheduling},
+  author={Qiu, Junhao and Zhuang, Haoyang and Liu, Fei and Liu, Jianjun and Zhang, Qingfu},
+  journal={IEEE Transactions on Evolutionary Computation},
+  year={2026}
+}
 ```
 
-## Quick Start
+If you are interested in LLM-based automatic heuristic design, you can also check [E2OC](https://github.com/jhqiu1/E2OC) and [LLM4AD](https://github.com/Optima-CityU/LLM4AD).
 
-1. **Set your LLM credentials** (via environment variables):
-```bash
-export LLM_API_KEY="your-api-key"
-export LLM_BASE_URL="https://api.openai.com/v1"
-export LLM_MODEL="gpt-4o-mini"
-```
+If you encounter any difficulty using the code, please contact [junhaoqiu2-c@my.cityu.edu.hk](mailto:junhaoqiu2-c@my.cityu.edu.hk) or submit an issue.
 
-2. **Run EvoDR**:
-```bash
-cd example/online_fafsp
-python run_evodr.py
-```
+## 📜 License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
