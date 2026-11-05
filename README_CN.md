@@ -1,4 +1,10 @@
-# EvoDR：基于大语言模型的动态柔性装配流水车间调度规则自动设计
+<div align="center">
+
+# ⚡ EvoDR
+
+### 一个会自己设计调度规则的调度专家。
+
+**在语言空间里进化，而不是在符号树里搜索。**
 
 [![IEEE TEVC](https://img.shields.io/badge/IEEE%20TEVC-2026-blue)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -6,47 +12,64 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2601.15738-b31b1b.svg)](https://arxiv.org/abs/2601.15738)
 [![English](https://img.shields.io/badge/English-README-blue.svg)](README.md)
 
-**EvoDR** 用 LLM 自动设计动态柔性装配流水车间的调度规则。订单持续到达，每个订单包含多个产品，要所有部件和产品全部齐套才能交付。框架里有两个 LLM 各司其职：一个写规则，另一个调度专家（**LLM-S**）盯着进化中的种群，指出哪好哪不好、下一步该往哪走。
+</div>
 
-这个思路——让写代码的 LLM 和懂领域的 LLM 配对，把搜索结果翻译成可执行的引导——并不绑定在这一个问题上。它可以搬到其他复杂排产问题，也可以搬到一般的算法设计任务：模拟器决定谁留下，领域专家决定接下来试什么。
+订单随时在来，每一单都要所有部件、所有产品齐套才能交付。手工设计调度规则是一场打不赢的仗，GP 式的自动设计又困在符号树里出不来。
 
-📄 [IEEE Transactions on Evolutionary Computation, 2026](https://arxiv.org/abs/2601.15738)
+**EvoDR 派两个 LLM 上场：**
+
+> 🧠 **一个写规则，一个看产线。**
+> LLM-A 生成可执行的规则；**LLM-S** 作为调度专家，盯着进化中的种群，指出谁在干活、谁是死重，引导下一代往哪走。
+>
+> *模拟器决定谁活下来，专家决定接下来试什么。*
+
+进化出来的规则**亚毫秒**响应、在线**零** LLM 调用、设计成本**只要 $0.189**。
+
+<div align="center">
+
+| 🏆 干翻 7 个 AHD 基线 | 📊 480 实例 · 24 工况 | 💸 $0.189 一次设计 | ⚡ <1 ms 每次决策 |
+|---|---|---|---|
+
+</div>
+
+📄 **[IEEE Transactions on Evolutionary Computation, 2026](https://arxiv.org/abs/2601.15738)**
 
 <p align="center"><img src="docs/figures/framework.png" width="95%" alt="EvoDR 框架图"></p>
 
-## 📖 工作原理
+## 🧠 核心思想
 
-**从专家规则出发，不从零开始。** 初始化以经典规则（EDD）为种子：LLM-S 分析它在当前环境下的优劣势，第一代种群围绕这些发现生成。
+现有的 LLM 算法设计回路都只向模型要**代码**。EvoDR 多要了一样东西：**判断力**。第二个领域专家 LLM 观察整个搜索过程，读最好的和最差的规则，把干巴巴的适应度数字翻译成语义引导——"这条规则饿死了总装工位"、"那个权重没在干活"。
 
-**四个算子进化。** C1 融合两个父代规则的长处；C2 要求生成和现有规则完全不同的东西；M1 把 LLM-S 的建议落成代码改动；M2 在好规则上调参数。探索与利用的平衡发生在语言空间里，而不是 GP 那种固定符号空间。
+这些引导不碰选择，只塑造下一代生成什么。这个模式可以装进任何 LLM 驱动的算法设计回路，适配任何复杂排产或优化问题。
 
-**让专家说话，但不让专家掌权。** LLM-S 结合车间动态状态和种群里最好/最差的表现来评估规则，返回结构化建议。模拟器算的分数决定选择，建议只决定下一代生成什么。
+## ⚙️ 进化回路
 
-## 🏆 结果
-
-- 20 个工业实例上，EvoDR 进化出的规则优于 GP、GEP、RandSample、FunSearch、EOH、MCTS-AHD 和 ReEvo——平均拖期低 3.17–16.81%，测试集上比 EDD 高 18.63%。
-- 480 个实例、24 个工况（产线从 3+6 到 5+12、到达订单 20–50、负载因子 1–4），EvoDR 始终保持最优或接近最优，总体相对 EDD 的 ARI 为 35.62%。
-- 整个离线设计用 GPT-4o-mini 只花约 $0.189。规则部署后完全不调 LLM——每个决策步做一次优先级排序，亚毫秒。
+- 🔥 **从 EDD 冷启动** —— LLM-S 解剖一条经典规则，第一代种群围绕它的短板生成
+- 🔀 **四个算子** —— C1 融合父代长处 · C2 要求完全不同 · M1 把专家建议写成代码 · M2 重调权重
+- 🏁 **部署即忘** —— 进化出的规则就是一个优先级函数：每个决策步对 577–3253 个作业–产线配对排序，运行时不带任何模型
 
 <p align="center"><img src="docs/figures/convergence_analysis.png" width="75%" alt="收敛分析"></p>
-<p align="center">每一次下降都是一次被 LLM-S 反馈引导的改进：200 次采样内做到 7371.61，EDD 为 8909.21。</p>
+<p align="center"><em>每一次下降都是一次被专家引导的规则改进：200 次采样内 7371.61，EDD 为 8909.21。</em></p>
 
-## 📐 问题规模
+## 📊 数字说话
 
-单个算例：30–60 个订单（其中 20–50 个动态到达）、39–110 个产品、共 117–355 个作业、9–17 条产线，每个决策步要对 577–3253 个可行的作业–产线配对排序。
+| 战场 | 结果 |
+|---|---|
+| 对阵 GP · GEP · RandSample · FunSearch · EOH · MCTS-AHD · ReEvo（20 个工业实例） | 平均拖期低 **3.17–16.81%**，测试集比 EDD 高 18.63% |
+| 鲁棒性：24 工况、480 实例（3+6 → 5+12 产线、20–50 到达、负载 1–4×） | 始终最优或接近最优，总体 ARI **35.62%** |
+| 一次完整设计（GPT-4o-mini） | **$0.189**，0.46M tokens |
+| 在线调度 | **< 1 ms**，零 LLM 调用 |
+| 显著性 | Friedman + Wilcoxon，全部 p ≤ 0.0025（Bonferroni 校正） |
 
-## ⚡ 快速开始
+## 🚀 快速开始
 
 ```bash
 pip install -r requirements.txt
-export LLM_API_KEY="your-api-key"
-export LLM_BASE_URL="https://api.openai.com/v1"
-export LLM_MODEL="gpt-4o-mini"
-cd example/online_fafsp
-python run_evodr.py
+export LLM_API_KEY="your-api-key" LLM_BASE_URL="https://api.openai.com/v1" LLM_MODEL="gpt-4o-mini"
+cd example/online_fafsp && python run_evodr.py
 ```
 
-这会在内置的 20 实例数据集上跑完整流程。想把 EvoDR 搬到自己的问题上，看 [`EVODR.md`](EVODR.md)：定义好状态特征、动作空间，以及你的领域专家该看什么。
+想把 EvoDR 搬到自己的问题：定义状态、动作，以及你的领域专家该看什么——[`EVODR.md`](EVODR.md) 有完整迁移指南。
 
 ## 🔖 引用
 
@@ -60,9 +83,7 @@ python run_evodr.py
 }
 ```
 
-我们组的其他工作：[E2OC](https://github.com/jhqiu1/E2OC)（多目标进化算法的算子协同设计）、[LLM4AD](https://github.com/Optima-CityU/LLM4AD)（平台）。
-
-有问题或建议：[junhaoqiu2-c@my.cityu.edu.hk](mailto:junhaoqiu2-c@my.cityu.edu.hk)
+我们组的其他工作：[E2OC](https://github.com/jhqiu1/E2OC) · [LLM4AD](https://github.com/Optima-CityU/LLM4AD) · [junhaoqiu2-c@my.cityu.edu.hk](mailto:junhaoqiu2-c@my.cityu.edu.hk)
 
 ## 📜 许可证
 
