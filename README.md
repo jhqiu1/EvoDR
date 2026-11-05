@@ -1,5 +1,14 @@
 # EvoDR: Evolving Dispatching Rules via Large Language Model for Dynamic Flexible Assembly Flow Shop Scheduling
 
+[![IEEE TEVC](https://img.shields.io/badge/IEEE%20TEVC-2026-blue)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Release](https://img.shields.io/badge/Release-v1.0.0-green.svg)](https://github.com/jhqiu1/EvoDR/releases)
+[![arXiv](https://img.shields.io/badge/arXiv-2601.15738-b31b1b.svg)](https://arxiv.org/abs/2601.15738)
+[![中文](https://img.shields.io/badge/中文-README-ff69b4.svg)](README_CN.md)
+<!-- Once available, enable:
+[![Website](https://img.shields.io/badge/Website-EvoDR-8A2BE2.svg)](https://jhqiu1.github.io/evodr)
+-->
+
 **EvoDR** automatically evolves priority dispatching rules (PDRs) for the **dynamic flexible assembly flow shop scheduling problem (FAFSP)** with dual kitting constraints — component kitting before assembly and multi-product consolidated delivery per order. A dual-expert mechanism lets **LLM-A** generate executable rule code while **LLM-S** provides scheduling-specific analysis and improvement suggestions; objective fitness remains the sole basis for selection, and semantic feedback only steers rule generation.
 
 > This repository contains the core EvoDR framework with a runnable FAFSP example. The comparative AHD baselines (GP/GEP/FunSearch/EOH/MCTS-AHD/ReEvo) and the robustness datasets (24 scenarios) are not included. The `ablations/` folder contains the EDR-S variants used in the paper's ablation study; the small suggestion pool there (4 generic suggestions) is the one used for the reported Table VI results.
@@ -21,6 +30,9 @@ Dynamic scheduling under kitting constraints calls for real-time dispatching. Th
 - ⚖️ **Hybrid Evaluation.** Two independent channels: objective fitness from the simulator (the sole basis for best-solution update, parent and survival selection) and a semantic channel from LLM-S (only injected into the next generation prompt).
 - 🔁 **Four Evolutionary Operators.** C1 dominance-fusion crossover, C2 exploratory crossover, M1 directed optimization (driven by LLM-S suggestions), M2 parameter tuning.
 
+<p align="center"><img src="docs/figures/framework.png" width="95%" alt="EvoDR framework"></p>
+<p align="center"><em>Overview of the EvoDR framework for dynamic FAFSP: initialization, hybrid evaluation, and co-evolution.</em></p>
+
 ### 📐 Problem and Scale
 
 Scheduling decisions are modeled as priority ranking of feasible job–machine pairs on a heterogeneous graph, triggered at every job completion or order arrival. Per instance:
@@ -39,6 +51,9 @@ Scheduling decisions are modeled as priority ranking of feasible job–machine p
 - **vs. AHD methods** (GP, GEP, RandSample, FunSearch, EOH, MCTS-AHD, ReEvo; 20 industrial instances, 200 samples each): average tardiness 3.17–16.81% lower; +18.63% over EDD on the test set; Friedman + Wilcoxon confirmed (all p ≤ 0.0025, Bonferroni-corrected).
 - **Robustness** (480 instances, 24 scenarios varying resource scale, flexibility, arrival volume, and load factor): best or near-best performance in the vast majority of scenarios; lowest overall average tardiness with ARI 35.62% over EDD.
 - **Cost**: ~$0.189 and 0.46M tokens per offline design run with GPT-4o-mini; online dispatching requires only a single priority ranking per decision step — no LLM calls, sub-millisecond response.
+
+<p align="center"><img src="docs/figures/convergence_analysis.png" width="75%" alt="Convergence analysis"></p>
+<p align="center"><em>Evolution process with LLM-S feedback: each drop corresponds to an accepted rule improvement, reaching 7371.61 versus EDD's 8909.21 within 200 samples.</em></p>
 
 ## 📦 Requirements
 
@@ -108,7 +123,8 @@ If you find EvoDR helpful for your research or applied projects, please cite:
   title={EvoDR: Evolving Dispatching Rules via Large Language Model for Dynamic Flexible Assembly Flow Shop Scheduling},
   author={Qiu, Junhao and Zhuang, Haoyang and Liu, Fei and Liu, Jianjun and Zhang, Qingfu},
   journal={IEEE Transactions on Evolutionary Computation},
-  year={2026}
+  year={2026},
+  note={arXiv:2601.15738}
 }
 ```
 
