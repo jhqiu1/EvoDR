@@ -6,7 +6,9 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2601.15738-b31b1b.svg)](https://arxiv.org/abs/2601.15738)
 [![English](https://img.shields.io/badge/English-README-blue.svg)](README.md)
 
-**EvoDR** 面向带**双成套约束**（部件齐套 + 多产品整单齐套交付）的**动态柔性装配流水车间调度问题（FAFSP）**，自动演化优先调度规则（PDR）。框架采用双专家机制：**LLM-A** 生成可执行的规则代码，**LLM-S** 提供调度领域的分析与改进建议；目标适应度是选择的唯一依据，语义反馈只引导规则生成。
+**EvoDR** 面向带**双成套约束**（部件齐套 + 多产品整单齐套交付）的**动态柔性装配流水车间调度问题（FAFSP）**，自动演化优先调度规则（PDR）。核心思想：**在模拟器返回的目标适应度之外，额外引入调度专家 LLM（LLM-S）提供结构化语义引导**（规则分析、局限与改进方向），用于引导规则生成——适应度仍是选择的唯一依据，语义反馈只引导生成。这一「适应度负责选择、领域语义负责引导」的双通道模式不限于 FAFSP，可推广到其他复杂排产问题乃至一般算法设计任务。
+
+📄 论文：[IEEE Transactions on Evolutionary Computation, 2026](https://arxiv.org/abs/2601.15738) · 预印本：[arXiv:2601.15738](https://arxiv.org/abs/2601.15738)
 
 > 本仓库包含 EvoDR 核心框架与一个可直接运行的 FAFSP 算例。对比的 AHD 基线方法（GP/GEP/FunSearch/EOH/MCTS-AHD/ReEvo）与鲁棒性实验数据（24 个工况）未包含。`ablations/` 目录包含论文消融实验的 EDR-S 系列变体，其中的小建议池（4 条通用建议）即论文 Table VI 所用版本。
 
@@ -27,6 +29,10 @@
 
 <p align="center"><img src="docs/figures/framework.png" width="95%" alt="EvoDR 框架图"></p>
 <p align="center"><em>EvoDR 框架总览：初始化、混合评估与协同进化。</em></p>
+
+### 🔭 可推广性
+
+核心机制与具体问题无关：**任何基于 LLM 的算法设计循环，都可以增加一个领域专家 LLM，让它读取种群、把数值结果转化为可执行的语义引导**，而完全不触碰适应度与选择。消融实验表明，LLM-S 的调度专用反馈提供了随机建议（多样性）之外的定向价值。迁移到新问题域（重新定义状态特征、动作空间与领域专家提示）参见 [`EVODR.md`](EVODR.md)。
 
 ### 📐 问题与规模
 

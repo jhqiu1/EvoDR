@@ -9,7 +9,9 @@
 [![Website](https://img.shields.io/badge/Website-EvoDR-8A2BE2.svg)](https://jhqiu1.github.io/evodr)
 -->
 
-**EvoDR** automatically evolves priority dispatching rules (PDRs) for the **dynamic flexible assembly flow shop scheduling problem (FAFSP)** with dual kitting constraints — component kitting before assembly and multi-product consolidated delivery per order. A dual-expert mechanism lets **LLM-A** generate executable rule code while **LLM-S** provides scheduling-specific analysis and improvement suggestions; objective fitness remains the sole basis for selection, and semantic feedback only steers rule generation.
+**EvoDR** automatically evolves priority dispatching rules (PDRs) for the **dynamic flexible assembly flow shop scheduling problem (FAFSP)** with dual kitting constraints — component kitting before assembly and multi-product consolidated delivery per order. Its key idea: **beyond the objective fitness returned by the simulator, a scheduling-expert LLM (LLM-S) is additionally asked to provide structured semantic guidance** (rule analysis, limitations, and improvement directions) that steers rule generation. Objective fitness remains the sole basis for selection; semantic feedback only guides generation. This dual-channel pattern — *fitness for selection, domain-expert semantics for guidance* — is not specific to FAFSP and can be transferred to other complex production scheduling problems or general algorithm design tasks.
+
+📄 Paper: [IEEE Transactions on Evolutionary Computation, 2026](https://arxiv.org/abs/2601.15738) · Preprint: [arXiv:2601.15738](https://arxiv.org/abs/2601.15738)
 
 > This repository contains the core EvoDR framework with a runnable FAFSP example. The comparative AHD baselines (GP/GEP/FunSearch/EOH/MCTS-AHD/ReEvo) and the robustness datasets (24 scenarios) are not included. The `ablations/` folder contains the EDR-S variants used in the paper's ablation study; the small suggestion pool there (4 generic suggestions) is the one used for the reported Table VI results.
 
@@ -32,6 +34,10 @@ Dynamic scheduling under kitting constraints calls for real-time dispatching. Th
 
 <p align="center"><img src="docs/figures/framework.png" width="95%" alt="EvoDR framework"></p>
 <p align="center"><em>Overview of the EvoDR framework for dynamic FAFSP: initialization, hybrid evaluation, and co-evolution.</em></p>
+
+### 🔭 Generalization
+
+The core mechanism is problem-agnostic: **any LLM-based algorithm design loop can be augmented with a second domain-expert LLM that reads the population and turns numerical results into actionable semantic guidance**, without ever touching fitness or selection. Ablations confirm the scheduling-specific feedback of LLM-S adds directed value beyond the diversity that random suggestions already provide. See [`EVODR.md`](EVODR.md) for migrating the framework to a new problem domain (redefine state features, action space, and the domain-expert prompt).
 
 ### 📐 Problem and Scale
 
